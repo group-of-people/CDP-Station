@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Maker from "@makerdao/dai";
+import CDPList from './CDPList'
 import getWeb3 from "./utils/getWeb3";
 import logo from "./logo.svg";
 import "./App.css";
@@ -55,6 +56,7 @@ class App extends Component {
         <div>Logged in as {this.state.account}</div>
         <div>{this.state.ethPrice}</div>
         <div>{this.state.mkrPrice}</div>
+        {this.state.account && <CDPList address={this.state.account} />}
       </div>
     );
   }
