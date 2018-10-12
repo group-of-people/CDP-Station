@@ -18,13 +18,6 @@ module.exports = {
       host: 'localhost',
       port: 8545,
       network_id: '*'
-    },
-    rinkeby: {
-      provider: function() {
-        return new HDWalletProvider(mnemonic, 'https://rinkeby.infura.io/mXHEyD5OI3wXAnDE6uT4')
-      },
-      network_id: 4,
-      gasPrice: 6000000000
-    } 
+    }
   }
 };
