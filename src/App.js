@@ -1,9 +1,8 @@
 import React, { Component } from "react";
 import Maker from "@makerdao/dai";
+import { Container } from 'semantic-ui-react'
 import CDPList from './CDPList'
 import getWeb3 from "./utils/getWeb3";
-import logo from "./logo.svg";
-import "./App.css";
 
 const maker = Maker.create("browser");
 
@@ -47,9 +46,8 @@ class App extends Component {
 
   render() {
     return (
-      <div className="App">
+      <Container>
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Settle Maker</h1>
         </header>
         {!this.state.account && 'Loading...'}
@@ -57,7 +55,7 @@ class App extends Component {
         <div>{this.state.ethPrice}</div>
         <div>{this.state.mkrPrice}</div>
         {this.state.account && <CDPList address={this.state.account} />}
-      </div>
+      </Container>
     );
   }
 }
