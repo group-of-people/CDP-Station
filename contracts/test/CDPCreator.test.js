@@ -34,7 +34,7 @@ contract('CDPCreator', (accounts) => {
             });
         });
 
-        it('should not create a CDP and draw a fuckton of dai', async () => {
+        it('should not create a CDP and draw a lot of dai', async () => {
             await cdpCreator.createCDP(min, dai*200, { value: min, from: accounts[0]}).should.be.fulfilled;
             await cdpCreator.createCDP(min, dai*100, { value: min, from: accounts[0]}).should.be.rejected;
         })
