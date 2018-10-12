@@ -6,4 +6,4 @@ To run:
 
 `npm start`
 
-Then go to http://localhost:port, with port being the port you're running from, default is 80.
+Then go to http://localhost:port, with port being the port you're running from, default is 3000.
