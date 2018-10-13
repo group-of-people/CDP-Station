@@ -25,30 +25,34 @@ class App extends Component {
   initializeAccount = async () => {
     // Get network provider and web3 instance.
     // See utils/getWeb3 for more info.
+    let web3, accs;
     try {
-      const web3 = await getWeb3;
-      const accs = await web3.eth.getAccounts();
+      web3 = await getWeb3;
+      accs = await web3.eth.getAccounts();
       if (accs.length === 0) {
         this.setState({ account: "" });
         return;
       }
       if (accs[0] === this.state.account) return;
-      this.setState({ account: accs[0], web3 });
     } catch (e) {
       console.log(e, "Error finding web3.");
+      return;
     }
 
     try {
       await maker.authenticate();
       const priceService = maker.service("price");
-      const [ethPrice, mkrPrice] = await Promise.all([
+      const [ethPrice, mkrPrice, wethToPeth] = await Promise.all([
         priceService.getEthPrice(),
-        priceService.getMkrPrice()
+        priceService.getMkrPrice(),
+        priceService.getWethToPethRatio()
       ]);
-
       this.setState({
-        ethPrice: ethPrice.toString(),
-        mkrPrice: mkrPrice.toString()
+        account: accs[0],
+        web3,
+        ethPrice: ethPrice,
+        mkrPrice: mkrPrice,
+        wethToPeth
       });
     } catch (e) {
       console.log(e, "Failed to initialize maker");
@@ -74,10 +78,15 @@ class App extends Component {
     return (
       <>
         <div>Logged in as {this.state.account}</div>
-        <div>{this.state.ethPrice}</div>
-        <div>{this.state.mkrPrice}</div>
+        <div>{this.state.ethPrice.toString()}</div>
+        <div>{this.state.mkrPrice.toString()}</div>
         {this.state.account && (
-          <CDPList key={this.state.account} address={this.state.account} />
+          <CDPList
+            key={this.state.account}
+            address={this.state.account}
+            wethToPeth={this.state.wethToPeth}
+            ethPrice={this.state.ethPrice}
+          />
         )}
       </>
     );
