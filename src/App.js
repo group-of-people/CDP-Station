@@ -42,17 +42,20 @@ class App extends Component {
     try {
       await maker.authenticate();
       const priceService = maker.service("price");
-      const [ethPrice, mkrPrice, wethToPeth] = await Promise.all([
+      const cdpService = maker.service("cdp")
+      const [ethPrice, mkrPrice, wethToPeth, liquidationRatio] = await Promise.all([
         priceService.getEthPrice(),
         priceService.getMkrPrice(),
-        priceService.getWethToPethRatio()
+        priceService.getWethToPethRatio(),
+        cdpService.getLiquidationRatio()
       ]);
       this.setState({
         account: accs[0],
         web3,
         ethPrice: ethPrice,
         mkrPrice: mkrPrice,
-        wethToPeth
+        wethToPeth,
+        liquidationRatio
       });
     } catch (e) {
       console.log(e, "Failed to initialize maker");
@@ -80,12 +83,14 @@ class App extends Component {
         <div>Logged in as {this.state.account}</div>
         <div>{this.state.ethPrice.toString()}</div>
         <div>{this.state.mkrPrice.toString()}</div>
+        <div>Liquidation Ratio: {this.state.liquidationRatio}</div>
         {this.state.account && (
           <CDPList
             key={this.state.account}
             address={this.state.account}
             wethToPeth={this.state.wethToPeth}
             ethPrice={this.state.ethPrice}
+            liquidationRation={this.state.liquidationRatio}
           />
         )}
       </>

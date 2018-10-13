@@ -42,9 +42,11 @@ export default class CDPList extends Component {
         <Table celled>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>CDP Id</Table.HeaderCell>
+              <Table.HeaderCell>CDP</Table.HeaderCell>
               <Table.HeaderCell>Debt</Table.HeaderCell>
-              <Table.HeaderCell>Collateral</Table.HeaderCell>
+              <Table.HeaderCell>DAI Available</Table.HeaderCell>
+              <Table.HeaderCell>Collateral ETH</Table.HeaderCell>
+              <Table.HeaderCell>Collateral DAI</Table.HeaderCell>
               {details && (
                 <>
                   <Table.HeaderCell>WETH/PETH</Table.HeaderCell>
@@ -56,19 +58,16 @@ export default class CDPList extends Component {
           <Table.Body>
             {this.state.cdps.map(cdp => (
               <Table.Row>
-                <Table.Cell>
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={`https://mkr.tools/cdp/${cdp.id}`}
-                  >
-                    {cdp.id}
-                  </a>
-                </Table.Cell>
+                <Table.Cell>#{cdp.id}</Table.Cell>
                 <Table.Cell>{cdp.daiDebt.toString(4)}</Table.Cell>
                 <Table.Cell>
-                  {this.getLockedEth(cdp)}({this.getLockedDai(cdp)})
+                  {(
+                    this.getLockedDai(cdp) / this.props.liquidationRation -
+                    cdp.daiDebt.toNumber()
+                  ).toFixed(4)} DAI
                 </Table.Cell>
+                <Table.Cell>{this.getLockedEth(cdp).toFixed(4)} ETH</Table.Cell>
+                <Table.Cell>{this.getLockedDai(cdp).toFixed(4)} DAI</Table.Cell>
                 {details && (
                   <>
                     <Table.Cell>{this.props.wethToPeth.toFixed(4)}</Table.Cell>
@@ -84,18 +83,14 @@ export default class CDPList extends Component {
   }
 
   getLockedEth(cdp) {
-    return (
-      (cdp.pethLocked.toNumber() * this.props.wethToPeth).toFixed(4) + "  ETH"
-    );
+    return cdp.pethLocked.toNumber() * this.props.wethToPeth;
   }
 
   getLockedDai(cdp) {
     return (
-      (
-        cdp.pethLocked.toNumber() *
-        this.props.wethToPeth *
-        this.props.ethPrice.toNumber()
-      ).toFixed(4) + " DAI"
+      cdp.pethLocked.toNumber() *
+      this.props.wethToPeth *
+      this.props.ethPrice.toNumber()
     );
   }
 
