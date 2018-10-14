@@ -37,7 +37,7 @@ contract CDPCreator {
         tub.give(cupID, msg.sender);
         dai.transfer(msg.sender, amountDAI);
 
-        weth.transfer(msg.sender, (amountETH - pethAmount));
+        //weth.transfer(msg.sender, (amountETH - pethAmount));
 
         emit CDPCreated(cupID, msg.sender, amountDAI);
     }
