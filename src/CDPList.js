@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Maker from "@makerdao/dai";
-import { Table } from 'semantic-ui-react'
+import { Container, Table, Checkbox } from "semantic-ui-react";
 
 const { DAI, PETH } = Maker;
 
@@ -14,7 +14,8 @@ function humanizeCDPResponse(cdp) {
 
 export default class CDPList extends Component {
   state = {
-    cdps: []
+    cdps: [],
+    details: false
   };
   async componentDidMount() {
     const result = await fetch(
@@ -27,33 +28,73 @@ export default class CDPList extends Component {
   }
 
   render() {
+    const { details } = this.state;
     return (
-      <Table celled>
-        <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell>CDP Id</Table.HeaderCell>
-            <Table.HeaderCell>Debt</Table.HeaderCell>
-            <Table.HeaderCell>PETH locked</Table.HeaderCell>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {this.state.cdps.map(cdp => (
+      <>
+        <Container textAlign="right">
+          <Checkbox
+            toggle
+            label={"Details"}
+            checked={details}
+            onChange={this.onDetailsChange}
+          />
+        </Container>
+        <Table celled>
+          <Table.Header>
             <Table.Row>
-              <Table.Cell>
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href={`https://mkr.tools/cdp/${cdp.id}`}
-                >
-                  {cdp.id}
-                </a>
-              </Table.Cell>
-              <Table.Cell>{cdp.daiDebt.toString(6)}</Table.Cell>
-              <Table.Cell>{cdp.pethLocked.toString(6)}</Table.Cell>
+              <Table.HeaderCell>CDP</Table.HeaderCell>
+              <Table.HeaderCell>Debt</Table.HeaderCell>
+              <Table.HeaderCell>DAI Available</Table.HeaderCell>
+              <Table.HeaderCell>Collateral ETH</Table.HeaderCell>
+              <Table.HeaderCell>Collateral DAI</Table.HeaderCell>
+              {details && (
+                <>
+                  <Table.HeaderCell>WETH/PETH</Table.HeaderCell>
+                  <Table.HeaderCell>PETH locked</Table.HeaderCell>
+                </>
+              )}
             </Table.Row>
-          ))}
-        </Table.Body>
-      </Table>
+          </Table.Header>
+          <Table.Body>
+            {this.state.cdps.map(cdp => (
+              <Table.Row>
+                <Table.Cell>#{cdp.id}</Table.Cell>
+                <Table.Cell>{cdp.daiDebt.toString(4)}</Table.Cell>
+                <Table.Cell>
+                  {(
+                    this.getLockedDai(cdp) / this.props.liquidationRation -
+                    cdp.daiDebt.toNumber()
+                  ).toFixed(4)} DAI
+                </Table.Cell>
+                <Table.Cell>{this.getLockedEth(cdp).toFixed(4)} ETH</Table.Cell>
+                <Table.Cell>{this.getLockedDai(cdp).toFixed(4)} DAI</Table.Cell>
+                {details && (
+                  <>
+                    <Table.Cell>{this.props.wethToPeth.toFixed(4)}</Table.Cell>
+                    <Table.Cell>{cdp.pethLocked.toString(4)}</Table.Cell>
+                  </>
+                )}
+              </Table.Row>
+            ))}
+          </Table.Body>
+        </Table>
+      </>
     );
   }
+
+  getLockedEth(cdp) {
+    return cdp.pethLocked.toNumber() * this.props.wethToPeth;
+  }
+
+  getLockedDai(cdp) {
+    return (
+      cdp.pethLocked.toNumber() *
+      this.props.wethToPeth *
+      this.props.ethPrice.toNumber()
+    );
+  }
+
+  onDetailsChange = () => {
+    this.setState({ details: !this.state.details });
+  };
 }
