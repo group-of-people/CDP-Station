@@ -11,6 +11,9 @@
  *     gasPrice: 10000000000,
  *   },
  */
+var HDWalletProvider = require('truffle-hdwallet-provider');
+
+const mnemonic = '';
 
 module.exports = {
   networks: {
@@ -18,6 +21,13 @@ module.exports = {
       host: 'localhost',
       port: 8545,
       network_id: '*'
-    }
+    },
+    mainnet: {
+      provider: function() { 
+        return new HDWalletProvider(mnemonic, 'https://mainnet.infura.io/') 
+      },
+      network_id: '1',
+      gasPrice: 4000000000,
+    },
   }
 };
