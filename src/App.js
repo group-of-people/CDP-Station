@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Maker from "@makerdao/dai";
 import { Container, Loader } from "semantic-ui-react";
-import CDPList from "./CDPList";
+import CDPList from "./cdp/List";
 import getWeb3 from "./utils/getWeb3";
 
 const maker = Maker.create("browser");
@@ -42,8 +42,13 @@ class App extends Component {
     try {
       await maker.authenticate();
       const priceService = maker.service("price");
-      const cdpService = maker.service("cdp")
-      const [ethPrice, mkrPrice, wethToPeth, liquidationRatio] = await Promise.all([
+      const cdpService = maker.service("cdp");
+      const [
+        ethPrice,
+        mkrPrice,
+        wethToPeth,
+        liquidationRatio
+      ] = await Promise.all([
         priceService.getEthPrice(),
         priceService.getMkrPrice(),
         priceService.getWethToPethRatio(),

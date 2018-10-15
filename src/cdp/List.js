@@ -1,21 +1,30 @@
 import React, { Component } from "react";
 import Maker from "@makerdao/dai";
-import { Container, Table, Checkbox } from "semantic-ui-react";
+import { Icon, Table, Card } from "semantic-ui-react";
+import CDPCard from "./Card";
 
 const { DAI, PETH } = Maker;
 
-function humanizeCDPResponse(cdp) {
+function humanizeCDPResponse(cdp, props) {
+  const pethLocked = PETH.wei(cdp.ink);
+  const daiDebt = DAI.wei(cdp.art);
+  const daiLocked =
+    pethLocked.toNumber() * props.wethToPeth * props.ethPrice.toNumber();
+  const daiAvailable = daiLocked / props.liquidationRation - daiDebt.toNumber();
+
   return {
     id: cdp.cupi,
-    daiDebt: DAI.wei(cdp.art),
-    pethLocked: PETH.wei(cdp.ink)
+    daiAvailable,
+    daiDebt,
+    daiLocked,
+    pethLocked,
+    ethLocked: pethLocked.toNumber() * props.wethToPeth
   };
 }
 
 export default class CDPList extends Component {
   state = {
-    cdps: [],
-    details: false
+    cdps: []
   };
   async componentDidMount() {
     const result = await fetch(
@@ -23,22 +32,40 @@ export default class CDPList extends Component {
     );
     const response = await result.json();
     this.setState({
-      cdps: response.results.map(cdp => humanizeCDPResponse(cdp))
+      cdps: response.results.map(cdp => humanizeCDPResponse(cdp, this.props))
     });
   }
 
   render() {
-    const { details } = this.state;
+    const details = true;
     return (
       <>
-        <Container textAlign="right">
-          <Checkbox
-            toggle
-            label={"Details"}
-            checked={details}
-            onChange={this.onDetailsChange}
-          />
-        </Container>
+        <Card.Group>
+          {this.state.cdps.map(cdp => (
+            <CDPCard key={cdp.id} cdp={cdp} />
+          ))}
+          <Card onClick={() => {}}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: 200
+              }}
+            >
+              <Icon name="add circle" size="massive" color={"yellow"} />
+            </div>
+            <Card.Content
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              <Card.Header>New CDP</Card.Header>
+            </Card.Content>
+          </Card>
+        </Card.Group>
         <Table celled>
           <Table.Header>
             <Table.Row>
@@ -62,12 +89,13 @@ export default class CDPList extends Component {
                 <Table.Cell>{cdp.daiDebt.toString(4)}</Table.Cell>
                 <Table.Cell>
                   {(
-                    this.getLockedDai(cdp) / this.props.liquidationRation -
+                    cdp.daiLocked / this.props.liquidationRation -
                     cdp.daiDebt.toNumber()
-                  ).toFixed(4)} DAI
+                  ).toFixed(4)}{" "}
+                  DAI
                 </Table.Cell>
-                <Table.Cell>{this.getLockedEth(cdp).toFixed(4)} ETH</Table.Cell>
-                <Table.Cell>{this.getLockedDai(cdp).toFixed(4)} DAI</Table.Cell>
+                <Table.Cell>{cdp.ethLocked.toFixed(4)} ETH</Table.Cell>
+                <Table.Cell>{cdp.daiLocked.toFixed(4)} DAI</Table.Cell>
                 {details && (
                   <>
                     <Table.Cell>{this.props.wethToPeth.toFixed(4)}</Table.Cell>
@@ -81,20 +109,4 @@ export default class CDPList extends Component {
       </>
     );
   }
-
-  getLockedEth(cdp) {
-    return cdp.pethLocked.toNumber() * this.props.wethToPeth;
-  }
-
-  getLockedDai(cdp) {
-    return (
-      cdp.pethLocked.toNumber() *
-      this.props.wethToPeth *
-      this.props.ethPrice.toNumber()
-    );
-  }
-
-  onDetailsChange = () => {
-    this.setState({ details: !this.state.details });
-  };
 }
