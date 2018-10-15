@@ -1,5 +1,4 @@
 const CDPCreator = artifacts.require('CDPCreator.sol');
-const TUB = artifacts.require('Saitub.sol');
 const BigNumber = web3.BigNumber;
 const expectEvent = require('./expectEvent');
 
@@ -10,15 +9,13 @@ require('chai')
 contract('CDPCreator', (accounts) => {
     const min = new BigNumber(web3.toWei(1, "ether"));
     const dai = 1000000000000000000;
-    let cdpCreator, tub;
+    let cdpCreator;
 
     beforeEach(async () => {
         cdpCreator = await CDPCreator.new("0x7ba25f791fa76c3ef40ac98ed42634a8bc24c238",
                                           "0xa6164a2e88e258a663772ed4912a0865af8f6d06",
                                           "0xc226f3cd13d508bc319f4f4290172748199d6612", 
                                           "0xe82ce3d6bf40f2f9414c8d01a35e3d9eb16a1761");
-        
-        tub = web3.eth.contract(TUB.abi).at("0xe82ce3d6bf40f2f9414c8d01a35e3d9eb16a1761");
     })
 
     describe('Creation Tests', () => {

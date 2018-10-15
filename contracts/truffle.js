@@ -24,10 +24,10 @@ module.exports = {
     },
     mainnet: {
       provider: function() { 
-        return new HDWalletProvider(mnemonic, 'https://mainnet.infura.io/') 
+        return new HDWalletProvider(mnemonic, '') 
       },
       network_id: '1',
-      gasPrice: 4000000000,
+      gasPrice: 3000000000,
     },
   }
 };

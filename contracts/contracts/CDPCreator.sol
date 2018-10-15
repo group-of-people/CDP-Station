@@ -1,8 +1,9 @@
 pragma solidity ^0.4.24;
 import "./SaiTub.sol";
+import "./WETH.sol";
 
 contract CDPCreator {
-    ERC20 public weth;
+    WETH9 public weth;
     ERC20 public peth;
     ERC20 public dai;
     SaiTub public tub;
@@ -12,7 +13,7 @@ contract CDPCreator {
 
     constructor(address _weth, address _peth, address _dai, address _tub) public {
         require(_weth != address(0) && _peth != address(0) && _tub != address(0) && _dai != address(0));
-        weth = ERC20(_weth);
+        weth = WETH9(_weth);
         peth = ERC20(_peth);
         dai = ERC20(_dai);
         tub = SaiTub(_tub);
@@ -20,24 +21,21 @@ contract CDPCreator {
 
     function createCDP(uint256 amountETH, uint256 amountDAI) payable external {
         require(amountETH >= 0.005 ether);
-        bytes32 cupID;
-
+        require(msg.value == amountETH);
         require(address(weth).call.value(msg.value)());
+
         weth.approve(address(tub), amountETH);
 
-        uint256 rate = (10 ** 18 * amountETH) / (tub.ask(amountETH));
-        uint256 pethAmount = (rate * amountETH) / (10 ** 18);
-        tub.join(pethAmount);
+        uint256 amountPETH = (amountETH ** 2) / (tub.ask(amountETH));
+        tub.join(amountPETH);
 
-        cupID = tub.open();
-        peth.approve(address(tub), pethAmount);
-        tub.lock(cupID, pethAmount);
+        bytes32 cupID = tub.open();
+        peth.approve(address(tub), amountPETH);
+        tub.lock(cupID, amountPETH);
         tub.draw(cupID, amountDAI);
 
         tub.give(cupID, msg.sender);
         dai.transfer(msg.sender, amountDAI);
-
-        //weth.transfer(msg.sender, (amountETH - pethAmount));
 
         emit CDPCreated(cupID, msg.sender, amountDAI);
     }
@@ -47,18 +45,23 @@ contract CDPCreator {
         require(address(weth).call.value(msg.value)());
         weth.approve(address(tub), amountETH);
 
-        uint256 rate = (10 ** 18 * amountETH) / (tub.ask(amountETH));
-        uint256 pethAmount = (rate * amountETH) / (10 ** 18);
-        tub.join(pethAmount);
-
-        weth.transfer(msg.sender, (amountETH - pethAmount));
+        uint256 amountPETH = (amountETH ** 2) / (tub.ask(amountETH));
+        tub.join(amountPETH);
+        peth.transfer(msg.sender, amountPETH);
     }
 
-    function convertPETHToETH(uint256 amountPETH) payable external {
+    function convertPETHToETH(uint256 amountPETH) external {
         require(peth.transferFrom(msg.sender, address(this), amountPETH));
         
+        peth.approve(address(tub), amountPETH);
         uint256 bid = tub.bid(amountPETH);
         tub.exit(amountPETH);
-        weth.transfer(msg.sender, bid);
+        weth.withdraw(bid);
+        msg.sender.transfer(bid);
+    }
+
+    function () payable external {
+        //only accept payments from WETH withdrawal
+        require(msg.sender == address(weth));
     }
 }
