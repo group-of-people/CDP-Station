@@ -22,8 +22,8 @@ const Chart = ({ data }) => (
   </PieChart>
 );
 
-const CDPCard = ({ cdp }) => (
-  <Card>
+const CDPCard = ({ cdp, onClick }) => (
+  <Card onClick={onClick}>
     <Chart
       data={[
         { name: "DAI Debt", value: cdp.daiDebt.toNumber() },

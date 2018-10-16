@@ -10,7 +10,7 @@ function humanizeCDPResponse(cdp, props) {
   const daiDebt = DAI.wei(cdp.art);
   const daiLocked =
     pethLocked.toNumber() * props.wethToPeth * props.ethPrice.toNumber();
-  const daiAvailable = daiLocked / props.liquidationRation - daiDebt.toNumber();
+  const daiAvailable = daiLocked / props.liquidationRatio - daiDebt.toNumber();
 
   return {
     id: cdp.cupi,
@@ -89,7 +89,7 @@ export default class CDPList extends Component {
                 <Table.Cell>{cdp.daiDebt.toString(4)}</Table.Cell>
                 <Table.Cell>
                   {(
-                    cdp.daiLocked / this.props.liquidationRation -
+                    cdp.daiLocked / this.props.liquidationRatio -
                     cdp.daiDebt.toNumber()
                   ).toFixed(4)}{" "}
                   DAI
