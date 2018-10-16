@@ -62,7 +62,7 @@ export default class CDPList extends Component {
                 <Table.Cell>{cdp.daiDebt.toString(4)}</Table.Cell>
                 <Table.Cell>
                   {(
-                    this.getLockedDai(cdp) / this.props.liquidationRation -
+                    this.getLockedDai(cdp) / this.props.liquidationRatio -
                     cdp.daiDebt.toNumber()
                   ).toFixed(4)} DAI
                 </Table.Cell>
