@@ -1,35 +1,42 @@
 import React, { Component } from "react";
 import CDPCreatorBuild from "../utils/CDPCreator.json";
-import { Input, Button, Modal, Header } from "semantic-ui-react";
+import { Button, Modal, Header, Form } from "semantic-ui-react";
 
 export default class CDPCreator extends Component {
-  constructor(props) {
-    super(props);
+  state = {
+    contract: new this.props.web3.eth.Contract(
+      CDPCreatorBuild.abi,
+      "0x940bF0EE39db2F9b2f85059725216e3898372222"
+    ),
+    amountETH: null,
+    amountDAI: null
+  };
 
-    this.state = {
-      contract: null,
-      amountETH: null,
-      amountDAI: null
-    };
-
-    this.handleETHChange = this.handleETHChange.bind(this);
-    this.handleDAIChange = this.handleDAIChange.bind(this);
-    this.createCDP = this.createCDP.bind(this);
-  }
-
-  componentDidMount() {
-    this.instantiateContract();
-  }
   render() {
+    const { amountETH, amountDAI } = this.state;
+    const valid = !!amountETH && !!amountDAI;
+
     return (
       <Modal open>
         <Header>Open a New CDP</Header>
         <Modal.Content>
-          <Input onChange={this.handleETHChange} placeholder="ETH to lock up" />
-          <Input onChange={this.handleDAIChange} placeholder="DAI to draw" />
+          <Form>
+            <Form.Input
+              name={"amountETH"}
+              placeholder="ETH to lock up"
+              value={this.state.amountETH}
+              onChange={this.handleChange}
+            />
+            <Form.Input
+              name={"amountDAI"}
+              placeholder="DAI to draw"
+              value={this.state.amountDAI}
+              onChange={this.handleChange}
+            />
+          </Form>
         </Modal.Content>
         <Modal.Actions>
-          <Button primary onClick={this.createCDP}>
+          <Button primary disabled={!valid} onClick={this.createCDP}>
             CreateCDP
           </Button>
         </Modal.Actions>
@@ -37,16 +44,7 @@ export default class CDPCreator extends Component {
     );
   }
 
-  instantiateContract() {
-    this.setState({
-      contract: new this.props.web3.eth.Contract(
-        CDPCreatorBuild.abi,
-        "0x940bF0EE39db2F9b2f85059725216e3898372222"
-      )
-    });
-  }
-
-  async createCDP() {
+  createCDP = async () => {
     const eth = this.props.web3.utils.toWei(
       this.state.amountETH.toString(),
       "ether"
@@ -56,13 +54,9 @@ export default class CDPCreator extends Component {
       .createCDP(eth, dai)
       .send({ from: this.props.address, value: eth });
     this.props.onRequestClose();
-  }
+  };
 
-  handleETHChange(e) {
-    this.setState({ amountETH: e.target.value });
-  }
-
-  handleDAIChange(e) {
-    this.setState({ amountDAI: e.target.value });
-  }
+  handleChange = (e, { name, value }) => {
+    this.setState({ [name]: value });
+  };
 }
