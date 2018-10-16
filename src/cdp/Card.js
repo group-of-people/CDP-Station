@@ -13,10 +13,10 @@ const Chart = ({ data }) => (
       outerRadius={80}
       fill="#8884d8"
       isAnimationActive={false}
-      dataKey={'value'}
+      dataKey={"value"}
     >
       {data.map((entry, index) => (
-        <Cell fill={COLORS[index % COLORS.length]} />
+        <Cell key={index} fill={COLORS[index % COLORS.length]} />
       ))}
     </Pie>
     <Tooltip />

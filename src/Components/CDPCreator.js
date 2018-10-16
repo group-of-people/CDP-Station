@@ -1,15 +1,10 @@
 import React, { Component } from "react";
-import CDPCreatorBuild from "../utils/CDPCreator.json";
 import { Button, Modal, Header, Form } from "semantic-ui-react";
 
 export default class CDPCreator extends Component {
   state = {
-    contract: new this.props.web3.eth.Contract(
-      CDPCreatorBuild.abi,
-      "0x940bF0EE39db2F9b2f85059725216e3898372222"
-    ),
-    amountETH: null,
-    amountDAI: null
+    amountETH: "",
+    amountDAI: ""
   };
 
   render() {
@@ -45,14 +40,10 @@ export default class CDPCreator extends Component {
   }
 
   createCDP = async () => {
-    const eth = this.props.web3.utils.toWei(
-      this.state.amountETH.toString(),
-      "ether"
+    await this.props.store.createCDP(
+      this.state.amountETH,
+      this.state.amountDAI
     );
-    const dai = (this.state.amountDAI * Math.pow(10, 18)).toString();
-    await this.state.contract.methods
-      .createCDP(eth, dai)
-      .send({ from: this.props.address, value: eth });
     this.props.onRequestClose();
   };
 

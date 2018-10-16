@@ -9,18 +9,10 @@ export default class Work extends Component {
   render() {
     return (
       <>
-        <CDPList
-          key={this.props.address}
-          address={this.props.address}
-          wethToPeth={this.props.wethToPeth}
-          ethPrice={this.props.ethPrice}
-          liquidationRatio={this.props.liquidationRatio}
-          onNewCDP={this.onNewCDP}
-        />
+        <CDPList store={this.props.store} onNewCDP={this.onNewCDP} />
         {this.state.showNewCDPModal && (
           <NewCdpModal
-            web3={this.props.web3}
-            address={this.props.address}
+            store={this.props.store}
             onRequestClose={this.onCloseNewCDP}
           />
         )}

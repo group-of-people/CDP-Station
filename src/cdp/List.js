@@ -1,47 +1,16 @@
 import React, { Component } from "react";
-import Maker from "@makerdao/dai";
+import { observer } from "mobx-react";
 import { Icon, Table, Card } from "semantic-ui-react";
 import CDPCard from "./Card";
 
-const { DAI, PETH } = Maker;
 
-function humanizeCDPResponse(cdp, props) {
-  const pethLocked = PETH.wei(cdp.ink);
-  const daiDebt = DAI.wei(cdp.art);
-  const daiLocked =
-    pethLocked.toNumber() * props.wethToPeth * props.ethPrice.toNumber();
-  const daiAvailable = daiLocked / props.liquidationRatio - daiDebt.toNumber();
-
-  return {
-    id: cdp.cupi,
-    daiAvailable,
-    daiDebt,
-    daiLocked,
-    pethLocked,
-    ethLocked: pethLocked.toNumber() * props.wethToPeth
-  };
-}
-
-export default class CDPList extends Component {
-  state = {
-    cdps: []
-  };
-  async componentDidMount() {
-    const result = await fetch(
-      `https://dai-service.makerdao.com/cups/conditions=lad:${this.props.address.toLowerCase()}/sort=cupi:asc`
-    );
-    const response = await result.json();
-    this.setState({
-      cdps: response.results.map(cdp => humanizeCDPResponse(cdp, this.props))
-    });
-  }
-
+export class CDPList extends Component {
   render() {
     const details = true;
     return (
       <>
         <Card.Group>
-          {this.state.cdps.map(cdp => (
+          {this.props.store.cdps.map(cdp => (
             <CDPCard key={cdp.id} cdp={cdp} />
           ))}
           <Card onClick={this.props.onNewCDP}>
@@ -83,13 +52,13 @@ export default class CDPList extends Component {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {this.state.cdps.map(cdp => (
-              <Table.Row>
+            {this.props.store.cdps.map(cdp => (
+              <Table.Row key={cdp.id}>
                 <Table.Cell>#{cdp.id}</Table.Cell>
                 <Table.Cell>{cdp.daiDebt.toString(4)}</Table.Cell>
                 <Table.Cell>
                   {(
-                    cdp.daiLocked / this.props.liquidationRatio -
+                    cdp.daiLocked / this.props.store.liquidationRatio.get() -
                     cdp.daiDebt.toNumber()
                   ).toFixed(4)}{" "}
                   DAI
@@ -98,7 +67,7 @@ export default class CDPList extends Component {
                 <Table.Cell>{cdp.daiLocked.toFixed(4)} DAI</Table.Cell>
                 {details && (
                   <>
-                    <Table.Cell>{this.props.wethToPeth.toFixed(4)}</Table.Cell>
+                    <Table.Cell>{this.props.store.wethToPeth.get().toFixed(4)}</Table.Cell>
                     <Table.Cell>{cdp.pethLocked.toString(4)}</Table.Cell>
                   </>
                 )}
@@ -110,3 +79,5 @@ export default class CDPList extends Component {
     );
   }
 }
+
+export default observer(CDPList)
