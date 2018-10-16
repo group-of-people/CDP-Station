@@ -16,10 +16,13 @@ export default class Work extends Component {
           ethPrice={this.props.ethPrice}
           liquidationRatio={this.props.liquidationRatio}
           onNewCDP={this.onNewCDP}
-          onRequestClose={this.onCloseNewCDP}
         />
         {this.state.showNewCDPModal && (
-          <NewCdpModal web3={this.props.web3} address={this.props.address} />
+          <NewCdpModal
+            web3={this.props.web3}
+            address={this.props.address}
+            onRequestClose={this.onCloseNewCDP}
+          />
         )}
       </>
     );
