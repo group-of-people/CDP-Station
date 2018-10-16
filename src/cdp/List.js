@@ -44,7 +44,7 @@ export default class CDPList extends Component {
           {this.state.cdps.map(cdp => (
             <CDPCard key={cdp.id} cdp={cdp} />
           ))}
-          <Card onClick={() => {}}>
+          <Card onClick={this.props.onNewCDP}>
             <div
               style={{
                 display: "flex",
