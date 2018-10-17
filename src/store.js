@@ -42,10 +42,12 @@ class Store {
         CDPCreatorBuild.abi,
         "0x940bF0EE39db2F9b2f85059725216e3898372222"
       );
-      web3.currentProvider.publicConfigStore.on(
-        "update",
-        this.initializeAccount
-      );
+      this.initializeAccount().then(() => {
+        web3.currentProvider.publicConfigStore.on(
+          "update",
+          this.initializeAccount
+        );
+      });
     });
   }
 
@@ -58,7 +60,7 @@ class Store {
       if (accs.length === 0) {
         return;
       }
-      if (accs[0] === this.account) return;
+      if (accs[0] === this.account.get()) return;
     } catch (e) {
       console.log(e, "Error finding web3.");
       return;
