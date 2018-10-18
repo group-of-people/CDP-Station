@@ -12,14 +12,16 @@ function humanizeCDPResponse(cdp, props) {
   const daiLocked =
     pethLocked.toNumber() * props.wethToPeth * props.ethPrice.toNumber();
   const daiAvailable = daiLocked / props.liquidationRatio - daiDebt.toNumber();
-
+  const collateralization = 
+    (pethLocked.toNumber() * props.wethToPeth * props.ethPrice.toNumber()) / daiDebt.toNumber() * 100;
   return {
     id: cdp.cupi,
     daiAvailable,
     daiDebt,
     daiLocked,
     pethLocked,
-    ethLocked: pethLocked.toNumber() * props.wethToPeth
+    ethLocked: pethLocked.toNumber() * props.wethToPeth,
+    collateralization: collateralization.toFixed(2)
   };
 }
 
@@ -27,6 +29,7 @@ class Store {
   cdps = observable([]);
   web3 = observable.box(null);
   account = observable.box("");
+  maker = observable.box(null);
   loading = observable.box(true);
   ethPrice = observable.box(null);
   mkrPrice = observable.box(null);
@@ -48,6 +51,8 @@ class Store {
           this.initializeAccount
         );
       });
+      this.maker = maker;
+      this.maker.authenticate();
     });
   }
 
@@ -116,6 +121,15 @@ class Store {
     await this.contract.methods
       .createCDP(eth, daiBN.toString())
       .send({ from: this.account.get(), value: eth });
+  };
+
+  drawDAI = async (amountDAI, cdp) => {
+    try {
+      const cdpInstance = await this.maker.getCdp(cdp.id);
+      await cdpInstance.drawDai(amountDAI);
+    }catch (e) {
+      console.log(e, 'Error drawing DAI');
+    }
   };
 }
 

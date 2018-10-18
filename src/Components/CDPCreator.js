@@ -16,10 +16,10 @@ export default class CDPCreator extends Component {
     return (
       <Modal open>
         <Header>Open a New CDP</Header>
-        <Header as="h5" style={{ color: this.state.color, display: "inline" }}>
+        <Header as="h5" style={{ color: this.state.color, display: "inline", paddingBottom: 0 }}>
           Collateralization: {this.state.collateralization}%
         </Header>
-        <Header as="h5" style={{ color: this.state.color, display: "inline" }}>
+        <Header as="h5" style={{ color: this.state.color, display: "inline", paddingBottom: 0 }}>
           Liquidation Price: ${this.state.liquidation}
         </Header>
         <Modal.Content>
@@ -66,7 +66,7 @@ export default class CDPCreator extends Component {
     this.setState({ [name]: value }, () => {
       const ethPrice = parseFloat(this.state.amountETH) * parseFloat(this.props.store.ethPrice.get().toNumber());
       const collateralization = (ethPrice && this.state.amountDAI) ?
-        ((parseFloat(this.state.amountDAI) / ethPrice) * 100).toFixed(2)
+        ((parseFloat(ethPrice / this.state.amountDAI)) * 100).toFixed(2)
         : 0;
       const liquidation = (ethPrice && this.state.amountDAI) ?
         ((parseFloat(this.state.amountDAI) * this.props.store.liquidationRatio.get()) / (parseFloat(this.state.amountETH))).toFixed(2)
@@ -74,11 +74,11 @@ export default class CDPCreator extends Component {
       this.setState({ collateralization: collateralization });
       this.setState({ liquidation: liquidation });
 
-      if (collateralization > 50) {
+      if (this.state.amountETH && this.state.amountDAI && collateralization < 150) {
         this.setState({ color: 'red' });
         this.setState({ valid: false });
       }
-      else if (collateralization <= 50 && this.state.amountETH && this.state.amountDAI) {
+      else if (this.state.amountETH && this.state.amountDAI && collateralization >= 150) {
         this.setState({ color: 'gray' });
         this.setState({ valid: true });
       }

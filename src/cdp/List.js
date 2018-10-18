@@ -2,26 +2,36 @@ import React, { Component } from "react";
 import { observer } from "mobx-react";
 import { Icon, Card } from "semantic-ui-react";
 import CDPCard from "./Card";
-import CDPDetails from './Details'
+import CDPDetails from './Details';
+import CDPDraw from "./Draw";
 
 export class CDPList extends Component {
   state = {
-    detailsCDP: null
+    detailsCDP: null,
+    cdpDetails: false,
+    draw: null
   };
 
   render() {
     return (
       <>
-        {!!this.state.detailsCDP && (
+        {!!this.state.cdpDetails && (
           <CDPDetails
             cdp={this.state.detailsCDP}
             store={this.props.store}
             onRequestClose={this.onCDPDetailsClose}
           />
         )}
+        {!!this.state.draw && (
+          <CDPDraw
+            cdp={this.state.detailsCDP}
+            store={this.props.store}
+            onRequestClose={this.onCDPDrawClose}
+          />
+        )}
         <Card.Group>
           {this.props.store.cdps.map(cdp => (
-            <CDPCard key={cdp.id} cdp={cdp} onClick={this.onCDPDetails} />
+            <CDPCard key={cdp.id} cdp={cdp} onClick={this.onCDPDetails} drawDAI={this.onCDPDraw} />
           ))}
           <Card onClick={this.props.onNewCDP}>
             <div
@@ -50,12 +60,20 @@ export class CDPList extends Component {
   }
 
   onCDPDetails = cdp => {
-    this.setState({ detailsCDP: cdp });
+    this.setState({ detailsCDP: cdp, cdpDetails: true });
   };
 
   onCDPDetailsClose = () => {
-    this.setState({ detailsCDP: null });
+    this.setState({ detailsCDP: null, cdpDetails: false });
   };
+
+  onCDPDraw = cdp => {
+    this.setState({ draw: true, detailsCDP: cdp });
+  };
+
+  onCDPDrawClose = () => {
+    this.setState({ draw: null, cdpDetails: false });
+  }
 }
 
 export default observer(CDPList);

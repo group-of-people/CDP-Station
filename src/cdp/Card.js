@@ -27,35 +27,44 @@ class CDPCard extends React.Component {
   render() {
     const { cdp } = this.props;
     return (
-      <Card onClick={this.onClick}>
-        <Chart
-          data={[
-            { name: "DAI Debt", value: cdp.daiDebt.toNumber() },
-            { name: "DAI Available", value: cdp.daiAvailable }
-            // {name: "DAI Collateral", value: cdp.daiLocked - cdp.daiAvailable - cdp.daiDebt.toNumber()}
-          ]}
-        />
-        <Card.Content textAlign={"right"}>
-          <Card.Header>CDP {cdp.id} </Card.Header>
-          <Card.Meta>{cdp.ethLocked.toFixed(4)} ETH </Card.Meta>
-        </Card.Content>
-        <Card.Content extra>
-          <div className="ui two buttons">
-            <Button basic color="blue">
-              Draw
+      <>
+        {cdp.pethLocked.toNumber() != 0 && (
+          <Card onClick={this.onClick}>
+            <Chart
+              data={[
+                { name: "DAI Debt", value: cdp.daiDebt.toNumber() },
+                { name: "DAI Available", value: cdp.daiAvailable }
+                // {name: "DAI Collateral", value: cdp.daiLocked - cdp.daiAvailable - cdp.daiDebt.toNumber()}
+              ]}
+            />
+            <Card.Content textAlign={"right"}>
+              <Card.Header>CDP {cdp.id} </Card.Header>
+              <Card.Meta>{cdp.ethLocked.toFixed(4)} ETH </Card.Meta>
+            </Card.Content>
+            <Card.Content extra>
+              <div className="ui two buttons">
+                <Button basic color="blue" onClick={this.drawDai}>
+                  Draw
             </Button>
-            <Button basic color="green">
-              Repay
+                <Button basic color="green">
+                  Repay
             </Button>
-          </div>
-        </Card.Content>
-      </Card>
+              </div>
+            </Card.Content>
+          </Card>
+        )
+        }
+      </>
     );
   }
 
   onClick = () => {
     this.props.onClick(this.props.cdp);
   };
+
+  drawDai = () => {
+    this.props.drawDAI(this.props.cdp);
+  }
 }
 
 export default CDPCard;
