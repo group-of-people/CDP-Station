@@ -13,7 +13,7 @@ function humanizeCDPResponse(cdp, props) {
   const daiLocked =
     pethLocked.toNumber() * props.wethToPeth * props.ethPrice.toNumber();
   const daiAvailable = daiLocked / props.liquidationRatio - daiDebt.toNumber();
-  const collateralization = 
+  const collateralization =
     (pethLocked.toNumber() * props.wethToPeth * props.ethPrice.toNumber()) / daiDebt.toNumber() * 100;
 
   return {

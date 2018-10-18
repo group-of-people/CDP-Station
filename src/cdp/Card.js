@@ -45,15 +45,14 @@ class CDPCard extends React.Component {
               <div className="ui two buttons">
                 <Button basic color="blue" onClick={this.drawDai}>
                   Draw
-            </Button>
+                </Button>
                 <Button basic color="green" onClick={this.repayDai}>
                   Repay
-            </Button>
+                </Button>
               </div>
             </Card.Content>
           </Card>
-        )
-        }
+        )}
       </>
     );
   }
@@ -64,11 +63,11 @@ class CDPCard extends React.Component {
 
   drawDai = () => {
     this.props.drawDAI(this.props.cdp);
-  }
+  };
 
   repayDai = () => {
     this.props.repayDAI(this.props.cdp);
-  }
+  };
 }
 
 export default CDPCard;
