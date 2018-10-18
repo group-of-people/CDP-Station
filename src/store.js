@@ -111,9 +111,10 @@ class Store {
 
   createCDP = async (amountETH, amountDAI) => {
     const eth = this.web3.utils.toWei(amountETH.toString(), "ether");
-    const dai = (amountDAI * Math.pow(10, 18)).toString();
+    const dai = amountDAI * Math.pow(10, 18);
+    const daiBN = new this.web3.utils.BN(dai.toString());
     await this.contract.methods
-      .createCDP(eth, dai)
+      .createCDP(eth, daiBN.toString())
       .send({ from: this.account.get(), value: eth });
   };
 }

@@ -46,6 +46,7 @@ class App extends Component {
         <div>{store.ethPrice.get().toString()}</div>
         <div>{store.mkrPrice.get().toString()}</div>
         <div>Liquidation Ratio: {store.liquidationRatio.get()}</div>
+        <div>ETH/PETH Ratio: {store.wethToPeth.get().toFixed(4)}</div>
         {store.account.get() &&
           this.state.mode === "work" && (
             <Work key={this.state.account} store={store} />

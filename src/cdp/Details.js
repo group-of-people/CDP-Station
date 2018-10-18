@@ -22,7 +22,12 @@ export default class CDPDetails extends Component {
             </li>
             <li>Collateral ETH - {cdp.ethLocked.toFixed(4)} ETH</li>
             <li>Collateral DAI - {cdp.daiLocked.toFixed(4)} DAI</li>
-            <li>WETH/PETH - {this.props.store.wethToPeth.get().toFixed(4)}</li>
+            <li>Liquidation Price - {" "}$  
+                {(
+                  parseFloat(cdp.daiDebt) * this.props.store.liquidationRatio.get() / 
+                  parseFloat(cdp.ethLocked)
+                ).toFixed(2)}
+            </li>
             <li>PETH locked - {cdp.pethLocked.toString(4)}</li>
           </ul>
         </Modal.Content>
