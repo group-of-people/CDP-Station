@@ -4,12 +4,14 @@ import { Icon, Card } from "semantic-ui-react";
 import CDPCard from "./Card";
 import CDPDetails from './Details';
 import CDPDraw from "./Draw";
+import CDPRepay from "./Repay";
 
 export class CDPList extends Component {
   state = {
     detailsCDP: null,
     cdpDetails: false,
-    draw: null
+    draw: null,
+    repay: null,
   };
 
   render() {
@@ -29,9 +31,16 @@ export class CDPList extends Component {
             onRequestClose={this.onCDPDrawClose}
           />
         )}
+        {!!this.state.repay && (
+          <CDPRepay
+            cdp={this.state.detailsCDP}
+            store={this.props.store}
+            onRequestClose={this.onCDPRepayClose}
+          />
+        )}
         <Card.Group>
           {this.props.store.cdps.map(cdp => (
-            <CDPCard key={cdp.id} cdp={cdp} onClick={this.onCDPDetails} drawDAI={this.onCDPDraw} />
+            <CDPCard key={cdp.id} cdp={cdp} onClick={this.onCDPDetails} drawDAI={this.onCDPDraw} repayDAI={this.onCDPRepay} />
           ))}
           <Card onClick={this.props.onNewCDP}>
             <div
@@ -73,6 +82,14 @@ export class CDPList extends Component {
 
   onCDPDrawClose = () => {
     this.setState({ draw: null, cdpDetails: false });
+  }
+
+  onCDPRepay = cdp => {
+    this.setState({ repay: true, detailsCDP: cdp });
+  };
+
+  onCDPRepayClose = () => {
+    this.setState({ repay: false, cdpDetails: false });
   }
 }
 

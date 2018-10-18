@@ -28,7 +28,7 @@ class CDPCard extends React.Component {
     const { cdp } = this.props;
     return (
       <>
-        {cdp.pethLocked.toNumber() != 0 && (
+        {cdp.pethLocked.toNumber() !== 0 && (
           <Card onClick={this.onClick}>
             <Chart
               data={[
@@ -46,7 +46,7 @@ class CDPCard extends React.Component {
                 <Button basic color="blue" onClick={this.drawDai}>
                   Draw
             </Button>
-                <Button basic color="green">
+                <Button basic color="green" onClick={this.repayDai}>
                   Repay
             </Button>
               </div>
@@ -64,6 +64,10 @@ class CDPCard extends React.Component {
 
   drawDai = () => {
     this.props.drawDAI(this.props.cdp);
+  }
+
+  repayDai = () => {
+    this.props.repayDAI(this.props.cdp);
   }
 }
 

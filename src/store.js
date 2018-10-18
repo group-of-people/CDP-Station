@@ -1,10 +1,11 @@
 import { observable, runInAction } from "mobx";
 import Maker from "@makerdao/dai";
 import CDPCreatorBuild from "./utils/CDPCreator.json";
+import ERC20 from "./utils/ERC20.json";
 import getWeb3 from "./utils/getWeb3";
 
 const maker = Maker.create("browser");
-const { DAI, PETH } = Maker;
+const { DAI, PETH, MKR } = Maker;
 
 function humanizeCDPResponse(cdp, props) {
   const pethLocked = PETH.wei(cdp.ink);
@@ -14,6 +15,7 @@ function humanizeCDPResponse(cdp, props) {
   const daiAvailable = daiLocked / props.liquidationRatio - daiDebt.toNumber();
   const collateralization = 
     (pethLocked.toNumber() * props.wethToPeth * props.ethPrice.toNumber()) / daiDebt.toNumber() * 100;
+
   return {
     id: cdp.cupi,
     daiAvailable,
@@ -45,6 +47,10 @@ class Store {
         CDPCreatorBuild.abi,
         "0x940bF0EE39db2F9b2f85059725216e3898372222"
       );
+      this.mkrContract = new web3.eth.Contract(
+        ERC20.abi,
+        "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2"
+      )
       this.initializeAccount().then(() => {
         web3.currentProvider.publicConfigStore.on(
           "update",
@@ -52,7 +58,6 @@ class Store {
         );
       });
       this.maker = maker;
-      this.maker.authenticate();
     });
   }
 
@@ -72,9 +77,9 @@ class Store {
     }
 
     try {
-      await maker.authenticate();
-      const priceService = maker.service("price");
-      const cdpService = maker.service("cdp");
+      await this.maker.authenticate();
+      const priceService = this.maker.service("price");
+      const cdpService = this.maker.service("cdp");
       const [
         ethPrice,
         mkrPrice,
@@ -91,6 +96,7 @@ class Store {
         )
       ]);
       const cdps = await cdpsResponse.json();
+      const mkrBalance = await this.mkrContract.methods.balanceOf(accs[0]).call({ from: accs[0] });
 
       runInAction(() => {
         this.account.set(accs[0]);
@@ -104,10 +110,11 @@ class Store {
             humanizeCDPResponse(cdp, {
               wethToPeth,
               liquidationRatio,
-              ethPrice
+              ethPrice,
             })
           )
         );
+        this.mkrBalance = mkrBalance;
       });
     } catch (e) {
       console.log(e, "Failed to initialize maker");
@@ -127,10 +134,19 @@ class Store {
     try {
       const cdpInstance = await this.maker.getCdp(cdp.id);
       await cdpInstance.drawDai(amountDAI);
-    }catch (e) {
+    } catch (e) {
       console.log(e, 'Error drawing DAI');
     }
   };
+
+  repayDAI = async (amountDAI, cdp) => {
+    try {
+      const cdpInstance = await this.maker.getCdp(cdp.id);
+      await cdpInstance.wipeDai(amountDAI);
+    } catch (e) {
+      console.log(e.message, 'Error repaying DAI');
+    }
+  }
 }
 
 export default new Store();

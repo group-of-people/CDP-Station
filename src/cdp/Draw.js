@@ -14,7 +14,7 @@ export default class Draw extends Component {
             <Modal open>
                 <Header>Draw DAI</Header>
                 <Header as="h5" style={{ color: this.state.color, display: "inline", paddingBottom: '0' }}>
-                    DAI Available: {this.props.cdp.daiAvailable.toFixed(4)}
+                    DAI Available: {this.props.cdp.daiAvailable.toString()}
                 </Header>
                 <Modal.Content>
                     <Form>
