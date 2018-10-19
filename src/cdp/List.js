@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import { observer } from "mobx-react";
 import { Icon, Card } from "semantic-ui-react";
 import CDPCard from "./Card";
-import CDPDetails from "./Details";
-import CDPDraw from "./Draw";
-import CDPRepay from "./Repay";
+import CDPDetails from "./Modals/Details";
+import CDPDraw from "./Modals/Draw";
+import CDPRepay from "./Modals/Repay";
 
 export class CDPList extends Component {
   state = {

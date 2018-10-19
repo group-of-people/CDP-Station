@@ -42,11 +42,17 @@ class App extends Component {
 
     return (
       <>
-        <div>Logged in as {store.account.get()}</div>
-        <div>{store.ethPrice.get().toString()}</div>
-        <div>{store.mkrPrice.get().toString()}</div>
-        <div>Liquidation Ratio: {store.liquidationRatio.get()}</div>
-        <div>ETH/PETH Ratio: {store.wethToPeth.get().toFixed(4)}</div>
+        <div style={{ display: "inline" }}>
+          <div>Logged in as {store.account.get()}</div>
+          <div>{store.ethPrice.get().toString()}</div>
+          <div>{store.mkrPrice.get().toString()}</div>
+          <div>Liquidation Ratio: {store.liquidationRatio.get()}</div>
+          <div>ETH/PETH Ratio: {store.wethToPeth.get().toFixed(4)}</div>
+        </div>
+        <div style={{ display: "inline" }}>
+          <div>DAI Balance: {store.daiBalance.get().toString(4)}</div>
+          <div>MKR Balance: {store.mkrBalance.get().toString(4)}</div>
+        </div>
         <br />
         {store.account.get() &&
           this.state.mode === "work" && (

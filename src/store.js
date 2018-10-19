@@ -14,7 +14,9 @@ function humanizeCDPResponse(cdp, props) {
     pethLocked.toNumber() * props.wethToPeth * props.ethPrice.toNumber();
   const daiAvailable = daiLocked / props.liquidationRatio - daiDebt.toNumber();
   const collateralization =
-    (pethLocked.toNumber() * props.wethToPeth * props.ethPrice.toNumber()) / daiDebt.toNumber() * 100;
+    ((pethLocked.toNumber() * props.wethToPeth * props.ethPrice.toNumber()) /
+      daiDebt.toNumber()) *
+    100;
 
   return {
     id: cdp.cupi,
@@ -37,6 +39,8 @@ class Store {
   mkrPrice = observable.box(null);
   wethToPeth = observable.box(null);
   liquidationRatio = observable.box(null);
+  mkrBalance = observable.box(null);
+  daiBalance = observable.box(null);
 
   constructor() {
     // Get network provider and web3 instance.
@@ -50,7 +54,11 @@ class Store {
       this.mkrContract = new web3.eth.Contract(
         ERC20.abi,
         "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2"
-      )
+      );
+      this.daiContract = new web3.eth.Contract(
+        ERC20.abi,
+        "0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359"
+      );
       this.initializeAccount().then(() => {
         web3.currentProvider.publicConfigStore.on(
           "update",
@@ -96,7 +104,12 @@ class Store {
         )
       ]);
       const cdps = await cdpsResponse.json();
-      const mkrBalance = await this.mkrContract.methods.balanceOf(accs[0]).call({ from: accs[0] });
+      const mkr = await this.mkrContract.methods
+        .balanceOf(accs[0])
+        .call({ from: accs[0] });
+      const dai = await this.daiContract.methods
+        .balanceOf(accs[0])
+        .call({ from: accs[0] });
 
       runInAction(() => {
         this.account.set(accs[0]);
@@ -110,11 +123,12 @@ class Store {
             humanizeCDPResponse(cdp, {
               wethToPeth,
               liquidationRatio,
-              ethPrice,
+              ethPrice
             })
           )
         );
-        this.mkrBalance = mkrBalance;
+        this.mkrBalance.set(MKR.wei(mkr));
+        this.daiBalance.set(DAI.wei(dai));
       });
     } catch (e) {
       console.log(e, "Failed to initialize maker");
@@ -135,7 +149,7 @@ class Store {
       const cdpInstance = await this.maker.getCdp(cdp.id);
       await cdpInstance.drawDai(amountDAI);
     } catch (e) {
-      console.log(e, 'Error drawing DAI');
+      console.log(e, "Error drawing DAI");
     }
   };
 
@@ -144,9 +158,36 @@ class Store {
       const cdpInstance = await this.maker.getCdp(cdp.id);
       await cdpInstance.wipeDai(amountDAI);
     } catch (e) {
-      console.log(e.message, 'Error repaying DAI');
+      console.log(e, "Error repaying DAI");
     }
-  }
+  };
+
+  lockETH = async (amountETH, cdp) => {
+    try {
+      const cdpInstance = await this.maker.getCdp(cdp.id);
+      await cdpInstance.lockEth(amountETH);
+    } catch (e) {
+      console.log(e, "Error locking ETH");
+    }
+  };
+
+  freePETH = async (amountPETH, cdp) => {
+    try {
+      const cdpInstance = await this.maker.getCdp(cdp.id);
+      await cdpInstance.freePeth(amountPETH);
+    } catch (e) {
+      console.log(e, "Error freeing PETH");
+    }
+  };
+
+  shutCDP = async cdp => {
+    try {
+      const cdpInstance = await this.maker.getCdp(cdp.id);
+      await cdpInstance.shut();
+    } catch (e) {
+      console.log(e, "Error shutting CDP");
+    }
+  };
 }
 
 export default new Store();

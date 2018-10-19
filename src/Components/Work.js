@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import CDPList from "../cdp/List";
-import NewCdpModal from "./CDPCreator";
+import NewCdpModal from "../cdp/Modals/Creator";
 
 export default class Work extends Component {
   state = {
