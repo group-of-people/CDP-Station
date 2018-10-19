@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Button, Modal, Header, Form } from "semantic-ui-react";
-import { runInThisContext } from "vm";
 
 export default class Free extends Component {
   state = {
