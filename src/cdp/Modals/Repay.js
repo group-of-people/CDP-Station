@@ -10,7 +10,7 @@ export default class Repay extends Component {
 
   render() {
     return (
-      <Modal open>
+      <Modal open onClose={this.props.onRequestClose}>
         <Header>Repay (requires MKR)</Header>
         <Header
           as="h5"

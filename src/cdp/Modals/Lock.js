@@ -11,7 +11,7 @@ export default class Lock extends Component {
 
   render() {
     return (
-      <Modal open>
+      <Modal open onClose={this.props.onRequestClose}>
         <Header>Lock ETH</Header>
         <Header
           as="h5"

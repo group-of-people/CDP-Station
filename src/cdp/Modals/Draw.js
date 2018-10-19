@@ -4,18 +4,26 @@ import { Button, Modal, Header, Form } from "semantic-ui-react";
 export default class Draw extends Component {
   state = {
     amountDAI: "",
-    color: "gray",
-    valid: false
   };
 
   render() {
+    let valid = false;
+    if (
+      this.state.amountDAI &&
+      this.props.cdp.daiAvailable >= this.state.amountDAI
+    ) {
+      valid = true;
+    } else {
+      valid = false;
+    }
+
     return (
-      <Modal open>
+      <Modal open onClose={this.props.onRequestClose}>
         <Header>Draw DAI</Header>
         <Header
           as="h5"
           style={{
-            color: this.state.color,
+            color: "gray",
             display: "inline",
             paddingBottom: "0"
           }}
@@ -35,7 +43,7 @@ export default class Draw extends Component {
           </Form>
         </Modal.Content>
         <Modal.Actions>
-          <Button primary disabled={!this.state.valid} onClick={this.drawDAI}>
+          <Button primary disabled={!valid} onClick={this.drawDAI}>
             Draw DAI
           </Button>
           <Button color="red" onClick={this.props.onRequestClose}>
@@ -52,15 +60,6 @@ export default class Draw extends Component {
   };
 
   handleChange = (e, { name, value }) => {
-    this.setState({ [name]: value }, () => {
-      if (
-        this.state.amountDAI &&
-        this.props.cdp.daiAvailable >= this.state.amountDAI
-      ) {
-        this.setState({ valid: true });
-      } else {
-        this.setState({ valid: false });
-      }
-    });
+    this.setState({ [name]: value });
   };
 }
