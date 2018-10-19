@@ -53,7 +53,6 @@ export default class Draw extends Component {
 
   handleChange = (e, { name, value }) => {
     this.setState({ [name]: value }, () => {
-      //const collateralization =
       if (
         this.state.amountDAI &&
         this.props.cdp.daiAvailable >= this.state.amountDAI

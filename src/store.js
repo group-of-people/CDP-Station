@@ -5,7 +5,7 @@ import ERC20 from "./utils/ERC20.json";
 import getWeb3 from "./utils/getWeb3";
 
 const maker = Maker.create("browser");
-const { DAI, PETH, MKR } = Maker;
+const { DAI, PETH, MKR, ETH } = Maker;
 
 function humanizeCDPResponse(cdp, props) {
   const pethLocked = PETH.wei(cdp.ink);
@@ -41,6 +41,7 @@ class Store {
   liquidationRatio = observable.box(null);
   mkrBalance = observable.box(null);
   daiBalance = observable.box(null);
+  ethBalance = observable.box(null)
 
   constructor() {
     // Get network provider and web3 instance.
@@ -93,7 +94,8 @@ class Store {
         mkrPrice,
         wethToPeth,
         liquidationRatio,
-        cdpsResponse
+        cdpsResponse,
+        ethBalance
       ] = await Promise.all([
         priceService.getEthPrice(),
         priceService.getMkrPrice(),
@@ -101,7 +103,8 @@ class Store {
         cdpService.getLiquidationRatio(),
         fetch(
           `https://dai-service.makerdao.com/cups/conditions=lad:${accs[0].toLowerCase()}/sort=cupi:asc`
-        )
+        ),
+        web3.eth.getBalance(accs[0])
       ]);
       const cdps = await cdpsResponse.json();
       const mkr = await this.mkrContract.methods
@@ -129,9 +132,10 @@ class Store {
         );
         this.mkrBalance.set(MKR.wei(mkr));
         this.daiBalance.set(DAI.wei(dai));
+        this.ethBalance.set(ETH.wei(ethBalance))
       });
     } catch (e) {
-      console.log(e, "Failed to initialize maker");
+      console.log(e, "Failed to initialize");
     }
   };
 

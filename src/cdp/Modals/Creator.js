@@ -4,8 +4,8 @@ import { observer } from "mobx-react";
 
 export class CDPCreator extends Component {
   state = {
-    amountETH: "",
-    amountDAI: "",
+    amountETH: this.props.store.ethBalance.get().toNumber(),
+    amountDAI: 0,
   };
 
   render() {
@@ -110,7 +110,7 @@ export class CDPCreator extends Component {
   };
 
   handleChange = (e, { name, value }) => {
-    this.setState({ [name]: value }, () => {});
+    this.setState({ [name]: value });
   };
 }
 

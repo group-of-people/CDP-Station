@@ -52,6 +52,7 @@ class App extends Component {
         <div style={{ display: "inline" }}>
           <div>DAI Balance: {store.daiBalance.get().toString(4)}</div>
           <div>MKR Balance: {store.mkrBalance.get().toString(4)}</div>
+          <div>ETH Balance: {store.ethBalance.get().toString(4)}</div>
         </div>
         <br />
         {store.account.get() &&
