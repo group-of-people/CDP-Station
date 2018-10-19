@@ -1,39 +1,73 @@
 import React, { Component } from "react";
 import { Button, Modal, Header, Form } from "semantic-ui-react";
+import { observer } from "mobx-react";
 
-export default class CDPCreator extends Component {
+export class CDPCreator extends Component {
   state = {
     amountETH: "",
     amountDAI: "",
-    collateralization: null,
-    liquidation: null,
-    color: "gray",
-    valid: false
   };
 
   render() {
+    const ethPrice =
+      parseFloat(this.state.amountETH) *
+      parseFloat(this.props.store.ethPrice.get().toNumber());
+    const collateralization =
+      ethPrice && this.state.amountDAI
+        ? (parseFloat(ethPrice / this.state.amountDAI) * 100).toFixed(2)
+        : 0;
+    const liquidation =
+      ethPrice && this.state.amountDAI
+        ? (
+            (parseFloat(this.state.amountDAI) *
+              this.props.store.liquidationRatio.get()) /
+            parseFloat(this.state.amountETH)
+          ).toFixed(2)
+        : null;
+
+    let color;
+    let valid = false;
+    if (
+      this.state.amountETH &&
+      this.state.amountDAI &&
+      collateralization < 150
+    ) {
+      color = "red";
+      valid = false;
+    } else if (
+      this.state.amountETH &&
+      this.state.amountDAI &&
+      collateralization >= 150
+    ) {
+      color = "gray";
+      valid = true;
+    } else {
+      color = "gray";
+      valid = false;
+    }
+
     return (
-      <Modal open>
+      <Modal open onClose={this.props.onRequestClose}>
         <Header>Open a New CDP</Header>
         <Header
           as="h5"
           style={{
-            color: this.state.color,
+            color: color,
             display: "inline",
             paddingBottom: 0
           }}
         >
-          Collateralization: {this.state.collateralization}%
+          Collateralization: {collateralization}%
         </Header>
         <Header
           as="h5"
           style={{
-            color: this.state.color,
+            color: color,
             display: "inline",
             paddingBottom: 0
           }}
         >
-          Liquidation Price: ${this.state.liquidation}
+          Liquidation Price: ${liquidation}
         </Header>
         <Modal.Content>
           <Form>
@@ -56,7 +90,7 @@ export default class CDPCreator extends Component {
           </Form>
         </Modal.Content>
         <Modal.Actions>
-          <Button primary disabled={!this.state.valid} onClick={this.createCDP}>
+          <Button primary disabled={!valid} onClick={this.createCDP}>
             CreateCDP
           </Button>
           <Button color="red" onClick={this.props.onRequestClose}>
@@ -76,43 +110,8 @@ export default class CDPCreator extends Component {
   };
 
   handleChange = (e, { name, value }) => {
-    this.setState({ [name]: value }, () => {
-      const ethPrice =
-        parseFloat(this.state.amountETH) *
-        parseFloat(this.props.store.ethPrice.get().toNumber());
-      const collateralization =
-        ethPrice && this.state.amountDAI
-          ? (parseFloat(ethPrice / this.state.amountDAI) * 100).toFixed(2)
-          : 0;
-      const liquidation =
-        ethPrice && this.state.amountDAI
-          ? (
-              (parseFloat(this.state.amountDAI) *
-                this.props.store.liquidationRatio.get()) /
-              parseFloat(this.state.amountETH)
-            ).toFixed(2)
-          : null;
-      this.setState({ collateralization: collateralization });
-      this.setState({ liquidation: liquidation });
-
-      if (
-        this.state.amountETH &&
-        this.state.amountDAI &&
-        collateralization < 150
-      ) {
-        this.setState({ color: "red" });
-        this.setState({ valid: false });
-      } else if (
-        this.state.amountETH &&
-        this.state.amountDAI &&
-        collateralization >= 150
-      ) {
-        this.setState({ color: "gray" });
-        this.setState({ valid: true });
-      } else {
-        this.setState({ color: "gray" });
-        this.setState({ valid: false });
-      }
-    });
+    this.setState({ [name]: value }, () => {});
   };
 }
+
+export default observer(CDPCreator);
