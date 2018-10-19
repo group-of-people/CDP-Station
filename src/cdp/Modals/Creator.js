@@ -1,43 +1,50 @@
 import React, { Component } from "react";
 import { Button, Modal, Header, Form } from "semantic-ui-react";
 import { observer } from "mobx-react";
+import { observable, computed } from "mobx";
 
 export class CDPCreator extends Component {
-  state = {
-    amountETH: this.props.store.ethBalance.get().toNumber(),
-    amountDAI: 0,
-  };
+  EthToLock = observable.box(this.props.store.ethBalance.get().toNumber());
+  DaiToDraw = observable.box(0);
+
+  daiTotal = computed(
+    () =>
+      parseFloat(this.EthToLock.get()) *
+      this.props.store.ethPrice.get().toNumber()
+  );
+  collateralization = computed(
+    () =>
+      this.daiTotal.get() && this.DaiToDraw.get()
+        ? (
+            parseFloat(this.daiTotal.get() / this.DaiToDraw.get()) * 100
+          ).toFixed(2)
+        : 0
+  );
+  liquidation = computed(
+    () =>
+      this.daiTotal.get() && this.DaiToDraw.get()
+        ? (
+            (parseFloat(this.DaiToDraw.get()) *
+              this.props.store.liquidationRatio.get()) /
+            parseFloat(this.EthToLock.get())
+          ).toFixed(2)
+        : null
+  );
 
   render() {
-    const ethPrice =
-      parseFloat(this.state.amountETH) *
-      parseFloat(this.props.store.ethPrice.get().toNumber());
-    const collateralization =
-      ethPrice && this.state.amountDAI
-        ? (parseFloat(ethPrice / this.state.amountDAI) * 100).toFixed(2)
-        : 0;
-    const liquidation =
-      ethPrice && this.state.amountDAI
-        ? (
-            (parseFloat(this.state.amountDAI) *
-              this.props.store.liquidationRatio.get()) /
-            parseFloat(this.state.amountETH)
-          ).toFixed(2)
-        : null;
-
     let color;
     let valid = false;
     if (
-      this.state.amountETH &&
-      this.state.amountDAI &&
-      collateralization < 150
+      this.EthToLock.get() &&
+      this.DaiToDraw.get() &&
+      this.collateralization.get() < 150
     ) {
       color = "red";
       valid = false;
     } else if (
-      this.state.amountETH &&
-      this.state.amountDAI &&
-      collateralization >= 150
+      this.EthToLock.get() &&
+      this.DaiToDraw.get() &&
+      this.collateralization.get() >= 150
     ) {
       color = "gray";
       valid = true;
@@ -57,7 +64,7 @@ export class CDPCreator extends Component {
             paddingBottom: 0
           }}
         >
-          Collateralization: {collateralization}%
+          Collateralization: {this.collateralization.get()}%
         </Header>
         <Header
           as="h5"
@@ -67,24 +74,34 @@ export class CDPCreator extends Component {
             paddingBottom: 0
           }}
         >
-          Liquidation Price: ${liquidation}
+          Liquidation Price: ${this.liquidation.get()}
+        </Header>
+        <Header
+          as="h5"
+          style={{
+            color: color,
+            display: "inline",
+            paddingBottom: 0
+          }}
+        >
+          Collateral Price: ${this.daiTotal.get().toFixed(2)}
         </Header>
         <Modal.Content>
           <Form>
             <Form.Input
-              name={"amountETH"}
+              name={"EthToLock"}
               placeholder="ETH to lock up"
               type="number"
               step="0.001"
-              value={this.state.amountETH}
+              value={this.EthToLock.get()}
               onChange={this.handleChange}
             />
             <Form.Input
-              name={"amountDAI"}
+              name={"DaiToDraw"}
               placeholder="DAI to draw"
               type="number"
               step="0.01"
-              value={this.state.amountDAI}
+              value={this.DaiToDraw.get()}
               onChange={this.handleChange}
             />
           </Form>
@@ -103,14 +120,14 @@ export class CDPCreator extends Component {
 
   createCDP = async () => {
     await this.props.store.createCDP(
-      this.state.amountETH,
-      this.state.amountDAI
+      this.EthToLock.get(),
+      this.DaiToDraw.get()
     );
     this.props.onRequestClose();
   };
 
   handleChange = (e, { name, value }) => {
-    this.setState({ [name]: value });
+    this[name].set(value)
   };
 }
 
