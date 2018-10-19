@@ -3,8 +3,10 @@ import { Button, Modal, Header, Form } from "semantic-ui-react";
 
 export default class Lock extends Component {
   state = {
-    amountETH: "",
-    amountPETH: null,
+    amountETH: this.props.store.ethBalance.get().toNumber(),
+    amountPETH:
+      this.props.store.ethBalance.get().toNumber() /
+      this.props.store.wethToPeth.get(),
     color: "gray",
     valid: false
   };
@@ -41,7 +43,7 @@ export default class Lock extends Component {
               placeholder="ETH to lock"
               type="number"
               step="0.0001"
-              value={this.state.ETH}
+              value={this.state.amountETH}
               onChange={this.handleChange}
             />
           </Form>

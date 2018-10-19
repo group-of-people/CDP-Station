@@ -1,13 +1,9 @@
 import React, { Component } from "react";
 import { Modal, Header, Button, Icon } from "semantic-ui-react";
-import FreePETH from "./Free.js";
-import LockETH from "./Lock.js";
 
 export default class CDPDetails extends Component {
   state = {
-    governanceFee: null,
-    free: null,
-    lock: null
+    governanceFee: null
   };
 
   componentDidMount() {
@@ -95,43 +91,21 @@ export default class CDPDetails extends Component {
               </li>
             </ul>
           </div>
-          {!!this.state.lock && (
-            <LockETH
-              cdp={cdp}
-              store={this.props.store}
-              onRequestClose={this.onLockClose}
-            />
-          )}
-          {!!this.state.free && (
-            <FreePETH
-              cdp={cdp}
-              store={this.props.store}
-              onRequestClose={this.onFreeClose}
-            />
-          )}
         </Modal.Content>
       </Modal>
     );
   }
 
   onLock = async () => {
-    this.setState({ lock: true, detailsCDP: this.props.cdp });
+    this.props.store.showLock(this.props.cdp);
   };
 
-  onLockClose = async () => {
-    this.setState({ lock: null, detailsCDP: null });
+  onFree = () => {
+    this.props.store.showFree(this.props.cdp);
   };
 
   shutCDP = async () => {
     await this.props.store.shutCDP(this.props.cdp);
     this.props.onRequestClose();
-  };
-
-  onFree = cdp => {
-    this.setState({ free: true, detailsCDP: cdp });
-  };
-
-  onFreeClose = () => {
-    this.setState({ free: null, cdpDetails: null });
   };
 }

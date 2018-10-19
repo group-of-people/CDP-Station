@@ -3,6 +3,8 @@ import { Container, Loader } from "semantic-ui-react";
 import Work from "./Components/Work";
 import Alert from "./Components/Alert";
 import Helper from "./Components/Helper";
+import FreePETH from "./cdp/Modals/Free.js";
+import LockETH from "./cdp/Modals/Lock.js";
 import { observer } from "mobx-react";
 
 function getURLParameter(name) {
@@ -55,6 +57,20 @@ class App extends Component {
           <div>ETH Balance: {store.ethBalance.get().toString(4)}</div>
         </div>
         <br />
+        {!!store.showLockModal.get() && (
+            <LockETH
+              cdp={store.lockModalTargetCDP.get()}
+              store={this.props.store}
+              onRequestClose={store.hideLock}
+            />
+          )}
+        {!!store.showFreeModal.get() && (
+            <FreePETH
+              cdp={store.freeModalTargetCDP.get()}
+              store={this.props.store}
+              onRequestClose={store.hideFree}
+            />
+          )}
         {store.account.get() &&
           this.state.mode === "work" && (
             <Work key={this.state.account} store={store} />

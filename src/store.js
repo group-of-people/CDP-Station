@@ -30,6 +30,7 @@ function humanizeCDPResponse(cdp, props) {
 }
 
 class Store {
+  // DATA
   cdps = observable([]);
   web3 = observable.box(null);
   account = observable.box("");
@@ -42,6 +43,12 @@ class Store {
   mkrBalance = observable.box(null);
   daiBalance = observable.box(null);
   ethBalance = observable.box(null)
+
+  // UI State
+  showFreeModal = observable.box(false)
+  freeModalTargetCDP = observable.box(null)
+  showLockModal = observable.box(false)
+  lockModalTargetCDP = observable.box(null)
 
   constructor() {
     // Get network provider and web3 instance.
@@ -192,6 +199,35 @@ class Store {
       console.log(e, "Error shutting CDP");
     }
   };
+
+
+  showFree = (cdp) => {
+    runInAction(() => {
+      this.freeModalTargetCDP.set(cdp)
+      this.showFreeModal.set(true)
+    })
+  }
+
+  hideFree = () => {
+    runInAction(() => {
+      this.freeModalTargetCDP.set(null)
+      this.showFreeModal.set(false)
+    })
+  }
+
+  showLock = (cdp) => {
+    runInAction(() => {
+      this.lockModalTargetCDP.set(cdp)
+      this.showLockModal.set(true)
+    })
+  }
+
+  hideLock = () => {
+    runInAction(() => {
+      this.lockModalTargetCDP.set(null)
+      this.showLockModal.set(false)
+    })
+  }
 }
 
 export default new Store();
