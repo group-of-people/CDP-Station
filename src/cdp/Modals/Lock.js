@@ -40,6 +40,7 @@ export default class Lock extends Component {
           <Form>
             <Form.Input
               name={"amountETH"}
+              label={"ETH to lock"}
               placeholder="ETH to lock"
               type="number"
               step="0.0001"

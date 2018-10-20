@@ -35,6 +35,7 @@ export default class Repay extends Component {
           <Form>
             <Form.Input
               name={"amountDAI"}
+              label={"DAI to repay"}
               placeholder="DAI to repay"
               type="number"
               step="0.01"

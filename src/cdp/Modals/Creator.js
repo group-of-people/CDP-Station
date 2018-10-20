@@ -90,6 +90,7 @@ export class CDPCreator extends Component {
           <Form>
             <Form.Input
               name={"EthToLock"}
+              label={"ETH to lock up"}
               placeholder="ETH to lock up"
               type="number"
               step="0.001"
@@ -98,6 +99,7 @@ export class CDPCreator extends Component {
             />
             <Form.Input
               name={"DaiToDraw"}
+              label={'DAI to draw'}
               placeholder="DAI to draw"
               type="number"
               step="0.01"

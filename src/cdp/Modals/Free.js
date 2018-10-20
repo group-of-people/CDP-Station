@@ -26,6 +26,7 @@ export default class Free extends Component {
           <Form>
             <Form.Input
               name={"amountPETH"}
+              label={"PETH to free"}
               placeholder="PETH to free"
               type="number"
               step="0.0001"
@@ -52,8 +53,6 @@ export default class Free extends Component {
   };
 
   handleChange = (e, { name, value }) => {
-    this.setState({ [name]: value }, () => {
-
-    });
+    this.setState({ [name]: value });
   };
 }

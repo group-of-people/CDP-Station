@@ -3,7 +3,7 @@ import { Button, Modal, Header, Form } from "semantic-ui-react";
 
 export default class Draw extends Component {
   state = {
-    amountDAI: "",
+    amountDAI: ""
   };
 
   render() {
@@ -13,8 +13,6 @@ export default class Draw extends Component {
       this.props.cdp.daiAvailable >= this.state.amountDAI
     ) {
       valid = true;
-    } else {
-      valid = false;
     }
 
     return (
@@ -34,6 +32,7 @@ export default class Draw extends Component {
           <Form>
             <Form.Input
               name={"amountDAI"}
+              label={"DAI to draw"}
               placeholder="DAI to draw"
               type="number"
               step="0.01"
