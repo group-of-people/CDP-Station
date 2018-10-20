@@ -17,8 +17,10 @@ export class Free extends Component {
       ethPrice;
     const maxDrawnDAIAfterFree =
       DAICollateralAfterFree / this.props.store.liquidationRatio.get();
-    const minPETHCollateral = this.props.cdp.daiDebt.toNumber() / ethPrice / wethToPeth;
-    const freeablePETH = this.props.cdp.pethLocked.toNumber() - minPETHCollateral;
+    const minPETHCollateral =
+      this.props.cdp.daiDebt.toNumber() / ethPrice / wethToPeth;
+    const freeablePETH =
+      this.props.cdp.pethLocked.toNumber() - minPETHCollateral;
     let valid = true;
     let error = "";
 
@@ -40,7 +42,7 @@ export class Free extends Component {
         <Header
           as="h5"
           style={{
-            color: this.state.color,
+            color: "gray",
             display: "inline",
             paddingBottom: "0"
           }}

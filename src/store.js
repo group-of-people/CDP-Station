@@ -30,7 +30,7 @@ function humanizeCDPResponse(cdp, props) {
 }
 
 function removeClosedCDPs(cdps) {
-  for (let i = cdps.length-1; i >= 0; i--) {
+  for (let i = cdps.length - 1; i >= 0; i--) {
     if (cdps[i].closed) {
       cdps.splice(i, 1);
     }
@@ -42,7 +42,7 @@ class Store {
   cdps = observable([]);
   web3 = observable.box(null);
   account = observable.box("");
-  maker = null
+  maker = null;
   loading = observable.box(true);
   ethPrice = observable.box(null);
   mkrPrice = observable.box(null);
@@ -50,13 +50,14 @@ class Store {
   liquidationRatio = observable.box(null);
   mkrBalance = observable.box(null);
   daiBalance = observable.box(null);
-  ethBalance = observable.box(null)
+  ethBalance = observable.box(null);
+  pethBalance = observable.box(null);
 
   // UI State
-  showFreeModal = observable.box(false)
-  freeModalTargetCDP = observable.box(null)
-  showLockModal = observable.box(false)
-  lockModalTargetCDP = observable.box(null)
+  showFreeModal = observable.box(false);
+  freeModalTargetCDP = observable.box(null);
+  showLockModal = observable.box(false);
+  lockModalTargetCDP = observable.box(null);
 
   constructor() {
     // Get network provider and web3 instance.
@@ -74,6 +75,10 @@ class Store {
       this.daiContract = new web3.eth.Contract(
         ERC20.abi,
         "0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359"
+      );
+      this.pethContract = new web3.eth.Contract(
+        ERC20.abi,
+        "0xf53AD2c6851052A81B42133467480961B2321C09"
       );
       this.initializeAccount().then(() => {
         web3.currentProvider.publicConfigStore.on(
@@ -128,6 +133,9 @@ class Store {
       const dai = await this.daiContract.methods
         .balanceOf(accs[0])
         .call({ from: accs[0] });
+      const peth = await this.pethContract.methods
+        .balanceOf(accs[0])
+        .call({ from: accs[0] });
 
       runInAction(() => {
         this.account.set(accs[0]);
@@ -136,7 +144,7 @@ class Store {
         this.wethToPeth.set(wethToPeth);
         this.liquidationRatio.set(liquidationRatio);
         this.loading.set(false);
-        removeClosedCDPs(cdps.results)
+        removeClosedCDPs(cdps.results);
         this.cdps.replace(
           cdps.results.map(cdp =>
             humanizeCDPResponse(cdp, {
@@ -148,21 +156,22 @@ class Store {
         );
         this.mkrBalance.set(MKR.wei(mkr));
         this.daiBalance.set(DAI.wei(dai));
-        this.ethBalance.set(ETH.wei(ethBalance))
+        this.ethBalance.set(ETH.wei(ethBalance));
+        this.pethBalance.set(PETH.wei(peth));
       });
     } catch (e) {
       console.log(e, "Failed to initialize");
     }
   };
 
-  isSafe = async (cdp) => {
+  isSafe = async cdp => {
     try {
       const cdpInstance = await this.maker.getCdp(cdp.id);
       return await cdpInstance.isSafe;
     } catch (e) {
       //console.log(e, "Error");
     }
-  }
+  };
 
   createCDP = async (amountETH, amountDAI) => {
     const eth = this.web3.utils.toWei(amountETH.toString(), "ether");
@@ -194,10 +203,10 @@ class Store {
   lockETH = async (amountETH, cdp) => {
     console.log(this.web3.utils.fromAscii(cdp.id.toString()));
     try {
-      const eth = this.web3.utils.toWei(amountETH, 'ether');
+      const eth = this.web3.utils.toWei(amountETH, "ether");
       await this.contract.methods
-      .lockETH(cdp.id, eth)
-      .send({ from: this.account.get(), value: eth });
+        .lockETH(cdp.id, eth)
+        .send({ from: this.account.get(), value: eth });
     } catch (e) {
       console.log(e, "Error locking ETH");
     }
@@ -221,34 +230,33 @@ class Store {
     }
   };
 
-
-  showFree = (cdp) => {
+  showFree = cdp => {
     runInAction(() => {
-      this.freeModalTargetCDP.set(cdp)
-      this.showFreeModal.set(true)
-    })
-  }
+      this.freeModalTargetCDP.set(cdp);
+      this.showFreeModal.set(true);
+    });
+  };
 
   hideFree = () => {
     runInAction(() => {
-      this.freeModalTargetCDP.set(null)
-      this.showFreeModal.set(false)
-    })
-  }
+      this.freeModalTargetCDP.set(null);
+      this.showFreeModal.set(false);
+    });
+  };
 
-  showLock = (cdp) => {
+  showLock = cdp => {
     runInAction(() => {
-      this.lockModalTargetCDP.set(cdp)
-      this.showLockModal.set(true)
-    })
-  }
+      this.lockModalTargetCDP.set(cdp);
+      this.showLockModal.set(true);
+    });
+  };
 
   hideLock = () => {
     runInAction(() => {
-      this.lockModalTargetCDP.set(null)
-      this.showLockModal.set(false)
-    })
-  }
+      this.lockModalTargetCDP.set(null);
+      this.showLockModal.set(false);
+    });
+  };
 }
 
 export default new Store();

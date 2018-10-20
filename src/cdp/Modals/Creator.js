@@ -60,8 +60,8 @@ export class CDPCreator extends Component {
           style={{
             color: color,
             display: "inline",
-            marginLeft: '3%',
-            marginRight: '3%'
+            marginLeft: "3%",
+            marginRight: "3%"
           }}
         >
           Collateralization: {this.collateralization.get()}%
@@ -70,7 +70,7 @@ export class CDPCreator extends Component {
           style={{
             color: color,
             display: "inline",
-            marginRight: '3%'
+            marginRight: "3%"
           }}
         >
           Liquidation Price: ${this.liquidation.get()}
@@ -79,7 +79,7 @@ export class CDPCreator extends Component {
           style={{
             color: color,
             display: "inline",
-            marginRight: '3%'
+            marginRight: "3%"
           }}
         >
           Collateral Price: ${this.daiTotal.get().toFixed(2)}
@@ -97,7 +97,7 @@ export class CDPCreator extends Component {
             />
             <Form.Input
               name={"DaiToDraw"}
-              label={'DAI to draw'}
+              label={"DAI to draw"}
               placeholder="DAI to draw"
               type="number"
               step="0.01"
@@ -127,7 +127,7 @@ export class CDPCreator extends Component {
   };
 
   handleChange = (e, { name, value }) => {
-    this[name].set(value)
+    this[name].set(value);
   };
 }
 

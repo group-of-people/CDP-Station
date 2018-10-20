@@ -29,7 +29,7 @@ export default class Repay extends Component {
           as="h5"
           style={{ color: "gray", display: "inline", paddingBottom: "0" }}
         >
-          MKR Balance: {this.props.store.mkrBalance.get().toString()}
+          MKR Balance: {this.props.store.mkrBalance.get().toString(6)}
         </Header>
         <Modal.Content>
           <Form>

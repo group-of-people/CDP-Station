@@ -4,9 +4,10 @@ import { Button, Modal, Header, Form } from "semantic-ui-react";
 export default class Lock extends Component {
   state = {
     amountETH: this.props.store.ethBalance.get().toNumber(),
-    amountPETH:
+    amountPETH: (
       this.props.store.ethBalance.get().toNumber() /
-      this.props.store.wethToPeth.get(),
+      this.props.store.wethToPeth.get()
+    ).toFixed(6),
     color: "gray",
     valid: false
   };

@@ -9,7 +9,7 @@ export default class Alert extends Component {
         <div>{this.props.store.ethPrice.get().toString()}</div>
         <div>{this.props.store.mkrPrice.get().toString()}</div>
 
-        <Table singleLine collapsing style={{width: '85%'}}>
+        <Table singleLine collapsing style={{ width: "85%" }}>
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell>CDP</Table.HeaderCell>
@@ -21,24 +21,26 @@ export default class Alert extends Component {
           </Table.Header>
 
           <Table.Body>
-          {this.props.store.cdps.map(cdp => (
-            <Table.Row>
+            {this.props.store.cdps.map(cdp => (
+              <Table.Row>
                 <Table.Cell>{cdp.id}</Table.Cell>
                 <Table.Cell>{cdp.pethLocked.toString(4)}</Table.Cell>
                 <Table.Cell>{cdp.daiDebt.toString(4)}</Table.Cell>
                 <Table.Cell>
-                    {(
-                        (parseFloat(cdp.daiDebt) *
-                        this.props.store.liquidationRatio.get()) /
-                        parseFloat(cdp.ethLocked)
-                        ).toFixed(2)}
-              </Table.Cell>
-              <Table.Cell>
-                  {this.props.store.isSafe(cdp) && <div>Safe</div> }
-                  {!this.props.store.isSafe(cdp) && <div style={{color: "red"}}>Not Safe</div> }
-              </Table.Cell>
-            </Table.Row>
-          ))}
+                  {(
+                    (parseFloat(cdp.daiDebt) *
+                      this.props.store.liquidationRatio.get()) /
+                    parseFloat(cdp.ethLocked)
+                  ).toFixed(2)}
+                </Table.Cell>
+                <Table.Cell>
+                  {this.props.store.isSafe(cdp) && <div>Safe</div>}
+                  {!this.props.store.isSafe(cdp) && (
+                    <div style={{ color: "red" }}>Not Safe</div>
+                  )}
+                </Table.Cell>
+              </Table.Row>
+            ))}
           </Table.Body>
         </Table>
       </>
