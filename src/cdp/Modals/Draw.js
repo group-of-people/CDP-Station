@@ -18,7 +18,7 @@ export default class Draw extends Component {
     }
 
     return (
-      <Modal open onClose={this.props.onRequestClose}>
+      <Modal open closeIcon onClose={this.props.onRequestClose}>
         <Header>Draw DAI</Header>
         <Header
           as="h5"

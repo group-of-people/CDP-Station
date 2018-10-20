@@ -10,7 +10,7 @@ export default class Free extends Component {
 
   render() {
     return (
-      <Modal open onClose={this.props.onRequestClose}>
+      <Modal open closeIcon onClose={this.props.onRequestClose}>
         <Header>Free PETH</Header>
         <Header
           as="h5"
