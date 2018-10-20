@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Modal, Header, Form, Input } from "semantic-ui-react";
+import { Button, Modal, Header, Form, Input, Message } from "semantic-ui-react";
 import { observer } from "mobx-react";
 
 export class Free extends Component {
@@ -8,12 +8,30 @@ export class Free extends Component {
   };
 
   render() {
-    const amountETH = (
-      this.state.amountPETH * this.props.store.wethToPeth.get()
-    ).toFixed(4);
+    const ethPrice = this.props.store.ethPrice.get().toNumber();
+    const wethToPeth = this.props.store.wethToPeth.get();
+    const amountETH = this.state.amountPETH * wethToPeth;
+    const DAICollateralAfterFree =
+      (this.props.cdp.pethLocked.toNumber() - this.state.amountPETH) *
+      wethToPeth *
+      ethPrice;
+    const maxDrawnDAIAfterFree =
+      DAICollateralAfterFree / this.props.store.liquidationRatio.get();
+    const minPETHCollateral = this.props.cdp.daiDebt.toNumber() / ethPrice / wethToPeth;
+    const freeablePETH = this.props.cdp.pethLocked.toNumber() - minPETHCollateral;
     let valid = true;
-    if (this.state.amountPETH > this.props.cdp.pethLocked) {
+    let error = "";
+
+    if (this.state.amountPETH > this.props.cdp.pethLocked.toNumber()) {
       valid = false;
+      error = "CDP has less PETH locked than selected";
+    }
+
+    if (maxDrawnDAIAfterFree < this.props.cdp.daiDebt.toNumber()) {
+      valid = false;
+      error = `CDP will become unsafe. You can free at most ${freeablePETH.toFixed(
+        4
+      )} PETH`;
     }
 
     return (
@@ -35,7 +53,7 @@ export class Free extends Component {
               <label>PETH to free</label>
               <Input
                 name={"amountPETH"}
-                label={{ basic: true, content: `${amountETH} ETH` }}
+                label={{ basic: true, content: `${amountETH.toFixed(4)} ETH` }}
                 labelPosition={"right"}
                 placeholder="PETH to free"
                 type="number"
@@ -43,6 +61,12 @@ export class Free extends Component {
                 onChange={this.handleChange}
               />
             </Form.Field>
+            {!valid &&
+              error && (
+                <Message visible error>
+                  {error}
+                </Message>
+              )}
           </Form>
         </Modal.Content>
         <Modal.Actions>

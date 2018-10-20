@@ -34,7 +34,7 @@ class Store {
   cdps = observable([]);
   web3 = observable.box(null);
   account = observable.box("");
-  maker = observable.box(null);
+  maker = null
   loading = observable.box(true);
   ethPrice = observable.box(null);
   mkrPrice = observable.box(null);
