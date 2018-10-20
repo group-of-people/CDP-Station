@@ -40,6 +40,18 @@ contract CDPCreator {
         emit CDPCreated(cupID, msg.sender, amountDAI);
     }
 
+    function lockETH(uint256 id, uint256 amountETH) payable external {
+        require(msg.value == amountETH);
+        require(address(weth).call.value(msg.value)());
+        weth.approve(address(tub), amountETH);
+
+        uint256 amountPETH = (amountETH ** 2) / (tub.ask(amountETH));
+        tub.join(amountPETH);
+
+        peth.approve(address(tub), amountPETH);
+        tub.lock(bytes32(id), amountPETH);
+    }
+
     function convertETHToPETH(uint256 amountETH) payable external {
         require(msg.value == amountETH);
         require(address(weth).call.value(msg.value)());

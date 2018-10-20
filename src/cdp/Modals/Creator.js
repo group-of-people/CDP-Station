@@ -56,36 +56,34 @@ export class CDPCreator extends Component {
     return (
       <Modal open onClose={this.props.onRequestClose}>
         <Header>Open a New CDP</Header>
-        <Header
-          as="h5"
+        <div
           style={{
             color: color,
             display: "inline",
-            paddingBottom: 0
+            marginLeft: '3%',
+            marginRight: '3%'
           }}
         >
           Collateralization: {this.collateralization.get()}%
-        </Header>
-        <Header
-          as="h5"
+        </div>
+        <div
           style={{
             color: color,
             display: "inline",
-            paddingBottom: 0
+            marginRight: '3%'
           }}
         >
           Liquidation Price: ${this.liquidation.get()}
-        </Header>
-        <Header
-          as="h5"
+        </div>
+        <div
           style={{
             color: color,
             display: "inline",
-            paddingBottom: 0
+            marginRight: '3%'
           }}
         >
           Collateral Price: ${this.daiTotal.get().toFixed(2)}
-        </Header>
+        </div>
         <Modal.Content>
           <Form>
             <Form.Input

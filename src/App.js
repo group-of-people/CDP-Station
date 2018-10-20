@@ -44,38 +44,28 @@ class App extends Component {
 
     return (
       <>
-        <div style={{ display: "inline" }}>
-          <div>Logged in as {store.account.get()}</div>
-          <div>{store.ethPrice.get().toString()}</div>
-          <div>{store.mkrPrice.get().toString()}</div>
-          <div>Liquidation Ratio: {store.liquidationRatio.get()}</div>
-          <div>ETH/PETH Ratio: {store.wethToPeth.get().toFixed(4)}</div>
-        </div>
-        <div style={{ display: "inline" }}>
-          <div>DAI Balance: {store.daiBalance.get().toString(4)}</div>
-          <div>MKR Balance: {store.mkrBalance.get().toString(4)}</div>
-          <div>ETH Balance: {store.ethBalance.get().toString(4)}</div>
-        </div>
-        <br />
         {!!store.showLockModal.get() && (
-            <LockETH
-              cdp={store.lockModalTargetCDP.get()}
-              store={this.props.store}
-              onRequestClose={store.hideLock}
-            />
-          )}
+          <LockETH
+            cdp={store.lockModalTargetCDP.get()}
+            store={this.props.store}
+            onRequestClose={store.hideLock}
+          />
+        )}
         {!!store.showFreeModal.get() && (
-            <FreePETH
-              cdp={store.freeModalTargetCDP.get()}
-              store={this.props.store}
-              onRequestClose={store.hideFree}
-            />
-          )}
+          <FreePETH
+            cdp={store.freeModalTargetCDP.get()}
+            store={this.props.store}
+            onRequestClose={store.hideFree}
+          />
+        )}
         {store.account.get() &&
           this.state.mode === "work" && (
             <Work key={this.state.account} store={store} />
           )}
-        {store.account.get() && this.state.mode === "alert" && <Alert />}
+        {store.account.get() &&
+          this.state.mode === "alerts" && (
+            <Alert store={store} />
+          )}
         {store.account.get() && this.state.mode === "helper" && <Helper />}
       </>
     );

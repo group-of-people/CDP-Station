@@ -28,31 +28,29 @@ class CDPCard extends React.Component {
     const { cdp } = this.props;
     return (
       <>
-        {cdp.pethLocked.toNumber() !== 0 && (
-          <Card onClick={this.onClick}>
-            <Chart
-              data={[
-                { name: "DAI Debt", value: cdp.daiDebt.toNumber() },
-                { name: "DAI Available", value: cdp.daiAvailable }
-                // {name: "DAI Collateral", value: cdp.daiLocked - cdp.daiAvailable - cdp.daiDebt.toNumber()}
-              ]}
-            />
-            <Card.Content textAlign={"right"}>
-              <Card.Header>CDP {cdp.id} </Card.Header>
-              <Card.Meta>{cdp.ethLocked.toFixed(4)} ETH </Card.Meta>
-            </Card.Content>
-            <Card.Content extra>
-              <div className="ui two buttons">
-                <Button basic color="blue" onClick={this.drawDai}>
-                  Draw
-                </Button>
-                <Button basic color="green" onClick={this.repayDai}>
-                  Repay
-                </Button>
-              </div>
-            </Card.Content>
-          </Card>
-        )}
+        <Card onClick={this.onClick}>
+          <Chart
+            data={[
+              { name: "DAI Debt", value: cdp.daiDebt.toNumber() },
+              { name: "DAI Available", value: cdp.daiAvailable }
+              // {name: "DAI Collateral", value: cdp.daiLocked - cdp.daiAvailable - cdp.daiDebt.toNumber()}
+            ]}
+          />
+          <Card.Content textAlign={"right"}>
+            <Card.Header>CDP {cdp.id} </Card.Header>
+            <Card.Meta>{cdp.ethLocked.toFixed(4)} ETH </Card.Meta>
+          </Card.Content>
+          <Card.Content extra>
+            <div className="ui two buttons">
+              <Button basic color="blue" onClick={this.drawDai}>
+                Draw
+              </Button>
+              <Button basic color="green" onClick={this.repayDai}>
+                Repay
+              </Button>
+            </div>
+          </Card.Content>
+        </Card>
       </>
     );
   }

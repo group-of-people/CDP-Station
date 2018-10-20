@@ -27,7 +27,7 @@ module.exports = {
         return new HDWalletProvider(mnemonic, '') 
       },
       network_id: '1',
-      gasPrice: 3000000000,
+      gasPrice: 10000000000,
     },
   }
 };

@@ -29,6 +29,14 @@ function humanizeCDPResponse(cdp, props) {
   };
 }
 
+function removeClosedCDPs(cdps) {
+  for (let i = cdps.length-1; i >= 0; i--) {
+    if (cdps[i].closed) {
+      cdps.splice(i, 1);
+    }
+  }
+}
+
 class Store {
   // DATA
   cdps = observable([]);
@@ -57,7 +65,7 @@ class Store {
       this.web3 = web3;
       this.contract = new web3.eth.Contract(
         CDPCreatorBuild.abi,
-        "0x940bF0EE39db2F9b2f85059725216e3898372222"
+        "0x38753Ef9Fb83C3cC231f91aBD752F4823eD2677F"
       );
       this.mkrContract = new web3.eth.Contract(
         ERC20.abi,
@@ -128,6 +136,7 @@ class Store {
         this.wethToPeth.set(wethToPeth);
         this.liquidationRatio.set(liquidationRatio);
         this.loading.set(false);
+        removeClosedCDPs(cdps.results)
         this.cdps.replace(
           cdps.results.map(cdp =>
             humanizeCDPResponse(cdp, {
@@ -145,6 +154,15 @@ class Store {
       console.log(e, "Failed to initialize");
     }
   };
+
+  isSafe = async (cdp) => {
+    try {
+      const cdpInstance = await this.maker.getCdp(cdp.id);
+      return await cdpInstance.isSafe;
+    } catch (e) {
+      //console.log(e, "Error");
+    }
+  }
 
   createCDP = async (amountETH, amountDAI) => {
     const eth = this.web3.utils.toWei(amountETH.toString(), "ether");
@@ -174,9 +192,12 @@ class Store {
   };
 
   lockETH = async (amountETH, cdp) => {
+    console.log(this.web3.utils.fromAscii(cdp.id.toString()));
     try {
-      const cdpInstance = await this.maker.getCdp(cdp.id);
-      await cdpInstance.lockEth(amountETH);
+      const eth = this.web3.utils.toWei(amountETH, 'ether');
+      await this.contract.methods
+      .lockETH(cdp.id, eth)
+      .send({ from: this.account.get(), value: eth });
     } catch (e) {
       console.log(e, "Error locking ETH");
     }
