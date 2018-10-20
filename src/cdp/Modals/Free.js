@@ -1,14 +1,21 @@
 import React, { Component } from "react";
-import { Button, Modal, Header, Form } from "semantic-ui-react";
+import { Button, Modal, Header, Form, Input } from "semantic-ui-react";
+import { observer } from "mobx-react";
 
-export default class Free extends Component {
+export class Free extends Component {
   state = {
-    amountPETH: "",
-    color: "gray",
-    valid: false
+    amountPETH: 0
   };
 
   render() {
+    const amountETH = (
+      this.state.amountPETH * this.props.store.wethToPeth.get()
+    ).toFixed(4);
+    let valid = true;
+    if (this.state.amountPETH > this.props.cdp.pethLocked) {
+      valid = false;
+    }
+
     return (
       <Modal open closeIcon onClose={this.props.onRequestClose}>
         <Header>Free PETH</Header>
@@ -24,19 +31,22 @@ export default class Free extends Component {
         </Header>
         <Modal.Content>
           <Form>
-            <Form.Input
-              name={"amountPETH"}
-              label={"PETH to free"}
-              placeholder="PETH to free"
-              type="number"
-              step="0.0001"
-              value={this.state.PETH}
-              onChange={this.handleChange}
-            />
+            <Form.Field>
+              <label>PETH to free</label>
+              <Input
+                name={"amountPETH"}
+                label={{ basic: true, content: `${amountETH} ETH` }}
+                labelPosition={"right"}
+                placeholder="PETH to free"
+                type="number"
+                value={this.state.amountPETH}
+                onChange={this.handleChange}
+              />
+            </Form.Field>
           </Form>
         </Modal.Content>
         <Modal.Actions>
-          <Button primary disabled={this.state.valid} onClick={this.freePETH}>
+          <Button primary disabled={!valid} onClick={this.freePETH}>
             Free PETH
           </Button>
           <Button color="red" onClick={this.props.onRequestClose}>
@@ -56,3 +66,5 @@ export default class Free extends Component {
     this.setState({ [name]: value });
   };
 }
+
+export default observer(Free);
