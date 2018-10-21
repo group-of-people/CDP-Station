@@ -6,6 +6,7 @@ import getWeb3 from "./utils/getWeb3";
 
 const maker = Maker.create("browser");
 const { DAI, PETH, MKR, ETH } = Maker;
+export { DAI, PETH, MKR, ETH };
 
 function humanizeCDPResponse(cdp, props) {
   const pethLocked = PETH.wei(cdp.ink);

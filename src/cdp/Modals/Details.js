@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Modal, Header, Button, Icon } from "semantic-ui-react";
+import {MKR} from '../../store'
 
 export default class CDPDetails extends Component {
   state = {
@@ -8,7 +9,7 @@ export default class CDPDetails extends Component {
 
   componentDidMount() {
     this.props.store.maker.getCdp(this.props.cdp.id).then(cdp => {
-      cdp.getGovernanceFee().then(fee => {
+      cdp.getGovernanceFee(MKR).then(fee => {
         this.setState({ governanceFee: fee.toNumber() });
       });
     });
