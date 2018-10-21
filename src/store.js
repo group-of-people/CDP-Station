@@ -30,14 +30,6 @@ function humanizeCDPResponse(cdp, props) {
   };
 }
 
-function removeClosedCDPs(cdps) {
-  for (let i = cdps.length - 1; i >= 0; i--) {
-    if (cdps[i].closed) {
-      cdps.splice(i, 1);
-    }
-  }
-}
-
 class Store {
   // DATA
   cdps = observable([]);
@@ -115,19 +107,15 @@ class Store {
         mkrPrice,
         wethToPeth,
         liquidationRatio,
-        cdpsResponse,
         ethBalance
       ] = await Promise.all([
         priceService.getEthPrice(),
         priceService.getMkrPrice(),
         priceService.getWethToPethRatio(),
         cdpService.getLiquidationRatio(),
-        fetch(
-          `https://dai-service.makerdao.com/cups/conditions=lad:${accs[0].toLowerCase()}/sort=cupi:asc`
-        ),
         web3.eth.getBalance(accs[0])
       ]);
-      const cdps = await cdpsResponse.json();
+
       const mkr = await this.mkrContract.methods
         .balanceOf(accs[0])
         .call({ from: accs[0] });
@@ -144,21 +132,14 @@ class Store {
         this.mkrPrice.set(mkrPrice);
         this.wethToPeth.set(wethToPeth);
         this.liquidationRatio.set(liquidationRatio);
-        this.loading.set(false);
-        removeClosedCDPs(cdps.results);
-        this.cdps.replace(
-          cdps.results.map(cdp =>
-            humanizeCDPResponse(cdp, {
-              wethToPeth,
-              liquidationRatio,
-              ethPrice
-            })
-          )
-        );
         this.mkrBalance.set(MKR.wei(mkr));
         this.daiBalance.set(DAI.wei(dai));
         this.ethBalance.set(ETH.wei(ethBalance));
         this.pethBalance.set(PETH.wei(peth));
+      });
+      await this.updateCDPS();
+      runInAction(() => {
+        this.loading.set(false);
       });
     } catch (e) {
       console.log(e, "Failed to initialize");
@@ -174,6 +155,26 @@ class Store {
     }
   };
 
+  updateCDPS = async () => {
+    const acc = this.account.get();
+    const cdpsResponse = await fetch(
+      `https://dai-service.makerdao.com/cups/conditions=lad:${acc.toLowerCase()}/sort=cupi:asc`
+    );
+    const cdps = await cdpsResponse.json();
+
+    runInAction(() => {
+      this.cdps.replace(
+        cdps.results.filter(cdp => !cdp.closed).map(cdp =>
+          humanizeCDPResponse(cdp, {
+            wethToPeth: this.wethToPeth.get(),
+            liquidationRatio: this.liquidationRatio.get(),
+            ethPrice: this.ethPrice.get()
+          })
+        )
+      );
+    });
+  };
+
   createCDP = async (amountETH, amountDAI) => {
     const eth = this.web3.utils.toWei(amountETH.toString(), "ether");
     const dai = amountDAI * Math.pow(10, 18);
@@ -181,6 +182,7 @@ class Store {
     await this.contract.methods
       .createCDP(eth, daiBN.toString())
       .send({ from: this.account.get(), value: eth });
+    await this.updateCDPS();
   };
 
   drawDAI = async (amountDAI, cdp) => {

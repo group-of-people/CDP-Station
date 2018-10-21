@@ -6,5 +6,5 @@ export function isValidFloatInputNumber(value) {
 }
 
 export function parseInputFloat(value) {
-  return value === "" ? 0 : parseFloat(value) === NaN ? 0 : parseFloat(value);
+  return value === "" ? 0 : isNaN(parseFloat(value)) ? 0 : parseFloat(value);
 }

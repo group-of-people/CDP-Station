@@ -5,6 +5,7 @@ import { observable, computed } from "mobx";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 
 export class CDPCreator extends Component {
+  state = {};
   EthToLock = observable.box(this.props.store.ethBalance.get().toNumber());
   DaiToDraw = observable.box("0");
 
@@ -35,11 +36,14 @@ export class CDPCreator extends Component {
   );
 
   render() {
+    const { creating } = this.state;
     const minCollateralization = this.props.store.liquidationRatio.get() * 100;
     const ethBalance = this.props.store.ethBalance.get().toNumber();
+
     let valid = false;
     let error = "";
     if (this.EthToLock.get() === "" || this.DaiToDraw.get() === "") {
+      valid = false;
     } else if (this.collateralization.get() < minCollateralization) {
       error = `Collateralization < ${minCollateralization}%. You can draw up to ${(
         this.daiTotal.get() / this.props.store.liquidationRatio.get()
@@ -56,7 +60,7 @@ export class CDPCreator extends Component {
     }
 
     return (
-      <Modal open onClose={this.props.onRequestClose}>
+      <Modal open closeIcon onClose={this.props.onRequestClose}>
         <Header>Open a New CDP</Header>
         {!!this.DaiToDraw.get() && (
           <div
@@ -104,7 +108,7 @@ export class CDPCreator extends Component {
           </Form>
         </Modal.Content>
         <Modal.Actions>
-          <Button primary disabled={!valid} onClick={this.createCDP}>
+          <Button primary loading={!!creating} disabled={!valid} onClick={this.createCDP}>
             CreateCDP
           </Button>
           <Button color="red" onClick={this.props.onRequestClose}>
@@ -116,6 +120,7 @@ export class CDPCreator extends Component {
   }
 
   createCDP = async () => {
+    this.setState({ creating: true });
     await this.props.store.createCDP(
       this.EthToLock.get(),
       this.DaiToDraw.get()
