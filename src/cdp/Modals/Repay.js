@@ -13,7 +13,7 @@ export default class Repay extends Component {
   render() {
     const amountDAI = parseInputFloat(this.state.amountDAI);
     let valid = false;
-    if (amountDAI && this.props.cdp.daiDebt.toNumber() >= amountDAI) {
+    if (amountDAI > 0 && this.props.cdp.daiDebt.toNumber() >= amountDAI) {
       valid = true;
     }
 
