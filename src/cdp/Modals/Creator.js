@@ -33,6 +33,7 @@ export class CDPCreator extends Component {
 
   render() {
     const minCollateralization = this.props.store.liquidationRatio.get() * 100;
+    const ethBalance = this.props.store.ethBalance.get().toNumber();
     let valid = false;
     let error = "";
     if (
@@ -43,6 +44,9 @@ export class CDPCreator extends Component {
       error = `Collateralization < ${minCollateralization}%. You can draw up to ${(
         this.daiTotal.get() / this.props.store.liquidationRatio.get()
       ).toFixed(2)} DAI.`;
+      valid = false;
+    } else if (ethBalance < this.EthToLock.get()) {
+      error = `You can lock up to ${ethBalance} ETH`;
       valid = false;
     } else if (this.EthToLock.get()) {
       valid = true;
@@ -80,7 +84,7 @@ export class CDPCreator extends Component {
               placeholder="ETH to lock up"
               type="number"
               step="0.001"
-              value={this.EthToLock.get()}
+              value={this.EthToLock.get().toString()}
               onChange={this.handleChange}
             />
             <Form.Input
