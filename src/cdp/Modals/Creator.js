@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Modal, Header, Form } from "semantic-ui-react";
+import { Button, Modal, Header, Form, Message } from "semantic-ui-react";
 import { observer } from "mobx-react";
 import { observable, computed } from "mobx";
 
@@ -32,58 +32,46 @@ export class CDPCreator extends Component {
   );
 
   render() {
-    let color;
+    const minCollateralization = this.props.store.liquidationRatio.get() * 100;
     let valid = false;
+    let error = "";
     if (
       this.EthToLock.get() &&
       this.DaiToDraw.get() &&
-      this.collateralization.get() < 150
+      this.collateralization.get() < minCollateralization
     ) {
-      color = "red";
+      error = `Collateralization < ${minCollateralization}%. You can draw up to ${(
+        this.daiTotal.get() / this.props.store.liquidationRatio.get()
+      ).toFixed(2)} DAI.`;
       valid = false;
-    } else if (
-      this.EthToLock.get() &&
-      this.DaiToDraw.get() &&
-      this.collateralization.get() >= 150
-    ) {
-      color = "gray";
+    } else if (this.EthToLock.get()) {
       valid = true;
-    } else {
-      color = "gray";
-      valid = false;
     }
 
     return (
       <Modal open onClose={this.props.onRequestClose}>
         <Header>Open a New CDP</Header>
-        <div
-          style={{
-            color: color,
-            display: "inline",
-            marginLeft: "3%",
-            marginRight: "3%"
-          }}
-        >
-          Collateralization: {this.collateralization.get()}%
-        </div>
-        <div
-          style={{
-            color: color,
-            display: "inline",
-            marginRight: "3%"
-          }}
-        >
-          Liquidation Price: ${this.liquidation.get()}
-        </div>
-        <div
-          style={{
-            color: color,
-            display: "inline",
-            marginRight: "3%"
-          }}
-        >
-          Collateral Price: ${this.daiTotal.get().toFixed(2)}
-        </div>
+        {!!this.DaiToDraw.get() && (
+          <div
+            style={{
+              display: "inline",
+              marginLeft: "3%",
+              marginRight: "3%"
+            }}
+          >
+            Collateralization: {this.collateralization.get()}%
+          </div>
+        )}
+        {!!this.DaiToDraw.get() && (
+          <div
+            style={{
+              display: "inline",
+              marginRight: "3%"
+            }}
+          >
+            Liquidation Price: ${this.liquidation.get()}
+          </div>
+        )}
         <Modal.Content>
           <Form>
             <Form.Input
@@ -101,9 +89,15 @@ export class CDPCreator extends Component {
               placeholder="DAI to draw"
               type="number"
               step="0.01"
-              value={this.DaiToDraw.get()}
+              value={this.DaiToDraw.get().toString()}
               onChange={this.handleChange}
             />
+            {!valid &&
+              error && (
+                <Message visible error>
+                  {error}
+                </Message>
+              )}
           </Form>
         </Modal.Content>
         <Modal.Actions>
@@ -127,7 +121,7 @@ export class CDPCreator extends Component {
   };
 
   handleChange = (e, { name, value }) => {
-    this[name].set(value);
+    this[name].set(parseFloat(value) || 0);
   };
 }
 

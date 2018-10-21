@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { Table } from "semantic-ui-react";
+import { observer } from "mobx-react";
 
-export default class Alert extends Component {
+export class Alert extends Component {
   state = {};
   render() {
     return (
@@ -47,3 +48,5 @@ export default class Alert extends Component {
     );
   }
 }
+
+export default observer(Alert);
