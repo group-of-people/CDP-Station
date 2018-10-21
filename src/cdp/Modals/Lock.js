@@ -1,11 +1,9 @@
 import React, { Component } from "react";
-import { Button, Modal, Header, Form, Input } from "semantic-ui-react";
+import { Button, Modal, Header, Form, Input, Message } from "semantic-ui-react";
 
 export default class Lock extends Component {
   state = {
-    amountETH: this.props.store.ethBalance.get().toNumber(),
-    color: "gray",
-    valid: false
+    amountETH: this.props.store.ethBalance.get().toNumber()
   };
 
   render() {
@@ -14,6 +12,17 @@ export default class Lock extends Component {
 
     const pethLocked = this.props.cdp.pethLocked;
     const ethLocked = pethLocked.toNumber() * wethToPeth;
+
+    const ethBalance = this.props.store.ethBalance.get().toNumber();
+
+    let valid = true;
+    let error = "";
+    if (this.state.amountETH > ethBalance) {
+      valid = false;
+      error = `You can lock up to ${ethBalance.toFixed(4)} ETH`;
+    } else if (!this.state.amountETH || this.state.amountETH < 0) {
+      valid = false;
+    }
 
     return (
       <Modal open closeIcon onClose={this.props.onRequestClose}>
@@ -39,18 +48,21 @@ export default class Lock extends Component {
                 placeholder="ETH to lock"
                 type="number"
                 step="0.0001"
-                value={this.state.amountETH}
+                min={0}
+                value={this.state.amountETH.toString()}
                 onChange={this.handleChange}
               />
             </Form.Field>
+            {!valid &&
+              error && (
+                <Message visible error>
+                  {error}
+                </Message>
+              )}
           </Form>
         </Modal.Content>
         <Modal.Actions>
-          <Button
-            primary
-            disabled={!this.state.amountETH}
-            onClick={this.lockETH}
-          >
+          <Button primary disabled={!valid} onClick={this.lockETH}>
             Lock ETH
           </Button>
           <Button color="red" onClick={this.props.onRequestClose}>
@@ -67,6 +79,6 @@ export default class Lock extends Component {
   };
 
   handleChange = (e, { name, value }) => {
-    this.setState({ [name]: value });
+    this.setState({ [name]: parseFloat(value) || 0});
   };
 }

@@ -46,9 +46,9 @@ export class CDPCreator extends Component {
       ).toFixed(2)} DAI.`;
       valid = false;
     } else if (ethBalance < this.EthToLock.get()) {
-      error = `You can lock up to ${ethBalance} ETH`;
+      error = `You can lock up to ${ethBalance.toFixed(4)} ETH`;
       valid = false;
-    } else if (this.EthToLock.get()) {
+    } else if (this.EthToLock.get() && this.EthToLock.get() > 0) {
       valid = true;
     }
 
