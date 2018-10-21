@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Button, Modal, Header, Form } from "semantic-ui-react";
+import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 
 export default class Draw extends Component {
   state = {
@@ -8,9 +9,12 @@ export default class Draw extends Component {
 
   render() {
     let valid = false;
+    const amountDAI = parseInputFloat(this.state.amountDAI);
     if (
-      this.state.amountDAI &&
-      this.props.cdp.daiAvailable >= this.state.amountDAI
+      amountDAI &&
+      this.props.cdp.daiAvailable >= amountDAI &&
+      amountDAI > 0 &&
+      this.state.amountDAI !== ""
     ) {
       valid = true;
     }
@@ -34,8 +38,6 @@ export default class Draw extends Component {
               name={"amountDAI"}
               label={"DAI to draw"}
               placeholder="DAI to draw"
-              type="number"
-              step="0.01"
               value={this.state.amountDAI}
               onChange={this.handleChange}
             />
@@ -59,6 +61,9 @@ export default class Draw extends Component {
   };
 
   handleChange = (e, { name, value }) => {
+    if (!isValidFloatInputNumber(value)) {
+      return;
+    }
     this.setState({ [name]: value });
   };
 }

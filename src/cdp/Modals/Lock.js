@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Button, Modal, Header, Form, Input, Message } from "semantic-ui-react";
+import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 
 export default class Lock extends Component {
   state = {
@@ -7,8 +8,10 @@ export default class Lock extends Component {
   };
 
   render() {
+    const amountETH = parseInputFloat(this.state.amountETH);
+
     const wethToPeth = this.props.store.wethToPeth.get();
-    const amountPETH = (this.state.amountETH / wethToPeth).toFixed(4);
+    const amountPETH = (amountETH / wethToPeth).toFixed(4);
 
     const pethLocked = this.props.cdp.pethLocked;
     const ethLocked = pethLocked.toNumber() * wethToPeth;
@@ -17,10 +20,10 @@ export default class Lock extends Component {
 
     let valid = true;
     let error = "";
-    if (this.state.amountETH > ethBalance) {
+    if (amountETH > ethBalance) {
       valid = false;
       error = `You can lock up to ${ethBalance.toFixed(4)} ETH`;
-    } else if (!this.state.amountETH || this.state.amountETH < 0) {
+    } else if (!amountETH || amountETH < 0) {
       valid = false;
     }
 
@@ -46,10 +49,7 @@ export default class Lock extends Component {
                 label={{ basic: true, content: `${amountPETH} PETH` }}
                 labelPosition={"right"}
                 placeholder="ETH to lock"
-                type="number"
-                step="0.0001"
-                min={0}
-                value={this.state.amountETH.toString()}
+                value={this.state.amountETH}
                 onChange={this.handleChange}
               />
             </Form.Field>
@@ -79,6 +79,9 @@ export default class Lock extends Component {
   };
 
   handleChange = (e, { name, value }) => {
-    this.setState({ [name]: parseFloat(value) || 0});
+    if (!isValidFloatInputNumber(value)) {
+      return;
+    }
+    this.setState({ [name]: value });
   };
 }

@@ -1,39 +1,42 @@
 import React, { Component } from "react";
 import { Button, Modal, Header, Form, Input, Message } from "semantic-ui-react";
 import { observer } from "mobx-react";
+import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 
 export class Free extends Component {
   state = {
-    amountPETH: 0
+    amountPETH: "0"
   };
 
   render() {
+    const amountPETH = parseInputFloat(this.state.amountPETH);
     const ethPrice = this.props.store.ethPrice.get().toNumber();
     const wethToPeth = this.props.store.wethToPeth.get();
-    const amountETH = this.state.amountPETH * wethToPeth;
+    const amountETH = amountPETH * wethToPeth;
     const DAICollateralAfterFree =
-      (this.props.cdp.pethLocked.toNumber() - this.state.amountPETH) *
+      (this.props.cdp.pethLocked.toNumber() - amountPETH) *
       wethToPeth *
       ethPrice;
     const maxDrawnDAIAfterFree =
       DAICollateralAfterFree / this.props.store.liquidationRatio.get();
     const minPETHCollateral =
-      this.props.cdp.daiDebt.toNumber() / ethPrice / wethToPeth;
+      (this.props.cdp.daiDebt.toNumber() / ethPrice / wethToPeth) *
+      this.props.store.liquidationRatio.get();
     const freeablePETH =
       this.props.cdp.pethLocked.toNumber() - minPETHCollateral;
     let valid = true;
     let error = "";
 
-    if (this.state.amountPETH > this.props.cdp.pethLocked.toNumber()) {
+    if (amountPETH > this.props.cdp.pethLocked.toNumber()) {
       valid = false;
       error = "CDP has less PETH locked than selected";
-    }
-
-    if (maxDrawnDAIAfterFree < this.props.cdp.daiDebt.toNumber()) {
+    } else if (maxDrawnDAIAfterFree < this.props.cdp.daiDebt.toNumber()) {
       valid = false;
       error = `CDP will become unsafe. You can free at most ${freeablePETH.toFixed(
         4
       )} PETH`;
+    } else if (amountPETH <= 0 || this.state.amountPETH === "") {
+      valid = false;
     }
 
     return (
@@ -47,7 +50,8 @@ export class Free extends Component {
             paddingBottom: "0"
           }}
         >
-          PETH Locked: {this.props.cdp.pethLocked.toString(6)}
+          Locked: {this.props.cdp.pethLocked.toNumber().toFixed(4)} PETH (
+          {(this.props.cdp.pethLocked.toNumber() * wethToPeth).toFixed(4)} ETH)
         </Header>
         <Modal.Content>
           <Form>
@@ -58,7 +62,6 @@ export class Free extends Component {
                 label={{ basic: true, content: `${amountETH.toFixed(4)} ETH` }}
                 labelPosition={"right"}
                 placeholder="PETH to free"
-                type="number"
                 value={this.state.amountPETH}
                 onChange={this.handleChange}
               />
@@ -89,6 +92,9 @@ export class Free extends Component {
   };
 
   handleChange = (e, { name, value }) => {
+    if (!isValidFloatInputNumber(value)) {
+      return;
+    }
     this.setState({ [name]: value });
   };
 }
