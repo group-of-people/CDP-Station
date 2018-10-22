@@ -75,7 +75,12 @@ export class Free extends Component {
           </Form>
         </Modal.Content>
         <Modal.Actions>
-          <Button primary disabled={!valid} onClick={this.freePETH}>
+          <Button
+            primary
+            loading={this.state.freeing}
+            disabled={!valid}
+            onClick={this.freePETH}
+          >
             Free PETH
           </Button>
           <Button color="red" onClick={this.props.onRequestClose}>
@@ -87,6 +92,7 @@ export class Free extends Component {
   }
 
   freePETH = async () => {
+    this.setState({ freeing: true });
     await this.props.store.freePETH(this.state.amountPETH, this.props.cdp);
     this.props.onRequestClose();
   };

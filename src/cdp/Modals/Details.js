@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import { Modal, Header, Button, Icon } from "semantic-ui-react";
-import {MKR} from '../../store'
+import { observer } from "mobx-react";
+import { MKR } from "../../store";
 
-export default class CDPDetails extends Component {
+export class CDPDetails extends Component {
   state = {
     governanceFee: null
   };
@@ -110,3 +111,5 @@ export default class CDPDetails extends Component {
     this.props.onRequestClose();
   };
 }
+
+export default observer(CDPDetails);

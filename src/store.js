@@ -189,6 +189,7 @@ class Store {
     try {
       const cdpInstance = await this.maker.getCdp(cdp.id);
       await cdpInstance.drawDai(amountDAI);
+      await this.updateCDPS();
     } catch (e) {
       console.log(e, "Error drawing DAI");
     }
@@ -198,18 +199,20 @@ class Store {
     try {
       const cdpInstance = await this.maker.getCdp(cdp.id);
       await cdpInstance.wipeDai(amountDAI);
+      await this.updateCDPS();
     } catch (e) {
       console.log(e, "Error repaying DAI");
     }
   };
 
   lockETH = async (amountETH, cdp) => {
-    console.log(this.web3.utils.fromAscii(cdp.id.toString()));
+//    console.log(this.web3.utils.fromAscii(cdp.id.toString()));
     try {
       const eth = this.web3.utils.toWei(amountETH, "ether");
       await this.contract.methods
         .lockETH(cdp.id, eth)
         .send({ from: this.account.get(), value: eth });
+      await this.updateCDPS();
     } catch (e) {
       console.log(e, "Error locking ETH");
     }
@@ -219,6 +222,7 @@ class Store {
     try {
       const cdpInstance = await this.maker.getCdp(cdp.id);
       await cdpInstance.freePeth(amountPETH);
+      await this.updateCDPS();
     } catch (e) {
       console.log(e, "Error freeing PETH");
     }
@@ -228,6 +232,7 @@ class Store {
     try {
       const cdpInstance = await this.maker.getCdp(cdp.id);
       await cdpInstance.shut();
+      await this.updateCDPS();
     } catch (e) {
       console.log(e, "Error shutting CDP");
     }

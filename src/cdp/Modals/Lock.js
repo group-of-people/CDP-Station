@@ -62,7 +62,12 @@ export default class Lock extends Component {
           </Form>
         </Modal.Content>
         <Modal.Actions>
-          <Button primary disabled={!valid} onClick={this.lockETH}>
+          <Button
+            primary
+            loading={locking}
+            disabled={!valid}
+            onClick={this.lockETH}
+          >
             Lock ETH
           </Button>
           <Button color="red" onClick={this.props.onRequestClose}>
@@ -74,6 +79,7 @@ export default class Lock extends Component {
   }
 
   lockETH = async () => {
+    this.setState({ locking: true });
     await this.props.store.lockETH(this.state.amountETH, this.props.cdp);
     this.props.onRequestClose();
   };

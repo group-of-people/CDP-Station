@@ -50,7 +50,12 @@ export default class Repay extends Component {
           </Form>
         </Modal.Content>
         <Modal.Actions>
-          <Button primary disabled={!valid} onClick={this.repayDAI}>
+          <Button
+            primary
+            loading={this.state.repaying}
+            disabled={!valid}
+            onClick={this.repayDAI}
+          >
             Repay DAI
           </Button>
           <Button color="red" onClick={this.props.onRequestClose}>
@@ -62,6 +67,7 @@ export default class Repay extends Component {
   }
 
   repayDAI = async () => {
+    this.setState({ repaying: true });
     await this.props.store.repayDAI(this.state.amountDAI, this.props.cdp);
     this.props.onRequestClose();
   };

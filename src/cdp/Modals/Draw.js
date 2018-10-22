@@ -4,7 +4,8 @@ import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 
 export default class Draw extends Component {
   state = {
-    amountDAI: ""
+    amountDAI: "",
+    drawing: false
   };
 
   render() {
@@ -44,7 +45,12 @@ export default class Draw extends Component {
           </Form>
         </Modal.Content>
         <Modal.Actions>
-          <Button primary disabled={!valid} onClick={this.drawDAI}>
+          <Button
+            primary
+            loading={this.state.drawing}
+            disabled={!valid}
+            onClick={this.drawDAI}
+          >
             Draw DAI
           </Button>
           <Button color="red" onClick={this.props.onRequestClose}>
@@ -56,6 +62,7 @@ export default class Draw extends Component {
   }
 
   drawDAI = async () => {
+    this.setState({ drawing: true });
     await this.props.store.drawDAI(this.state.amountDAI, this.props.cdp);
     this.props.onRequestClose();
   };
