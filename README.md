@@ -8,7 +8,7 @@ Clone this repository
 
 `npm start`
 
-Then go to https://demo.settle.finance, choose the developer sandbox app, and embed http://localhost:port, with port being the port you're running from, default is 3000. You may also need to allow unsafe scripts or use ngrok to allow accessing http in the Settle demo's https environment
+Then go to https://demo.settle.finance, choose the developer sandbox app, and embed http://localhost:port, with port being the port you're running from, default is 3000. This app requires Metamask. You may also need to allow unsafe scripts or use ngrok to allow accessing http in the Settle demo's https environment. 
 
 
 
