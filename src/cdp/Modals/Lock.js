@@ -64,7 +64,7 @@ export default class Lock extends Component {
         <Modal.Actions>
           <Button
             primary
-            loading={locking}
+            loading={this.state.locking}
             disabled={!valid}
             onClick={this.lockETH}
           >
