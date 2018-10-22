@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Container, Loader, Dimmer } from "semantic-ui-react";
+import { Container, Loader, Dimmer, Icon } from "semantic-ui-react";
 import Work from "./Components/Work";
 import Alert from "./Components/Alert";
 import Helper from "./Components/Helper";
@@ -32,9 +32,11 @@ class App extends Component {
         </header>
         {store.noWeb3.get()
           ? this.renderNoWeb3()
-          : !store.loading.get()
-            ? this.renderContent()
-            : this.renderLoading()}
+          : store.locked.get()
+            ? this.renderLocked()
+            : !store.loading.get()
+              ? this.renderContent()
+              : this.renderLoading()}
       </Container>
     );
   }
@@ -47,8 +49,16 @@ class App extends Component {
     );
   }
 
+  renderLocked() {
+    return (
+      <Dimmer active>
+        <Icon name="lock" size={"big"} />
+        <div style={{ marginTop: 10 }}> MetaMask is locked.</div>
+      </Dimmer>
+    );
+  }
   renderLoading() {
-    return <Loader active>Metamask Locked?</Loader>;
+    return <Loader active />;
   }
 
   renderContent() {

@@ -2,7 +2,7 @@ import { observable, runInAction } from "mobx";
 import Maker from "@makerdao/dai";
 import CDPCreatorBuild from "./utils/CDPCreator.json";
 import ERC20 from "./utils/ERC20.json";
-import Web3 from 'web3'
+import Web3 from "web3";
 
 const { DAI, PETH, MKR, ETH } = Maker;
 export { DAI, PETH, MKR, ETH };
@@ -36,6 +36,7 @@ export class Store {
   account = observable.box("");
   maker = null;
   loading = observable.box(true);
+  locked = observable.box(false);
   ethPrice = observable.box(null);
   mkrPrice = observable.box(null);
   wethToPeth = observable.box(null);
@@ -50,19 +51,18 @@ export class Store {
   freeModalTargetCDP = observable.box(null);
   showLockModal = observable.box(false);
   lockModalTargetCDP = observable.box(null);
-  noWeb3 = observable.box(false)
+  noWeb3 = observable.box(false);
 
   constructor() {
     var web3 = window.web3;
     // Checking if Web3 has been injected by the browser (Mist/MetaMask)
     if (typeof web3 !== "undefined") {
-      // Use Mist/MetaMask's provider.
       web3 = new Web3(web3.currentProvider);
 
       console.log("Injected web3 detected.");
     } else {
-      this.noWeb3.set(true)
-      return
+      this.noWeb3.set(true);
+      return;
     }
     this.web3 = web3;
     this.contract = new web3.eth.Contract(
@@ -81,29 +81,34 @@ export class Store {
       ERC20.abi,
       "0xf53AD2c6851052A81B42133467480961B2321C09"
     );
-    this.initializeAccount().then(() => {
-      web3.currentProvider.publicConfigStore.on(
-        "update",
-        this.initializeAccount
-      );
-    });
-    this.maker = Maker.create("browser");
+
+    this.initializeAccount();
   }
 
   initializeAccount = async () => {
     let web3 = this.web3;
-
     let accs;
     try {
       accs = await web3.eth.getAccounts();
       if (accs.length === 0) {
+        this.locked.set(true);
+        this.account.set('')
+        setTimeout(this.initializeAccount, 500);
         return;
       }
-      if (accs[0] === this.account.get()) return;
+      this.locked.set(false);
+      if (accs[0] === this.account.get()) {
+        setTimeout(this.initializeAccount, 500);
+        return;
+      }
     } catch (e) {
       console.log(e, "Error finding web3.");
       return;
     }
+
+    this.loading.set(true)
+
+    this.maker = Maker.create("browser");
 
     try {
       await this.maker.authenticate();
@@ -147,7 +152,9 @@ export class Store {
       await this.updateCDPS();
       runInAction(() => {
         this.loading.set(false);
+        this.locked.set(false)
       });
+      setTimeout(this.initializeAccount, 500)
     } catch (e) {
       console.log(e, "Failed to initialize");
     }
