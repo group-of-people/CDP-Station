@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Container, Loader } from "semantic-ui-react";
+import { Container, Loader, Dimmer } from "semantic-ui-react";
 import Work from "./Components/Work";
 import Alert from "./Components/Alert";
 import Helper from "./Components/Helper";
@@ -30,8 +30,20 @@ class App extends Component {
         <header className="App-header">
           <h1 className="App-title">Settle Maker</h1>
         </header>
-        {!store.loading.get() ? this.renderContent() : this.renderLoading()}
+        {store.noWeb3.get()
+          ? this.renderNoWeb3()
+          : !store.loading.get()
+            ? this.renderContent()
+            : this.renderLoading()}
       </Container>
+    );
+  }
+
+  renderNoWeb3() {
+    return (
+      <Dimmer active>
+        No web3 found. Please use MetaMask or compatible dApp browser.
+      </Dimmer>
     );
   }
 
@@ -63,9 +75,7 @@ class App extends Component {
             <Work key={this.state.account} store={store} />
           )}
         {store.account.get() &&
-          this.state.mode === "alerts" && (
-            <Alert store={store} />
-          )}
+          this.state.mode === "alerts" && <Alert store={store} />}
         {store.account.get() && this.state.mode === "helper" && <Helper />}
       </>
     );

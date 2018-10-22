@@ -2,9 +2,8 @@ import { observable, runInAction } from "mobx";
 import Maker from "@makerdao/dai";
 import CDPCreatorBuild from "./utils/CDPCreator.json";
 import ERC20 from "./utils/ERC20.json";
-import getWeb3 from "./utils/getWeb3";
+import Web3 from 'web3'
 
-const maker = Maker.create("browser");
 const { DAI, PETH, MKR, ETH } = Maker;
 export { DAI, PETH, MKR, ETH };
 
@@ -30,7 +29,7 @@ function humanizeCDPResponse(cdp, props) {
   };
 }
 
-class Store {
+export class Store {
   // DATA
   cdps = observable([]);
   web3 = observable.box(null);
@@ -51,36 +50,44 @@ class Store {
   freeModalTargetCDP = observable.box(null);
   showLockModal = observable.box(false);
   lockModalTargetCDP = observable.box(null);
+  noWeb3 = observable.box(false)
 
   constructor() {
-    // Get network provider and web3 instance.
-    // See utils/getWeb3 for more info.
-    getWeb3.then(web3 => {
-      this.web3 = web3;
-      this.contract = new web3.eth.Contract(
-        CDPCreatorBuild.abi,
-        "0x38753Ef9Fb83C3cC231f91aBD752F4823eD2677F"
+    var web3 = window.web3;
+    // Checking if Web3 has been injected by the browser (Mist/MetaMask)
+    if (typeof web3 !== "undefined") {
+      // Use Mist/MetaMask's provider.
+      web3 = new Web3(web3.currentProvider);
+
+      console.log("Injected web3 detected.");
+    } else {
+      this.noWeb3.set(true)
+      return
+    }
+    this.web3 = web3;
+    this.contract = new web3.eth.Contract(
+      CDPCreatorBuild.abi,
+      "0x38753Ef9Fb83C3cC231f91aBD752F4823eD2677F"
+    );
+    this.mkrContract = new web3.eth.Contract(
+      ERC20.abi,
+      "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2"
+    );
+    this.daiContract = new web3.eth.Contract(
+      ERC20.abi,
+      "0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359"
+    );
+    this.pethContract = new web3.eth.Contract(
+      ERC20.abi,
+      "0xf53AD2c6851052A81B42133467480961B2321C09"
+    );
+    this.initializeAccount().then(() => {
+      web3.currentProvider.publicConfigStore.on(
+        "update",
+        this.initializeAccount
       );
-      this.mkrContract = new web3.eth.Contract(
-        ERC20.abi,
-        "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2"
-      );
-      this.daiContract = new web3.eth.Contract(
-        ERC20.abi,
-        "0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359"
-      );
-      this.pethContract = new web3.eth.Contract(
-        ERC20.abi,
-        "0xf53AD2c6851052A81B42133467480961B2321C09"
-      );
-      this.initializeAccount().then(() => {
-        web3.currentProvider.publicConfigStore.on(
-          "update",
-          this.initializeAccount
-        );
-      });
-      this.maker = maker;
     });
+    this.maker = Maker.create("browser");
   }
 
   initializeAccount = async () => {
@@ -206,7 +213,7 @@ class Store {
   };
 
   lockETH = async (amountETH, cdp) => {
-//    console.log(this.web3.utils.fromAscii(cdp.id.toString()));
+    //    console.log(this.web3.utils.fromAscii(cdp.id.toString()));
     try {
       const eth = this.web3.utils.toWei(amountETH, "ether");
       await this.contract.methods
@@ -266,5 +273,3 @@ class Store {
     });
   };
 }
-
-export default new Store();
