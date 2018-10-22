@@ -28,7 +28,7 @@ class App extends Component {
     return (
       <Container>
         <header className="App-header">
-          <h1 className="App-title">Settle Maker</h1>
+          <h1 className="App-title">SettleCDP</h1>
         </header>
         {store.noWeb3.get()
           ? this.renderNoWeb3()

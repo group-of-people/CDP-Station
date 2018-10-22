@@ -45,7 +45,7 @@ export class CDPDetails extends Component {
               ).toFixed(2)}
             </li>
             <li>PETH locked - {cdp.pethLocked.toString(4)}</li>
-            <li>
+            <li title={this.state.governanceFee}>
               Governance Fee -{" "}
               {!!this.state.governanceFee &&
                 this.state.governanceFee.toFixed(4)}{" "}
