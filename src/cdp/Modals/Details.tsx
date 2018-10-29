@@ -1,15 +1,26 @@
 import React, { Component } from "react";
 import { Modal, Header, Button, Icon } from "semantic-ui-react";
 import { observer } from "mobx-react";
-import { MKR } from "../../store";
+import { Store, MKR, CDP } from "../../store";
 
-export class CDPDetails extends Component {
-  state = {
+interface Props {
+  store: Store;
+  cdp: CDP
+
+  onRequestClose: () => void;
+}
+
+interface State {
+  governanceFee: number | null;
+}
+
+export class CDPDetails extends Component<Props, State> {
+  state: State = {
     governanceFee: null
   };
 
   componentDidMount() {
-    this.props.store.maker.getCdp(this.props.cdp.id).then(cdp => {
+    this.props.store.maker!.getCdp(this.props.cdp.id).then(cdp => {
       cdp.getGovernanceFee(MKR).then(fee => {
         this.setState({ governanceFee: fee.toNumber() });
       });
@@ -29,7 +40,7 @@ export class CDPDetails extends Component {
             <li>
               DAI Available -{" "}
               {(
-                cdp.daiLocked / this.props.store.liquidationRatio.get() -
+                cdp.daiLocked / this.props.store.liquidationRatio.get()! -
                 cdp.daiDebt.toNumber()
               ).toFixed(4)}{" "}
               DAI
@@ -39,13 +50,13 @@ export class CDPDetails extends Component {
             <li>
               Liquidation Price - $
               {(
-                (parseFloat(cdp.daiDebt) *
-                  this.props.store.liquidationRatio.get()) /
-                parseFloat(cdp.ethLocked)
+                (cdp.daiDebt.toNumber() *
+                  this.props.store.liquidationRatio.get()!) /
+                cdp.ethLocked
               ).toFixed(2)}
             </li>
             <li>PETH locked - {cdp.pethLocked.toString(4)}</li>
-            <li title={this.state.governanceFee}>
+            <li title={this.state.governanceFee ? this.state.governanceFee.toString(): ''}>
               Governance Fee -{" "}
               {!!this.state.governanceFee &&
                 this.state.governanceFee.toFixed(4)}{" "}

@@ -1,20 +1,55 @@
+/// <reference path="../types/maker.d.ts" />
+ 
 import { observable, runInAction } from "mobx";
-import Maker from "@makerdao/dai";
-import CDPCreatorBuild from "./utils/CDPCreator.json";
-import ERC20 from "./utils/ERC20.json";
+import Maker, { Currency } from "@makerdao/dai";
+import CDPCreatorBuild from "!json-loader!./abi/CDPCreator.abi";
+import ERC20 from "!json-loader!./abi/ERC20.abi";
+import { ERC20 as ERC20Contract } from "../types/web3-contracts/ERC20";
+import { CDPCreator as CDPCreatorContract } from "../types/web3-contracts/CDPCreator";
+
 import Web3 from "web3";
+
+declare global {
+  interface Window {
+    web3: Web3 | undefined;
+  }
+}
 
 const { DAI, PETH, MKR, ETH } = Maker;
 export { DAI, PETH, MKR, ETH };
 
-function humanizeCDPResponse(cdp, props) {
+interface RawCDP {
+  ink: number;
+  art: number;
+  cupi: number;
+  closed: boolean;
+}
+
+export interface CDP {
+  id: number;
+  pethLocked: Currency;
+  daiDebt: Currency;
+  daiAvailable: number;
+  daiLocked: number;
+  ethLocked: number;
+  collateralization: string;
+}
+
+// FIXME: remove me
+interface Extra {
+  wethToPeth: number,
+  ethPrice: Currency,
+  liquidationRatio: number
+}
+
+function humanizeCDPResponse(cdp: RawCDP, extra: Extra): CDP {
   const pethLocked = PETH.wei(cdp.ink);
   const daiDebt = DAI.wei(cdp.art);
   const daiLocked =
-    pethLocked.toNumber() * props.wethToPeth * props.ethPrice.toNumber();
-  const daiAvailable = daiLocked / props.liquidationRatio - daiDebt.toNumber();
+    pethLocked.toNumber() * extra.wethToPeth * extra.ethPrice.toNumber();
+  const daiAvailable = daiLocked / extra.liquidationRatio - daiDebt.toNumber();
   const collateralization =
-    ((pethLocked.toNumber() * props.wethToPeth * props.ethPrice.toNumber()) /
+    ((pethLocked.toNumber() * extra.wethToPeth * extra.ethPrice.toNumber()) /
       daiDebt.toNumber()) *
     100;
 
@@ -24,34 +59,42 @@ function humanizeCDPResponse(cdp, props) {
     daiDebt,
     daiLocked,
     pethLocked,
-    ethLocked: pethLocked.toNumber() * props.wethToPeth,
+    ethLocked: pethLocked.toNumber() * extra.wethToPeth,
+    // FIXME
     collateralization: collateralization.toFixed(2)
   };
 }
 
 export class Store {
   // DATA
-  cdps = observable([]);
-  web3 = observable.box(null);
+  cdps = observable<CDP>([]);
+  web3: Web3 | null = null;
   account = observable.box("");
-  maker = null;
+  maker: Maker | null = null;
   loading = observable.box(true);
   locked = observable.box(false);
-  ethPrice = observable.box(null);
-  mkrPrice = observable.box(null);
-  wethToPeth = observable.box(null);
-  liquidationRatio = observable.box(null);
-  mkrBalance = observable.box(null);
-  daiBalance = observable.box(null);
-  ethBalance = observable.box(null);
-  pethBalance = observable.box(null);
+  // FIXME ratio is correct type in reality
+  ethPrice = observable.box<Currency | null>(null);
+  mkrPrice = observable.box<Currency | null>(null);
+  wethToPeth = observable.box<number | null>(null);
+  liquidationRatio = observable.box<number | null>(null);
+  mkrBalance = observable.box<Currency | null>(null);
+  daiBalance = observable.box<Currency | null>(null);
+  ethBalance = observable.box<Currency | null>(null);
+  pethBalance = observable.box<Currency | null>(null);
 
   // UI State
   showFreeModal = observable.box(false);
-  freeModalTargetCDP = observable.box(null);
+  freeModalTargetCDP = observable.box<CDP | null>(null);
   showLockModal = observable.box(false);
-  lockModalTargetCDP = observable.box(null);
+  lockModalTargetCDP = observable.box<CDP | null>(null);
   noWeb3 = observable.box(false);
+
+  //contract typings
+  contract: CDPCreatorContract | null = null;
+  mkrContract: ERC20Contract | null = null;
+  daiContract: ERC20Contract | null = null;
+  pethContract: ERC20Contract | null = null;
 
   constructor() {
     var web3 = window.web3;
@@ -68,31 +111,31 @@ export class Store {
     this.contract = new web3.eth.Contract(
       CDPCreatorBuild.abi,
       "0x38753Ef9Fb83C3cC231f91aBD752F4823eD2677F"
-    );
+    ) as CDPCreatorContract;
     this.mkrContract = new web3.eth.Contract(
       ERC20.abi,
       "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2"
-    );
+    ) as ERC20Contract;
     this.daiContract = new web3.eth.Contract(
       ERC20.abi,
       "0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359"
-    );
+    ) as ERC20Contract;
     this.pethContract = new web3.eth.Contract(
       ERC20.abi,
       "0xf53AD2c6851052A81B42133467480961B2321C09"
-    );
+    ) as ERC20Contract;
 
     this.initializeAccount();
   }
 
   initializeAccount = async () => {
-    let web3 = this.web3;
-    let accs;
+    let web3 = this.web3!;
+    let accs: string[] = [];
     try {
       accs = await web3.eth.getAccounts();
       if (accs.length === 0) {
         this.locked.set(true);
-        this.account.set('')
+        this.account.set("");
         setTimeout(this.initializeAccount, 500);
         return;
       }
@@ -106,7 +149,7 @@ export class Store {
       return;
     }
 
-    this.loading.set(true)
+    this.loading.set(true);
 
     this.maker = Maker.create("browser");
 
@@ -128,15 +171,15 @@ export class Store {
         web3.eth.getBalance(accs[0])
       ]);
 
-      const mkr = await this.mkrContract.methods
-        .balanceOf(accs[0])
-        .call({ from: accs[0] });
-      const dai = await this.daiContract.methods
-        .balanceOf(accs[0])
-        .call({ from: accs[0] });
-      const peth = await this.pethContract.methods
-        .balanceOf(accs[0])
-        .call({ from: accs[0] });
+      const mkr = await this.mkrContract!.methods.balanceOf(accs[0]).call({
+        from: accs[0]
+      });
+      const dai = await this.daiContract!.methods.balanceOf(accs[0]).call({
+        from: accs[0]
+      });
+      const peth = await this.pethContract!.methods.balanceOf(accs[0]).call({
+        from: accs[0]
+      });
 
       runInAction(() => {
         this.account.set(accs[0]);
@@ -152,18 +195,18 @@ export class Store {
       await this.updateCDPS();
       runInAction(() => {
         this.loading.set(false);
-        this.locked.set(false)
+        this.locked.set(false);
       });
-      setTimeout(this.initializeAccount, 500)
+      setTimeout(this.initializeAccount, 500);
     } catch (e) {
       console.log(e, "Failed to initialize");
     }
   };
 
-  isSafe = async cdp => {
+  isSafe = async (cdp: CDP) => {
     try {
-      const cdpInstance = await this.maker.getCdp(cdp.id);
-      return await cdpInstance.isSafe;
+      const cdpInstance = await this.maker!.getCdp(cdp.id);
+      return await cdpInstance.isSafe();
     } catch (e) {
       //console.log(e, "Error");
     }
@@ -174,34 +217,35 @@ export class Store {
     const cdpsResponse = await fetch(
       `https://dai-service.makerdao.com/cups/conditions=lad:${acc.toLowerCase()}/sort=cupi:asc`
     );
-    const cdps = await cdpsResponse.json();
+    const cdps = (await cdpsResponse.json()) as { results: RawCDP[] };
 
     runInAction(() => {
       this.cdps.replace(
         cdps.results.filter(cdp => !cdp.closed).map(cdp =>
           humanizeCDPResponse(cdp, {
-            wethToPeth: this.wethToPeth.get(),
-            liquidationRatio: this.liquidationRatio.get(),
-            ethPrice: this.ethPrice.get()
+            wethToPeth: this.wethToPeth.get()!,
+            liquidationRatio: this.liquidationRatio.get()!,
+            ethPrice: this.ethPrice.get()!
           })
         )
       );
     });
   };
 
-  createCDP = async (amountETH, amountDAI) => {
-    const eth = this.web3.utils.toWei(amountETH.toString(), "ether");
+  createCDP = async (amountETH: number, amountDAI: number) => {
+    const eth = this.web3!.utils.toWei(amountETH.toString(), "ether");
     const dai = amountDAI * Math.pow(10, 18);
-    const daiBN = new this.web3.utils.BN(dai.toString());
-    await this.contract.methods
-      .createCDP(eth, daiBN.toString())
-      .send({ from: this.account.get(), value: eth });
+    const daiBN = Web3.utils.toBN(dai.toString());
+    await this.contract!.methods.createCDP(eth, daiBN.toString()).send({
+      from: this.account.get(),
+      value: eth
+    });
     await this.updateCDPS();
   };
 
-  drawDAI = async (amountDAI, cdp) => {
+  drawDAI = async (amountDAI: number, cdp: CDP) => {
     try {
-      const cdpInstance = await this.maker.getCdp(cdp.id);
+      const cdpInstance = await this.maker!.getCdp(cdp.id);
       await cdpInstance.drawDai(amountDAI);
       await this.updateCDPS();
     } catch (e) {
@@ -209,9 +253,9 @@ export class Store {
     }
   };
 
-  repayDAI = async (amountDAI, cdp) => {
+  repayDAI = async (amountDAI: number, cdp: CDP) => {
     try {
-      const cdpInstance = await this.maker.getCdp(cdp.id);
+      const cdpInstance = await this.maker!.getCdp(cdp.id);
       await cdpInstance.wipeDai(amountDAI);
       await this.updateCDPS();
     } catch (e) {
@@ -219,11 +263,11 @@ export class Store {
     }
   };
 
-  lockETH = async (amountETH, cdp) => {
+  lockETH = async (amountETH: number, cdp: CDP) => {
     //    console.log(this.web3.utils.fromAscii(cdp.id.toString()));
     try {
-      const eth = this.web3.utils.toWei(amountETH, "ether");
-      await this.contract.methods
+      const eth = this.web3!.utils.toWei(amountETH, "ether");
+      await this.contract!.methods
         .lockETH(cdp.id, eth)
         .send({ from: this.account.get(), value: eth });
       await this.updateCDPS();
@@ -232,9 +276,9 @@ export class Store {
     }
   };
 
-  freePETH = async (amountPETH, cdp) => {
+  freePETH = async (amountPETH: number, cdp: CDP) => {
     try {
-      const cdpInstance = await this.maker.getCdp(cdp.id);
+      const cdpInstance = await this.maker!.getCdp(cdp.id);
       await cdpInstance.freePeth(amountPETH);
       await this.updateCDPS();
     } catch (e) {
@@ -242,9 +286,9 @@ export class Store {
     }
   };
 
-  shutCDP = async cdp => {
+  shutCDP = async (cdp: CDP) => {
     try {
-      const cdpInstance = await this.maker.getCdp(cdp.id);
+      const cdpInstance = await this.maker!.getCdp(cdp.id);
       await cdpInstance.shut();
       await this.updateCDPS();
     } catch (e) {
@@ -252,7 +296,7 @@ export class Store {
     }
   };
 
-  showFree = cdp => {
+  showFree = (cdp: CDP) => {
     runInAction(() => {
       this.freeModalTargetCDP.set(cdp);
       this.showFreeModal.set(true);
@@ -266,7 +310,7 @@ export class Store {
     });
   };
 
-  showLock = cdp => {
+  showLock = (cdp: CDP) => {
     runInAction(() => {
       this.lockModalTargetCDP.set(cdp);
       this.showLockModal.set(true);

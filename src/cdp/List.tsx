@@ -5,13 +5,26 @@ import CDPCard from "./Card";
 import CDPDetails from "./Modals/Details";
 import CDPDraw from "./Modals/Draw";
 import CDPRepay from "./Modals/Repay";
+import {Store, CDP} from '../store'
 
-export class CDPList extends Component {
-  state = {
+interface Props {
+  store: Store,
+  onNewCDP: () => void
+}
+
+interface State {
+  detailsCDP: CDP | null,
+  cdpDetails: boolean,
+  draw: boolean,
+  repay: boolean
+}
+
+export class CDPList extends Component<Props, State> {
+  state: State = {
     detailsCDP: null,
     cdpDetails: false,
-    draw: null,
-    repay: null
+    draw: false,
+    repay: false
   };
 
   render() {
@@ -19,21 +32,21 @@ export class CDPList extends Component {
       <>
         {!!this.state.cdpDetails && (
           <CDPDetails
-            cdp={this.state.detailsCDP}
+            cdp={this.state.detailsCDP!}
             store={this.props.store}
             onRequestClose={this.onCDPDetailsClose}
           />
         )}
         {!!this.state.draw && (
           <CDPDraw
-            cdp={this.state.detailsCDP}
+            cdp={this.state.detailsCDP!}
             store={this.props.store}
             onRequestClose={this.onCDPDrawClose}
           />
         )}
         {!!this.state.repay && (
           <CDPRepay
-            cdp={this.state.detailsCDP}
+            cdp={this.state.detailsCDP!}
             store={this.props.store}
             onRequestClose={this.onCDPRepayClose}
           />
@@ -74,7 +87,7 @@ export class CDPList extends Component {
     );
   }
 
-  onCDPDetails = cdp => {
+  onCDPDetails = (cdp: CDP) => {
     this.setState({ detailsCDP: cdp, cdpDetails: true });
   };
 
@@ -82,15 +95,15 @@ export class CDPList extends Component {
     this.setState({ detailsCDP: null, cdpDetails: false });
   };
 
-  onCDPDraw = cdp => {
+  onCDPDraw = (cdp: CDP) => {
     this.setState({ draw: true, detailsCDP: cdp });
   };
 
   onCDPDrawClose = () => {
-    this.setState({ draw: null, cdpDetails: false });
+    this.setState({ draw: false, cdpDetails: false });
   };
 
-  onCDPRepay = cdp => {
+  onCDPRepay = (cdp: CDP) => {
     this.setState({ repay: true, detailsCDP: cdp });
   };
 

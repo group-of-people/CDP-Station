@@ -1,22 +1,39 @@
 import React, { Component } from "react";
 import { Button, Modal, Header, Form, Input, Message } from "semantic-ui-react";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
+import { Store, CDP } from "../../store";
 
-export default class Lock extends Component {
-  state = {
-    amountETH: this.props.store.ethBalance.get().toNumber()
+interface Props {
+  store: Store;
+  cdp: CDP;
+
+  onRequestClose: () => void;
+}
+
+interface State {
+  amountETH: string;
+  locking: boolean;
+}
+
+export default class Lock extends Component<Props, State> {
+  state: State = {
+    amountETH: this.props.store.ethBalance
+      .get()!
+      .toNumber()
+      .toString(),
+    locking: false
   };
 
   render() {
     const amountETH = parseInputFloat(this.state.amountETH);
 
-    const wethToPeth = this.props.store.wethToPeth.get();
+    const wethToPeth = this.props.store.wethToPeth.get()!;
     const amountPETH = (amountETH / wethToPeth).toFixed(4);
 
     const pethLocked = this.props.cdp.pethLocked;
     const ethLocked = pethLocked.toNumber() * wethToPeth;
 
-    const ethBalance = this.props.store.ethBalance.get().toNumber();
+    const ethBalance = this.props.store.ethBalance.get()!.toNumber();
 
     let valid = true;
     let error = "";
@@ -33,7 +50,6 @@ export default class Lock extends Component {
         <Header
           as="h5"
           style={{
-            color: this.state.color,
             display: "inline",
             paddingBottom: "0"
           }}
@@ -80,14 +96,17 @@ export default class Lock extends Component {
 
   lockETH = async () => {
     this.setState({ locking: true });
-    await this.props.store.lockETH(this.state.amountETH, this.props.cdp);
+    await this.props.store.lockETH(
+      parseInputFloat(this.state.amountETH),
+      this.props.cdp
+    );
     this.props.onRequestClose();
   };
 
-  handleChange = (e, { name, value }) => {
+  handleChange = (_e: any, { value }: { value: string }) => {
     if (!isValidFloatInputNumber(value)) {
       return;
     }
-    this.setState({ [name]: value });
+    this.setState({ amountETH: value });
   };
 }

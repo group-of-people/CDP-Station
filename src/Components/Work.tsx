@@ -1,8 +1,13 @@
 import React, { Component } from "react";
 import CDPList from "../cdp/List";
 import NewCdpModal from "../cdp/Modals/Creator";
+import {Store} from '../store'
 
-export default class Work extends Component {
+interface Props {
+  store: Store
+}
+
+export default class Work extends Component<Props, {}> {
   state = {
     showNewCDPModal: false
   };
@@ -11,27 +16,27 @@ export default class Work extends Component {
       <>
         <div style={{ display: "inline" }}>
           <div>Logged in as {this.props.store.account.get()}</div>
-          <div>{this.props.store.ethPrice.get().toString()}</div>
-          <div>{this.props.store.mkrPrice.get().toString()}</div>
+          <div>{this.props.store.ethPrice.get()!.toString()}</div>
+          <div>{this.props.store.mkrPrice.get()!.toString()}</div>
           <div>
             Liquidation Ratio: {this.props.store.liquidationRatio.get()}
           </div>
           <div>
-            ETH/PETH Ratio: {this.props.store.wethToPeth.get().toFixed(4)}
+            ETH/PETH Ratio: {this.props.store.wethToPeth.get()!.toFixed(4)}
           </div>
         </div>
         <div style={{ display: "inline" }}>
           <div>
-            DAI Balance: {this.props.store.daiBalance.get().toString(4)}
+            DAI Balance: {this.props.store.daiBalance.get()!.toString(4)}
           </div>
           <div>
-            MKR Balance: {this.props.store.mkrBalance.get().toString(4)}
+            MKR Balance: {this.props.store.mkrBalance.get()!.toString(4)}
           </div>
           <div>
-            PETH Balance: {this.props.store.pethBalance.get().toString(4)}
+            PETH Balance: {this.props.store.pethBalance.get()!.toString(4)}
           </div>
           <div>
-            ETH Balance: {this.props.store.ethBalance.get().toString(4)}
+            ETH Balance: {this.props.store.ethBalance.get()!.toString(4)}
           </div>
         </div>
         <br />

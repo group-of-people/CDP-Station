@@ -1,13 +1,27 @@
 import React, { Component } from "react";
 import { Button, Modal, Header, Form } from "semantic-ui-react";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
+import { Store, CDP } from "../../store";
 
-export default class Repay extends Component {
-  state = {
+interface Props {
+  store: Store;
+  cdp: CDP;
+
+  onRequestClose: () => void;
+}
+
+interface State {
+  amountDAI: string;
+  repaying: boolean;
+}
+
+export default class Repay extends Component<Props, State> {
+  state: State = {
     amountDAI: Math.min(
-      this.props.store.daiBalance.get().toNumber(),
+      this.props.store.daiBalance.get()!.toNumber(),
       this.props.cdp.daiDebt.toNumber()
-    )
+    ).toString(),
+    repaying: false
   };
 
   render() {
@@ -36,7 +50,7 @@ export default class Repay extends Component {
           as="h5"
           style={{ color: "gray", display: "inline", paddingBottom: "0" }}
         >
-          MKR Balance: {this.props.store.mkrBalance.get().toString(4)}
+          MKR Balance: {this.props.store.mkrBalance.get()!.toString(4)}
         </Header>
         <Modal.Content>
           <Form>
@@ -68,14 +82,17 @@ export default class Repay extends Component {
 
   repayDAI = async () => {
     this.setState({ repaying: true });
-    await this.props.store.repayDAI(this.state.amountDAI, this.props.cdp);
+    await this.props.store.repayDAI(
+      parseInputFloat(this.state.amountDAI),
+      this.props.cdp
+    );
     this.props.onRequestClose();
   };
 
-  handleChange = (e, { name, value }) => {
+  handleChange = (_e: any, { value }: { value: string }) => {
     if (!isValidFloatInputNumber(value)) {
       return;
     }
-    this.setState({ [name]: value });
+    this.setState({ amountDAI: value });
   };
 }

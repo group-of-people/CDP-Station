@@ -1,10 +1,11 @@
 import React from "react";
 import { Card, Button } from "semantic-ui-react";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
+import {CDP} from '../store'
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
-const Chart = ({ data }) => (
+const Chart = ({ data }: {data: {name: string, value: number}[]}) => (
   <PieChart height={200} width={260}>
     <Pie
       startAngle={90}
@@ -23,7 +24,15 @@ const Chart = ({ data }) => (
   </PieChart>
 );
 
-class CDPCard extends React.Component {
+interface Props {
+  cdp: CDP
+  onClick: (cdp: CDP) => void 
+  drawDAI: (cdp: CDP) => void 
+  repayDAI: (cdp: CDP) => void 
+
+}
+
+class CDPCard extends React.Component<Props> {
   render() {
     const { cdp } = this.props;
     return (

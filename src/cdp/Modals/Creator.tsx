@@ -3,24 +3,41 @@ import { Button, Modal, Header, Form, Message } from "semantic-ui-react";
 import { observer } from "mobx-react";
 import { observable, computed } from "mobx";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
+import { Store } from "../../store";
 
-export class CDPCreator extends Component {
-  state = {};
-  EthToLock = observable.box(this.props.store.ethBalance.get().toNumber());
+interface Props {
+  store: Store;
+
+  onRequestClose: () => void;
+}
+
+interface State {
+  creating: boolean;
+}
+
+export class CDPCreator extends Component<Props, State> {
+  state: State = {
+    creating: false
+  };
+  EthToLock = observable.box(
+    this.props.store.ethBalance
+      .get()!
+      .toNumber()
+      .toString()
+  );
   DaiToDraw = observable.box("0");
 
   daiTotal = computed(
     () =>
       parseInputFloat(this.EthToLock.get()) *
-      this.props.store.ethPrice.get().toNumber()
+      this.props.store.ethPrice.get()!.toNumber()
   );
   collateralization = computed(
     () =>
       this.daiTotal.get() && this.DaiToDraw.get()
         ? (
-            parseFloat(
-              this.daiTotal.get() / parseInputFloat(this.DaiToDraw.get())
-            ) * 100
+            (this.daiTotal.get() / parseInputFloat(this.DaiToDraw.get())) *
+            100
           ).toFixed(2)
         : 0
   );
@@ -29,7 +46,7 @@ export class CDPCreator extends Component {
       this.daiTotal.get() && this.DaiToDraw.get()
         ? (
             (parseInputFloat(this.DaiToDraw.get()) *
-              this.props.store.liquidationRatio.get()) /
+              this.props.store.liquidationRatio.get()!) /
             parseInputFloat(this.EthToLock.get())
           ).toFixed(2)
         : null
@@ -37,8 +54,8 @@ export class CDPCreator extends Component {
 
   render() {
     const { creating } = this.state;
-    const minCollateralization = this.props.store.liquidationRatio.get() * 100;
-    const ethBalance = this.props.store.ethBalance.get().toNumber();
+    const minCollateralization = this.props.store.liquidationRatio.get()! * 100;
+    const ethBalance = this.props.store.ethBalance.get()!.toNumber();
 
     let valid = false;
     let error = "";
@@ -46,10 +63,10 @@ export class CDPCreator extends Component {
       valid = false;
     } else if (this.collateralization.get() < minCollateralization) {
       error = `Collateralization < ${minCollateralization}%. You can draw up to ${(
-        this.daiTotal.get() / this.props.store.liquidationRatio.get()
+        this.daiTotal.get() / this.props.store.liquidationRatio.get()!
       ).toFixed(2)} DAI.`;
       valid = false;
-    } else if (ethBalance < this.EthToLock.get()) {
+    } else if (ethBalance < parseInputFloat(this.EthToLock.get())) {
       error = `You can lock up to ${ethBalance.toFixed(4)} ETH`;
       valid = false;
     } else if (
@@ -90,14 +107,14 @@ export class CDPCreator extends Component {
               label={"ETH to lock up"}
               placeholder="ETH to lock up"
               value={this.EthToLock.get()}
-              onChange={this.handleChange}
+              onChange={this.handleEthChange}
             />
             <Form.Input
               name={"DaiToDraw"}
               label={"DAI to draw"}
               placeholder="DAI to draw"
               value={this.DaiToDraw.get()}
-              onChange={this.handleChange}
+              onChange={this.handleDaiChange}
             />
             {!valid &&
               error && (
@@ -108,7 +125,12 @@ export class CDPCreator extends Component {
           </Form>
         </Modal.Content>
         <Modal.Actions>
-          <Button primary loading={!!creating} disabled={!valid} onClick={this.createCDP}>
+          <Button
+            primary
+            loading={!!creating}
+            disabled={!valid}
+            onClick={this.createCDP}
+          >
             CreateCDP
           </Button>
           <Button color="red" onClick={this.props.onRequestClose}>
@@ -122,17 +144,24 @@ export class CDPCreator extends Component {
   createCDP = async () => {
     this.setState({ creating: true });
     await this.props.store.createCDP(
-      this.EthToLock.get(),
-      this.DaiToDraw.get()
+      parseInputFloat(this.EthToLock.get()),
+      parseInputFloat(this.DaiToDraw.get())
     );
     this.props.onRequestClose();
   };
 
-  handleChange = (e, { name, value }) => {
+  handleEthChange = (_e: any, { value }: {value: string}) => {
     if (!isValidFloatInputNumber(value)) {
       return;
     }
-    this[name].set(value);
+    this.EthToLock.set(value);
+  };
+
+  handleDaiChange = (_e: any, { value }: {value: string}) => {
+    if (!isValidFloatInputNumber(value)) {
+      return;
+    }
+    this.DaiToDraw.set(value);
   };
 }
 

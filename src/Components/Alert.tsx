@@ -1,14 +1,18 @@
 import React, { Component } from "react";
 import { Table } from "semantic-ui-react";
 import { observer } from "mobx-react";
+import {Store} from '../store'
 
-export class Alert extends Component {
-  state = {};
+interface Props {
+  store: Store
+}
+
+export class Alert extends Component<Props, {}> {
   render() {
     return (
       <>
-        <div>{this.props.store.ethPrice.get().toString()}</div>
-        <div>{this.props.store.mkrPrice.get().toString()}</div>
+        <div>{this.props.store.ethPrice.get()!.toString()}</div>
+        <div>{this.props.store.mkrPrice.get()!.toString()}</div>
 
         <Table singleLine collapsing style={{ width: "85%" }}>
           <Table.Header>
@@ -29,9 +33,9 @@ export class Alert extends Component {
                 <Table.Cell>{cdp.daiDebt.toString(4)}</Table.Cell>
                 <Table.Cell>
                   {(
-                    (parseFloat(cdp.daiDebt) *
-                      this.props.store.liquidationRatio.get()) /
-                    parseFloat(cdp.ethLocked)
+                    (cdp.daiDebt.toNumber() *
+                      this.props.store.liquidationRatio.get()!) /
+                    cdp.ethLocked
                   ).toFixed(2)}
                 </Table.Cell>
                 <Table.Cell>

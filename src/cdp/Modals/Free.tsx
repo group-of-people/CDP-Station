@@ -2,26 +2,40 @@ import React, { Component } from "react";
 import { Button, Modal, Header, Form, Input, Message } from "semantic-ui-react";
 import { observer } from "mobx-react";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
+import { Store, CDP } from "../../store";
 
-export class Free extends Component {
-  state = {
-    amountPETH: "0"
+interface Props {
+  store: Store;
+  cdp: CDP;
+
+  onRequestClose: () => void;
+}
+
+interface State {
+  amountPETH: string;
+  freeing: boolean;
+}
+
+export class Free extends Component<Props, State> {
+  state: State = {
+    amountPETH: "0",
+    freeing: false
   };
 
   render() {
     const amountPETH = parseInputFloat(this.state.amountPETH);
-    const ethPrice = this.props.store.ethPrice.get().toNumber();
-    const wethToPeth = this.props.store.wethToPeth.get();
+    const ethPrice = this.props.store.ethPrice.get()!.toNumber();
+    const wethToPeth = this.props.store.wethToPeth.get()!;
     const amountETH = amountPETH * wethToPeth;
     const DAICollateralAfterFree =
       (this.props.cdp.pethLocked.toNumber() - amountPETH) *
       wethToPeth *
       ethPrice;
     const maxDrawnDAIAfterFree =
-      DAICollateralAfterFree / this.props.store.liquidationRatio.get();
+      DAICollateralAfterFree / this.props.store.liquidationRatio.get()!;
     const minPETHCollateral =
       (this.props.cdp.daiDebt.toNumber() / ethPrice / wethToPeth) *
-      this.props.store.liquidationRatio.get();
+      this.props.store.liquidationRatio.get()!;
     const freeablePETH =
       this.props.cdp.pethLocked.toNumber() - minPETHCollateral;
     let valid = true;
@@ -93,15 +107,18 @@ export class Free extends Component {
 
   freePETH = async () => {
     this.setState({ freeing: true });
-    await this.props.store.freePETH(this.state.amountPETH, this.props.cdp);
+    await this.props.store.freePETH(
+      parseInputFloat(this.state.amountPETH),
+      this.props.cdp
+    );
     this.props.onRequestClose();
   };
 
-  handleChange = (e, { name, value }) => {
+  handleChange = (_e: any, { value }: { value: string }) => {
     if (!isValidFloatInputNumber(value)) {
       return;
     }
-    this.setState({ [name]: value });
+    this.setState({ amountPETH: value });
   };
 }
 

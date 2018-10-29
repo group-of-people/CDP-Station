@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
-import registerServiceWorker from "./registerServiceWorker";
+//import registerServiceWorker from "./registerServiceWorker";
 import { Store } from "./store";
 
 //import 'semantic-ui-css/semantic.min.css';
@@ -18,4 +18,4 @@ window.addEventListener("load", function() {
   );
 });
 
-registerServiceWorker();
+//registerServiceWorker();

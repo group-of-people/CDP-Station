@@ -2,23 +2,27 @@ import React, { Component } from "react";
 import { Container, Loader, Dimmer, Icon } from "semantic-ui-react";
 import Work from "./Components/Work";
 import Alert from "./Components/Alert";
-import Helper from "./Components/Helper";
-import FreePETH from "./cdp/Modals/Free.js";
-import LockETH from "./cdp/Modals/Lock.js";
+import FreePETH from "./cdp/Modals/Free";
+import LockETH from "./cdp/Modals/Lock";
 import { observer } from "mobx-react";
+import {Store} from './store'
 
-function getURLParameter(name) {
-  // eslint-disable-next-line
-  return (
-    decodeURIComponent(
-      (new RegExp("[?|&]" + name + "=([^&;]+?)(&|#|;|$)").exec(
-        window.location.search
-      ) || [null, ""])[1].replace(/\+/g, "%20")
-    ) || null
+function getURLParameter(name: string) {
+  const match = new RegExp("[?|&]" + name + "=([^&;]+?)(&|#|;|$)").exec(
+    window.location.search
   );
+  if (!match) {
+    return null;
+  }
+  // eslint-disable-next-line
+  return decodeURIComponent((match[1] || "").replace(/\+/g, "%20")) || null;
 }
 
-class App extends Component {
+interface Props {
+  store: Store;
+}
+
+class App extends Component<Props> {
   state = {
     mode: getURLParameter("mode") || "work"
   };
@@ -68,25 +72,25 @@ class App extends Component {
       <>
         {!!store.showLockModal.get() && (
           <LockETH
-            cdp={store.lockModalTargetCDP.get()}
+            cdp={store.lockModalTargetCDP.get()!}
             store={this.props.store}
             onRequestClose={store.hideLock}
           />
         )}
         {!!store.showFreeModal.get() && (
           <FreePETH
-            cdp={store.freeModalTargetCDP.get()}
+            cdp={store.freeModalTargetCDP.get()!}
             store={this.props.store}
             onRequestClose={store.hideFree}
           />
         )}
         {store.account.get() &&
           this.state.mode === "work" && (
-            <Work key={this.state.account} store={store} />
+            <Work key={store.account.get()} store={store} />
           )}
         {store.account.get() &&
           this.state.mode === "alerts" && <Alert store={store} />}
-        {store.account.get() && this.state.mode === "helper" && <Helper />}
+        {/* {store.account.get() && this.state.mode === "helper" && <Helper />} */}
       </>
     );
   }

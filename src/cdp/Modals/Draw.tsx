@@ -1,9 +1,22 @@
 import React, { Component } from "react";
 import { Button, Modal, Header, Form } from "semantic-ui-react";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
+import {Store, CDP} from '../../store'
 
-export default class Draw extends Component {
-  state = {
+interface Props {
+  cdp: CDP
+  store: Store
+
+  onRequestClose: () => void
+}
+
+interface State {
+  amountDAI: string,
+  drawing: boolean
+}
+
+export default class Draw extends Component<Props, State> {
+  state:State = {
     amountDAI: "",
     drawing: false
   };
@@ -63,14 +76,14 @@ export default class Draw extends Component {
 
   drawDAI = async () => {
     this.setState({ drawing: true });
-    await this.props.store.drawDAI(this.state.amountDAI, this.props.cdp);
+    await this.props.store.drawDAI(parseInputFloat(this.state.amountDAI), this.props.cdp);
     this.props.onRequestClose();
   };
 
-  handleChange = (e, { name, value }) => {
+  handleChange = (_e: any, { value }: {value: string}) => {
     if (!isValidFloatInputNumber(value)) {
       return;
     }
-    this.setState({ [name]: value });
+    this.setState({ amountDAI: value });
   };
 }
