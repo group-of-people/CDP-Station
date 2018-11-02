@@ -5,19 +5,18 @@ import CDPCard from "./Card";
 import CDPDetails from "./Modals/Details";
 import CDPDraw from "./Modals/Draw";
 import CDPRepay from "./Modals/Repay";
-import CDP from '../store/cdp'
-import {Store} from '../store'
+import CDP from "../store/cdp";
+import { Store } from "../store";
 
 interface Props {
-  store: Store,
-  onNewCDP: () => void
+  store: Store;
 }
 
 interface State {
-  detailsCDP: CDP | null,
-  cdpDetails: boolean,
-  draw: boolean,
-  repay: boolean
+  detailsCDP: CDP | null;
+  cdpDetails: boolean;
+  draw: boolean;
+  repay: boolean;
 }
 
 export class CDPList extends Component<Props, State> {
@@ -62,7 +61,7 @@ export class CDPList extends Component<Props, State> {
               repayDAI={this.onCDPRepay}
             />
           ))}
-          <Card onClick={this.props.onNewCDP}>
+          <Card onClick={this.props.store.showNew}>
             <div
               style={{
                 display: "flex",

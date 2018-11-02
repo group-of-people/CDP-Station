@@ -47,6 +47,7 @@ export class Store {
   freeModalTargetCDP = observable.box<CDP | null>(null);
   showLockModal = observable.box(false);
   lockModalTargetCDP = observable.box<CDP | null>(null);
+  showNewCDPModal = observable.box(false);
   noWeb3 = observable.box(false);
 
   //contract typings
@@ -286,6 +287,18 @@ export class Store {
     runInAction(() => {
       this.lockModalTargetCDP.set(null);
       this.showLockModal.set(false);
+    });
+  };
+
+  showNew = () => {
+    runInAction(() => {
+      this.showNewCDPModal.set(true);
+    });
+  };
+
+  hideNew = () => {
+    runInAction(() => {
+      this.showNewCDPModal.set(false);
     });
   };
 }

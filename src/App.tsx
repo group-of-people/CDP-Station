@@ -4,8 +4,9 @@ import Work from "./Components/Work";
 import Alert from "./Components/Alert";
 import FreePETH from "./cdp/Modals/Free";
 import LockETH from "./cdp/Modals/Lock";
+import NewCdpModal from "./cdp/Modals/Creator";
 import { observer } from "mobx-react";
-import {Store} from './store'
+import { Store } from "./store";
 
 function getURLParameter(name: string) {
   const match = new RegExp("[?|&]" + name + "=([^&;]+?)(&|#|;|$)").exec(
@@ -82,6 +83,12 @@ class App extends Component<Props> {
             cdp={store.freeModalTargetCDP.get()!}
             store={this.props.store}
             onRequestClose={store.hideFree}
+          />
+        )}
+        {!!store.showNewCDPModal.get() && (
+          <NewCdpModal
+            store={this.props.store}
+            onRequestClose={store.hideNew}
           />
         )}
         {store.account.get() &&

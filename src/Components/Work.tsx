@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import CDPList from "../cdp/List";
-import NewCdpModal from "../cdp/Modals/Creator";
 import { Store } from "../store";
 
 interface Props {
@@ -35,26 +34,8 @@ export default class Work extends Component<Props, {}> {
           <div>ETH Balance: {balances.ethBalance.toString(4)}</div>
         </div>
         <br />
-        <CDPList store={this.props.store} onNewCDP={this.onNewCDP} />
-        {this.state.showNewCDPModal && (
-          <NewCdpModal
-            store={this.props.store}
-            onRequestClose={this.onCloseNewCDP}
-          />
-        )}
+        <CDPList store={this.props.store} />
       </>
     );
   }
-
-  onNewCDP = () => {
-    this.setState({
-      showNewCDPModal: true
-    });
-  };
-
-  onCloseNewCDP = () => {
-    this.setState({
-      showNewCDPModal: false
-    });
-  };
 }
