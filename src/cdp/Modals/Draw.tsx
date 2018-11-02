@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { Button, Modal, Header, Form } from "semantic-ui-react";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
-import {Store, CDP} from '../../store'
+import {Store} from '../../store'
+import CDP from '../../store/cdp'
 
 interface Props {
   cdp: CDP
@@ -26,7 +27,7 @@ export default class Draw extends Component<Props, State> {
     const amountDAI = parseInputFloat(this.state.amountDAI);
     if (
       amountDAI &&
-      this.props.cdp.daiAvailable >= amountDAI &&
+      this.props.cdp.daiAvailable.get() >= amountDAI &&
       amountDAI > 0 &&
       this.state.amountDAI !== ""
     ) {

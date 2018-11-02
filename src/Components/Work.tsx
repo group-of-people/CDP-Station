@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import CDPList from "../cdp/List";
 import NewCdpModal from "../cdp/Modals/Creator";
-import {Store} from '../store'
+import { Store } from "../store";
 
 interface Props {
-  store: Store
+  store: Store;
 }
 
 export default class Work extends Component<Props, {}> {
@@ -12,32 +12,27 @@ export default class Work extends Component<Props, {}> {
     showNewCDPModal: false
   };
   render() {
+    const balances = this.props.store.balances.get()!;
     return (
       <>
         <div style={{ display: "inline" }}>
           <div>Logged in as {this.props.store.account.get()}</div>
-          <div>{this.props.store.ethPrice.get()!.toString()}</div>
-          <div>{this.props.store.mkrPrice.get()!.toString()}</div>
+          <div>{this.props.store.prices.get()!.ethPrice.toString()}</div>
+          <div>{this.props.store.prices.get()!.mkrPrice.toString()}</div>
           <div>
-            Liquidation Ratio: {this.props.store.liquidationRatio.get()}
+            Liquidation Ratio:{" "}
+            {this.props.store.mkrSettings.get()!.liquidationRatio}
           </div>
           <div>
-            ETH/PETH Ratio: {this.props.store.wethToPeth.get()!.toFixed(4)}
+            ETH/PETH Ratio:{" "}
+            {this.props.store.prices.get()!.wethToPeth.toFixed(4)}
           </div>
         </div>
         <div style={{ display: "inline" }}>
-          <div>
-            DAI Balance: {this.props.store.daiBalance.get()!.toString(4)}
-          </div>
-          <div>
-            MKR Balance: {this.props.store.mkrBalance.get()!.toString(4)}
-          </div>
-          <div>
-            PETH Balance: {this.props.store.pethBalance.get()!.toString(4)}
-          </div>
-          <div>
-            ETH Balance: {this.props.store.ethBalance.get()!.toString(4)}
-          </div>
+          <div>DAI Balance: {balances.daiBalance.toString(4)}</div>
+          <div>MKR Balance: {balances.mkrBalance.toString(4)}</div>
+          <div>PETH Balance: {balances.pethBalance.toString(4)}</div>
+          <div>ETH Balance: {balances.ethBalance.toString(4)}</div>
         </div>
         <br />
         <CDPList store={this.props.store} onNewCDP={this.onNewCDP} />

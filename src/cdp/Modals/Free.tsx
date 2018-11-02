@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import { Button, Modal, Header, Form, Input, Message } from "semantic-ui-react";
 import { observer } from "mobx-react";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
-import { Store, CDP } from "../../store";
+import { Store } from "../../store";
+import CDP from '../../store/cdp'
 
 interface Props {
   store: Store;
@@ -23,28 +24,29 @@ export class Free extends Component<Props, State> {
   };
 
   render() {
+    const {cdp, store} = this.props
     const amountPETH = parseInputFloat(this.state.amountPETH);
-    const ethPrice = this.props.store.ethPrice.get()!.toNumber();
-    const wethToPeth = this.props.store.wethToPeth.get()!;
+    const ethPrice = store.prices.get()!.ethPrice.toNumber();
+    const wethToPeth = store.prices.get()!.wethToPeth;
     const amountETH = amountPETH * wethToPeth;
     const DAICollateralAfterFree =
-      (this.props.cdp.pethLocked.toNumber() - amountPETH) *
+      (cdp.pethLocked.get().toNumber() - amountPETH) *
       wethToPeth *
       ethPrice;
     const maxDrawnDAIAfterFree =
-      DAICollateralAfterFree / this.props.store.liquidationRatio.get()!;
+      DAICollateralAfterFree / store.mkrSettings.get()!.liquidationRatio;
     const minPETHCollateral =
-      (this.props.cdp.daiDebt.toNumber() / ethPrice / wethToPeth) *
-      this.props.store.liquidationRatio.get()!;
+      (cdp.daiDebt.get().toNumber() / ethPrice / wethToPeth) *
+      store.mkrSettings.get()!.liquidationRatio;
     const freeablePETH =
-      this.props.cdp.pethLocked.toNumber() - minPETHCollateral;
+      cdp.pethLocked.get().toNumber() - minPETHCollateral;
     let valid = true;
     let error = "";
 
-    if (amountPETH > this.props.cdp.pethLocked.toNumber()) {
+    if (amountPETH > cdp.pethLocked.get().toNumber()) {
       valid = false;
       error = "CDP has less PETH locked than selected";
-    } else if (maxDrawnDAIAfterFree < this.props.cdp.daiDebt.toNumber()) {
+    } else if (maxDrawnDAIAfterFree < cdp.daiDebt.get().toNumber()) {
       valid = false;
       error = `CDP will become unsafe. You can free at most ${freeablePETH.toFixed(
         4
@@ -64,8 +66,8 @@ export class Free extends Component<Props, State> {
             paddingBottom: "0"
           }}
         >
-          Locked: {this.props.cdp.pethLocked.toNumber().toFixed(4)} PETH (
-          {(this.props.cdp.pethLocked.toNumber() * wethToPeth).toFixed(4)} ETH)
+          Locked: {cdp.pethLocked.get().toNumber().toFixed(4)} PETH (
+          {cdp.ethLocked.get().toFixed(4)} ETH)
         </Header>
         <Modal.Content>
           <Form>

@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { Button, Modal, Header, Form } from "semantic-ui-react";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
-import { Store, CDP } from "../../store";
+import { Store } from "../../store";
+import CDP from '../../store/cdp'
 
 interface Props {
   store: Store;
@@ -18,8 +19,8 @@ interface State {
 export default class Repay extends Component<Props, State> {
   state: State = {
     amountDAI: Math.min(
-      this.props.store.daiBalance.get()!.toNumber(),
-      this.props.cdp.daiDebt.toNumber()
+      this.props.store.balances.get()!.daiBalance.toNumber(),
+      this.props.cdp.daiDebt.get().toNumber()
     ).toString(),
     repaying: false
   };
@@ -27,7 +28,7 @@ export default class Repay extends Component<Props, State> {
   render() {
     const amountDAI = parseInputFloat(this.state.amountDAI);
     let valid = false;
-    if (amountDAI > 0 && this.props.cdp.daiDebt.toNumber() >= amountDAI) {
+    if (amountDAI > 0 && this.props.cdp.daiDebt.get().toNumber() >= amountDAI) {
       valid = true;
     }
 
@@ -50,7 +51,7 @@ export default class Repay extends Component<Props, State> {
           as="h5"
           style={{ color: "gray", display: "inline", paddingBottom: "0" }}
         >
-          MKR Balance: {this.props.store.mkrBalance.get()!.toString(4)}
+          MKR Balance: {this.props.store.balances.get()!.mkrBalance.toString(4)}
         </Header>
         <Modal.Content>
           <Form>

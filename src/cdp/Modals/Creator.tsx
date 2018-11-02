@@ -20,9 +20,9 @@ export class CDPCreator extends Component<Props, State> {
     creating: false
   };
   EthToLock = observable.box(
-    this.props.store.ethBalance
+    this.props.store.balances
       .get()!
-      .toNumber()
+      .ethBalance.toNumber()
       .toString()
   );
   DaiToDraw = observable.box("0");
@@ -30,7 +30,7 @@ export class CDPCreator extends Component<Props, State> {
   daiTotal = computed(
     () =>
       parseInputFloat(this.EthToLock.get()) *
-      this.props.store.ethPrice.get()!.toNumber()
+      this.props.store.prices.get()!.ethPrice.toNumber()
   );
   collateralization = computed(
     () =>
@@ -46,7 +46,7 @@ export class CDPCreator extends Component<Props, State> {
       this.daiTotal.get() && this.DaiToDraw.get()
         ? (
             (parseInputFloat(this.DaiToDraw.get()) *
-              this.props.store.liquidationRatio.get()!) /
+              this.props.store.mkrSettings.get()!.liquidationRatio) /
             parseInputFloat(this.EthToLock.get())
           ).toFixed(2)
         : null
@@ -54,8 +54,8 @@ export class CDPCreator extends Component<Props, State> {
 
   render() {
     const { creating } = this.state;
-    const minCollateralization = this.props.store.liquidationRatio.get()! * 100;
-    const ethBalance = this.props.store.ethBalance.get()!.toNumber();
+    const minCollateralization = this.props.store.mkrSettings.get()!.liquidationRatio * 100;
+    const ethBalance = this.props.store.balances.get()!.ethBalance.toNumber();
 
     let valid = false;
     let error = "";
@@ -63,7 +63,7 @@ export class CDPCreator extends Component<Props, State> {
       valid = false;
     } else if (this.collateralization.get() < minCollateralization) {
       error = `Collateralization < ${minCollateralization}%. You can draw up to ${(
-        this.daiTotal.get() / this.props.store.liquidationRatio.get()!
+        this.daiTotal.get() / this.props.store.mkrSettings.get()!.liquidationRatio
       ).toFixed(2)} DAI.`;
       valid = false;
     } else if (ethBalance < parseInputFloat(this.EthToLock.get())) {
@@ -150,14 +150,14 @@ export class CDPCreator extends Component<Props, State> {
     this.props.onRequestClose();
   };
 
-  handleEthChange = (_e: any, { value }: {value: string}) => {
+  handleEthChange = (_e: any, { value }: { value: string }) => {
     if (!isValidFloatInputNumber(value)) {
       return;
     }
     this.EthToLock.set(value);
   };
 
-  handleDaiChange = (_e: any, { value }: {value: string}) => {
+  handleDaiChange = (_e: any, { value }: { value: string }) => {
     if (!isValidFloatInputNumber(value)) {
       return;
     }

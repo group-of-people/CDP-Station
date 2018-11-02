@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import { Modal, Header, Button, Icon } from "semantic-ui-react";
 import { observer } from "mobx-react";
-import { Store, MKR, CDP } from "../../store";
+import { Store, MKR } from "../../store";
+import CDP from "../../store/cdp";
 
 interface Props {
   store: Store;
-  cdp: CDP
+  cdp: CDP;
 
   onRequestClose: () => void;
 }
@@ -36,27 +37,34 @@ export class CDPDetails extends Component<Props, State> {
         <Modal.Content>
           <ul style={{ width: "40%", display: "inline-block" }}>
             <li>CDP - {cdp.id}</li>
-            <li>Debt - {cdp.daiDebt.toString(4)}</li>
+            <li>Debt - {cdp.daiDebt.get().toString(4)}</li>
             <li>
               DAI Available -{" "}
               {(
-                cdp.daiLocked / this.props.store.liquidationRatio.get()! -
-                cdp.daiDebt.toNumber()
+                cdp.daiLocked.get() /
+                  this.props.store.mkrSettings.get()!.liquidationRatio -
+                cdp.daiDebt.get().toNumber()
               ).toFixed(4)}{" "}
               DAI
             </li>
-            <li>Collateral ETH - {cdp.ethLocked.toFixed(4)} ETH</li>
-            <li>Collateral DAI - {cdp.daiLocked.toFixed(4)} DAI</li>
+            <li>Collateral ETH - {cdp.ethLocked.get().toFixed(4)} ETH</li>
+            <li>Collateral DAI - {cdp.daiLocked.get().toFixed(4)} DAI</li>
             <li>
               Liquidation Price - $
               {(
-                (cdp.daiDebt.toNumber() *
-                  this.props.store.liquidationRatio.get()!) /
-                cdp.ethLocked
+                (cdp.daiDebt.get().toNumber() *
+                  this.props.store.mkrSettings.get()!.liquidationRatio) /
+                cdp.ethLocked.get()
               ).toFixed(2)}
             </li>
-            <li>PETH locked - {cdp.pethLocked.toString(4)}</li>
-            <li title={this.state.governanceFee ? this.state.governanceFee.toString(): ''}>
+            <li>PETH locked - {cdp.pethLocked.get().toString(4)}</li>
+            <li
+              title={
+                this.state.governanceFee
+                  ? this.state.governanceFee.toString()
+                  : ""
+              }
+            >
               Governance Fee -{" "}
               {!!this.state.governanceFee &&
                 this.state.governanceFee.toFixed(4)}{" "}

@@ -1,18 +1,18 @@
 import React, { Component } from "react";
 import { Table } from "semantic-ui-react";
 import { observer } from "mobx-react";
-import {Store} from '../store'
+import { Store } from "../store";
 
 interface Props {
-  store: Store
+  store: Store;
 }
 
 export class Alert extends Component<Props, {}> {
   render() {
     return (
       <>
-        <div>{this.props.store.ethPrice.get()!.toString()}</div>
-        <div>{this.props.store.mkrPrice.get()!.toString()}</div>
+        <div>{this.props.store.prices.get()!.ethPrice.toString()}</div>
+        <div>{this.props.store.prices.get()!.mkrPrice.toString()}</div>
 
         <Table singleLine collapsing style={{ width: "85%" }}>
           <Table.Header>
@@ -29,13 +29,13 @@ export class Alert extends Component<Props, {}> {
             {this.props.store.cdps.map(cdp => (
               <Table.Row>
                 <Table.Cell>{cdp.id}</Table.Cell>
-                <Table.Cell>{cdp.pethLocked.toString(4)}</Table.Cell>
-                <Table.Cell>{cdp.daiDebt.toString(4)}</Table.Cell>
+                <Table.Cell>{cdp.pethLocked.get().toString(4)}</Table.Cell>
+                <Table.Cell>{cdp.daiDebt.get().toString(4)}</Table.Cell>
                 <Table.Cell>
                   {(
-                    (cdp.daiDebt.toNumber() *
-                      this.props.store.liquidationRatio.get()!) /
-                    cdp.ethLocked
+                    (cdp.daiDebt.get().toNumber() *
+                      this.props.store.mkrSettings.get()!.liquidationRatio) /
+                    cdp.ethLocked.get()
                   ).toFixed(2)}
                 </Table.Cell>
                 <Table.Cell>

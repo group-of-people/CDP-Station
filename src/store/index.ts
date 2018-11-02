@@ -1,13 +1,17 @@
-/// <reference path="../types/maker.d.ts" />
- 
-import { observable, runInAction } from "mobx";
-import Maker, { Currency } from "@makerdao/dai";
-import CDPCreatorBuild from "!json-loader!./abi/CDPCreator.abi";
-import ERC20 from "!json-loader!./abi/ERC20.abi";
-import { ERC20 as ERC20Contract } from "../types/web3-contracts/ERC20";
-import { CDPCreator as CDPCreatorContract } from "../types/web3-contracts/CDPCreator";
+/// <reference path="../../types/maker.d.ts" />
 
+import { observable, runInAction, IObservableValue } from "mobx";
 import Web3 from "web3";
+import Maker, { Currency } from "@makerdao/dai";
+import CDPCreatorBuild from "!json-loader!../abi/CDPCreator.abi";
+import ERC20 from "!json-loader!../abi/ERC20.abi";
+import { ERC20 as ERC20Contract } from "../../types/web3-contracts/ERC20";
+import { CDPCreator as CDPCreatorContract } from "../../types/web3-contracts/CDPCreator";
+import CDP, { RawCDP } from "./cdp";
+
+import Prices from "./prices";
+import MkrSettings from "./mkrSettings";
+import Balances from "./balances";
 
 declare global {
   interface Window {
@@ -18,51 +22,11 @@ declare global {
 const { DAI, PETH, MKR, ETH } = Maker;
 export { DAI, PETH, MKR, ETH };
 
-interface RawCDP {
-  ink: number;
-  art: number;
-  cupi: number;
-  closed: boolean;
-}
-
-export interface CDP {
-  id: number;
-  pethLocked: Currency;
-  daiDebt: Currency;
-  daiAvailable: number;
-  daiLocked: number;
-  ethLocked: number;
-  collateralization: string;
-}
-
 // FIXME: remove me
 interface Extra {
-  wethToPeth: number,
-  ethPrice: Currency,
-  liquidationRatio: number
-}
-
-function humanizeCDPResponse(cdp: RawCDP, extra: Extra): CDP {
-  const pethLocked = PETH.wei(cdp.ink);
-  const daiDebt = DAI.wei(cdp.art);
-  const daiLocked =
-    pethLocked.toNumber() * extra.wethToPeth * extra.ethPrice.toNumber();
-  const daiAvailable = daiLocked / extra.liquidationRatio - daiDebt.toNumber();
-  const collateralization =
-    ((pethLocked.toNumber() * extra.wethToPeth * extra.ethPrice.toNumber()) /
-      daiDebt.toNumber()) *
-    100;
-
-  return {
-    id: cdp.cupi,
-    daiAvailable,
-    daiDebt,
-    daiLocked,
-    pethLocked,
-    ethLocked: pethLocked.toNumber() * extra.wethToPeth,
-    // FIXME
-    collateralization: collateralization.toFixed(2)
-  };
+  wethToPeth: number;
+  ethPrice: Currency;
+  liquidationRatio: number;
 }
 
 export class Store {
@@ -73,15 +37,10 @@ export class Store {
   maker: Maker | null = null;
   loading = observable.box(true);
   locked = observable.box(false);
-  // FIXME ratio is correct type in reality
-  ethPrice = observable.box<Currency | null>(null);
-  mkrPrice = observable.box<Currency | null>(null);
-  wethToPeth = observable.box<number | null>(null);
-  liquidationRatio = observable.box<number | null>(null);
-  mkrBalance = observable.box<Currency | null>(null);
-  daiBalance = observable.box<Currency | null>(null);
-  ethBalance = observable.box<Currency | null>(null);
-  pethBalance = observable.box<Currency | null>(null);
+
+  prices: IObservableValue<Prices | null> = observable.box(null);
+  mkrSettings: IObservableValue<MkrSettings | null> = observable.box(null);
+  balances: IObservableValue<Balances | null> = observable.box(null);
 
   // UI State
   showFreeModal = observable.box(false);
@@ -183,14 +142,16 @@ export class Store {
 
       runInAction(() => {
         this.account.set(accs[0]);
-        this.ethPrice.set(ethPrice);
-        this.mkrPrice.set(mkrPrice);
-        this.wethToPeth.set(wethToPeth);
-        this.liquidationRatio.set(liquidationRatio);
-        this.mkrBalance.set(MKR.wei(mkr));
-        this.daiBalance.set(DAI.wei(dai));
-        this.ethBalance.set(ETH.wei(ethBalance));
-        this.pethBalance.set(PETH.wei(peth));
+        this.prices.set(new Prices(ethPrice, mkrPrice, wethToPeth));
+        this.mkrSettings.set(new MkrSettings(liquidationRatio));
+        this.balances.set(
+          new Balances(
+            MKR.wei(mkr),
+            DAI.wei(dai),
+            ETH.wei(ethBalance),
+            PETH.wei(peth)
+          )
+        );
       });
       await this.updateCDPS();
       runInAction(() => {
@@ -221,13 +182,16 @@ export class Store {
 
     runInAction(() => {
       this.cdps.replace(
-        cdps.results.filter(cdp => !cdp.closed).map(cdp =>
-          humanizeCDPResponse(cdp, {
-            wethToPeth: this.wethToPeth.get()!,
-            liquidationRatio: this.liquidationRatio.get()!,
-            ethPrice: this.ethPrice.get()!
-          })
-        )
+        cdps.results
+          .filter(cdp => !cdp.closed)
+          .map(
+            cdp =>
+              new CDP(
+                cdp,
+                this.prices as IObservableValue<Prices>,
+                this.mkrSettings as IObservableValue<MkrSettings>
+              )
+          )
       );
     });
   };
@@ -267,9 +231,10 @@ export class Store {
     //    console.log(this.web3.utils.fromAscii(cdp.id.toString()));
     try {
       const eth = this.web3!.utils.toWei(amountETH, "ether");
-      await this.contract!.methods
-        .lockETH(cdp.id, eth)
-        .send({ from: this.account.get(), value: eth });
+      await this.contract!.methods.lockETH(cdp.id, eth).send({
+        from: this.account.get(),
+        value: eth
+      });
       await this.updateCDPS();
     } catch (e) {
       console.log(e, "Error locking ETH");

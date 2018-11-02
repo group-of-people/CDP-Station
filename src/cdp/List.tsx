@@ -5,7 +5,8 @@ import CDPCard from "./Card";
 import CDPDetails from "./Modals/Details";
 import CDPDraw from "./Modals/Draw";
 import CDPRepay from "./Modals/Repay";
-import {Store, CDP} from '../store'
+import CDP from '../store/cdp'
+import {Store} from '../store'
 
 interface Props {
   store: Store,

@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { Button, Modal, Header, Form, Input, Message } from "semantic-ui-react";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
-import { Store, CDP } from "../../store";
+import { Store } from "../../store";
+import CDP from '../../store/cdp'
 
 interface Props {
   store: Store;
@@ -17,8 +18,7 @@ interface State {
 
 export default class Lock extends Component<Props, State> {
   state: State = {
-    amountETH: this.props.store.ethBalance
-      .get()!
+    amountETH: this.props.store.balances.get()!.ethBalance
       .toNumber()
       .toString(),
     locking: false
@@ -27,13 +27,13 @@ export default class Lock extends Component<Props, State> {
   render() {
     const amountETH = parseInputFloat(this.state.amountETH);
 
-    const wethToPeth = this.props.store.wethToPeth.get()!;
+    const wethToPeth = this.props.store.prices.get()!. wethToPeth;
     const amountPETH = (amountETH / wethToPeth).toFixed(4);
 
-    const pethLocked = this.props.cdp.pethLocked;
+    const pethLocked = this.props.cdp.pethLocked.get();
     const ethLocked = pethLocked.toNumber() * wethToPeth;
 
-    const ethBalance = this.props.store.ethBalance.get()!.toNumber();
+    const ethBalance = this.props.store.balances.get()!. ethBalance.toNumber();
 
     let valid = true;
     let error = "";

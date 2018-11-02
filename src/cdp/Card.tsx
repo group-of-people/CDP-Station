@@ -1,11 +1,12 @@
 import React from "react";
 import { Card, Button } from "semantic-ui-react";
+import { observer } from "mobx-react";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
-import {CDP} from '../store'
+import CDP from "../store/cdp";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
-const Chart = ({ data }: {data: {name: string, value: number}[]}) => (
+const Chart = ({ data }: { data: { name: string; value: number }[] }) => (
   <PieChart height={200} width={260}>
     <Pie
       startAngle={90}
@@ -25,11 +26,10 @@ const Chart = ({ data }: {data: {name: string, value: number}[]}) => (
 );
 
 interface Props {
-  cdp: CDP
-  onClick: (cdp: CDP) => void 
-  drawDAI: (cdp: CDP) => void 
-  repayDAI: (cdp: CDP) => void 
-
+  cdp: CDP;
+  onClick: (cdp: CDP) => void;
+  drawDAI: (cdp: CDP) => void;
+  repayDAI: (cdp: CDP) => void;
 }
 
 class CDPCard extends React.Component<Props> {
@@ -40,14 +40,14 @@ class CDPCard extends React.Component<Props> {
         <Card onClick={this.onClick}>
           <Chart
             data={[
-              { name: "DAI Debt", value: cdp.daiDebt.toNumber() },
-              { name: "DAI Available", value: cdp.daiAvailable }
+              { name: "DAI Debt", value: cdp.daiDebt.get().toNumber() },
+              { name: "DAI Available", value: cdp.daiAvailable.get() }
               // {name: "DAI Collateral", value: cdp.daiLocked - cdp.daiAvailable - cdp.daiDebt.toNumber()}
             ]}
           />
           <Card.Content textAlign={"right"}>
             <Card.Header>CDP {cdp.id} </Card.Header>
-            <Card.Meta>{cdp.ethLocked.toFixed(4)} ETH </Card.Meta>
+            <Card.Meta>{cdp.ethLocked.get().toFixed(4)} ETH </Card.Meta>
           </Card.Content>
           <Card.Content extra>
             <div className="ui two buttons">
@@ -77,4 +77,4 @@ class CDPCard extends React.Component<Props> {
   };
 }
 
-export default CDPCard;
+export default observer(CDPCard);
