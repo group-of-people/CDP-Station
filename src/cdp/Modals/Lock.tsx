@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import { Button, Modal, Header, Form, Input, Message } from "semantic-ui-react";
+import {inject,observer} from 'mobx-react'
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 import { Store } from "../../store";
 import CDP from '../../store/cdp'
 
 interface Props {
-  store: Store;
+  store?: Store;
   cdp: CDP;
 
   onRequestClose: () => void;
@@ -16,24 +17,25 @@ interface State {
   locking: boolean;
 }
 
-export default class Lock extends Component<Props, State> {
+export class Lock extends Component<Props, State> {
   state: State = {
-    amountETH: this.props.store.balances.get()!.ethBalance
+    amountETH: this.props.store!.balances.get()!.ethBalance
       .toNumber()
       .toString(),
     locking: false
   };
 
   render() {
+    const store = this.props.store!
     const amountETH = parseInputFloat(this.state.amountETH);
 
-    const wethToPeth = this.props.store.prices.get()!. wethToPeth;
+    const wethToPeth = store.prices.get()!. wethToPeth;
     const amountPETH = (amountETH / wethToPeth).toFixed(4);
 
     const pethLocked = this.props.cdp.pethLocked.get();
-    const ethLocked = pethLocked.toNumber() * wethToPeth;
+    const ethLocked = this.props.cdp.ethLocked.get();
 
-    const ethBalance = this.props.store.balances.get()!. ethBalance.toNumber();
+    const ethBalance = store.balances.get()!.ethBalance.toNumber();
 
     let valid = true;
     let error = "";
@@ -96,7 +98,7 @@ export default class Lock extends Component<Props, State> {
 
   lockETH = async () => {
     this.setState({ locking: true });
-    await this.props.store.lockETH(
+    await this.props.store!.lockETH(
       parseInputFloat(this.state.amountETH),
       this.props.cdp
     );
@@ -110,3 +112,5 @@ export default class Lock extends Component<Props, State> {
     this.setState({ amountETH: value });
   };
 }
+
+export default inject('store')(observer(Lock))

@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import { Button, Modal, Header, Form, Input, Message } from "semantic-ui-react";
-import { observer } from "mobx-react";
+import { inject, observer } from "mobx-react";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 import { Store } from "../../store";
 import CDP from '../../store/cdp'
 
 interface Props {
-  store: Store;
+  store?: Store;
   cdp: CDP;
 
   onRequestClose: () => void;
@@ -24,7 +24,8 @@ export class Free extends Component<Props, State> {
   };
 
   render() {
-    const {cdp, store} = this.props
+    const {cdp} = this.props
+    const store = this.props.store!
     const amountPETH = parseInputFloat(this.state.amountPETH);
     const ethPrice = store.prices.get()!.ethPrice.toNumber();
     const wethToPeth = store.prices.get()!.wethToPeth;
@@ -109,7 +110,7 @@ export class Free extends Component<Props, State> {
 
   freePETH = async () => {
     this.setState({ freeing: true });
-    await this.props.store.freePETH(
+    await this.props.store!.freePETH(
       parseInputFloat(this.state.amountPETH),
       this.props.cdp
     );
@@ -124,4 +125,4 @@ export class Free extends Component<Props, State> {
   };
 }
 
-export default observer(Free);
+export default inject('store')(observer(Free));

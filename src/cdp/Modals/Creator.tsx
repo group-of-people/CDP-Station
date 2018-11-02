@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import { Button, Modal, Header, Form, Message } from "semantic-ui-react";
-import { observer } from "mobx-react";
+import { inject, observer } from "mobx-react";
 import { observable, computed } from "mobx";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 import { Store } from "../../store";
 
 interface Props {
-  store: Store;
+  store?: Store;
 
   onRequestClose: () => void;
 }
@@ -20,7 +20,7 @@ export class CDPCreator extends Component<Props, State> {
     creating: false
   };
   EthToLock = observable.box(
-    this.props.store.balances
+    this.props.store!.balances
       .get()!
       .ethBalance.toNumber()
       .toString()
@@ -30,7 +30,7 @@ export class CDPCreator extends Component<Props, State> {
   daiTotal = computed(
     () =>
       parseInputFloat(this.EthToLock.get()) *
-      this.props.store.prices.get()!.ethPrice.toNumber()
+      this.props.store!.prices.get()!.ethPrice.toNumber()
   );
   collateralization = computed(
     () =>
@@ -46,7 +46,7 @@ export class CDPCreator extends Component<Props, State> {
       this.daiTotal.get() && this.DaiToDraw.get()
         ? (
             (parseInputFloat(this.DaiToDraw.get()) *
-              this.props.store.mkrSettings.get()!.liquidationRatio) /
+              this.props.store!.mkrSettings.get()!.liquidationRatio) /
             parseInputFloat(this.EthToLock.get())
           ).toFixed(2)
         : null
@@ -54,8 +54,10 @@ export class CDPCreator extends Component<Props, State> {
 
   render() {
     const { creating } = this.state;
-    const minCollateralization = this.props.store.mkrSettings.get()!.liquidationRatio * 100;
-    const ethBalance = this.props.store.balances.get()!.ethBalance.toNumber();
+    const store = this.props.store!
+
+    const minCollateralization = store.mkrSettings.get()!.liquidationRatio * 100;
+    const ethBalance = store.balances.get()!.ethBalance.toNumber();
 
     let valid = false;
     let error = "";
@@ -63,7 +65,7 @@ export class CDPCreator extends Component<Props, State> {
       valid = false;
     } else if (this.collateralization.get() < minCollateralization) {
       error = `Collateralization < ${minCollateralization}%. You can draw up to ${(
-        this.daiTotal.get() / this.props.store.mkrSettings.get()!.liquidationRatio
+        this.daiTotal.get() / store.mkrSettings.get()!.liquidationRatio
       ).toFixed(2)} DAI.`;
       valid = false;
     } else if (ethBalance < parseInputFloat(this.EthToLock.get())) {
@@ -143,7 +145,7 @@ export class CDPCreator extends Component<Props, State> {
 
   createCDP = async () => {
     this.setState({ creating: true });
-    await this.props.store.createCDP(
+    await this.props.store!.createCDP(
       parseInputFloat(this.EthToLock.get()),
       parseInputFloat(this.DaiToDraw.get())
     );
@@ -165,4 +167,4 @@ export class CDPCreator extends Component<Props, State> {
   };
 }
 
-export default observer(CDPCreator);
+export default inject('store')(observer(CDPCreator));

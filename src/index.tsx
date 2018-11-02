@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { Provider } from "mobx-react";
 import App from "./App";
 //import registerServiceWorker from "./registerServiceWorker";
 import { Store } from "./store";
@@ -12,7 +13,9 @@ window.addEventListener("load", function() {
 
   ReactDOM.render(
     <div>
-      <App store={store} />
+      <Provider store={store}>
+        <App />
+      </Provider>
     </div>,
     document.getElementById("root")
   );

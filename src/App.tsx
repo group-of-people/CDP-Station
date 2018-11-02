@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Container, Loader, Dimmer, Icon } from "semantic-ui-react";
+import { inject } from "mobx-react";
 import Work from "./Components/Work";
 import Alert from "./Components/Alert";
 import FreePETH from "./cdp/Modals/Free";
@@ -20,7 +21,7 @@ function getURLParameter(name: string) {
 }
 
 interface Props {
-  store: Store;
+  store?: Store;
 }
 
 class App extends Component<Props> {
@@ -29,7 +30,7 @@ class App extends Component<Props> {
   };
 
   render() {
-    const { store } = this.props;
+    const store  = this.props.store!;
     return (
       <Container>
         <header className="App-header">
@@ -67,27 +68,24 @@ class App extends Component<Props> {
   }
 
   renderContent() {
-    const { store } = this.props;
+    const store  = this.props.store!;
 
     return (
       <>
         {!!store.showLockModal.get() && (
           <LockETH
             cdp={store.lockModalTargetCDP.get()!}
-            store={this.props.store}
             onRequestClose={store.hideLock}
           />
         )}
         {!!store.showFreeModal.get() && (
           <FreePETH
             cdp={store.freeModalTargetCDP.get()!}
-            store={this.props.store}
             onRequestClose={store.hideFree}
           />
         )}
         {!!store.showNewCDPModal.get() && (
           <NewCdpModal
-            store={this.props.store}
             onRequestClose={store.hideNew}
           />
         )}
@@ -103,4 +101,4 @@ class App extends Component<Props> {
   }
 }
 
-export default observer(App);
+export default inject("store")(observer(App));
