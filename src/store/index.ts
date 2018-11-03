@@ -5,6 +5,8 @@ import Web3 from "web3";
 import Maker, { Currency } from "@makerdao/dai";
 import CDPCreatorBuild from "!json-loader!../abi/CDPCreator.abi";
 import ERC20 from "!json-loader!../abi/ERC20.abi";
+import DSToken from "!json-loader!../abi/DSToken.abi";
+import { DSToken as DSTokenContract } from "../../types/web3-contracts/DSToken";
 import { ERC20 as ERC20Contract } from "../../types/web3-contracts/ERC20";
 import { CDPCreator as CDPCreatorContract } from "../../types/web3-contracts/CDPCreator";
 import CDP, { RawCDP } from "./cdp";
@@ -12,6 +14,7 @@ import CDP, { RawCDP } from "./cdp";
 import Prices from "./prices";
 import MkrSettings from "./mkrSettings";
 import Balances from "./balances";
+import Addresses from "./addresses.json";
 
 declare global {
   interface Window {
@@ -60,7 +63,7 @@ export class Store {
   contract: CDPCreatorContract | null = null;
   mkrContract: ERC20Contract | null = null;
   daiContract: ERC20Contract | null = null;
-  pethContract: ERC20Contract | null = null;
+  pethContract: DSTokenContract | null = null;
 
   constructor() {
     var web3 = window.web3;
@@ -76,20 +79,20 @@ export class Store {
     this.web3 = web3;
     this.contract = new web3.eth.Contract(
       CDPCreatorBuild.abi,
-      "0x38753Ef9Fb83C3cC231f91aBD752F4823eD2677F"
+      Addresses.Creator
     ) as CDPCreatorContract;
     this.mkrContract = new web3.eth.Contract(
       ERC20.abi,
-      "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2"
+      Addresses.MKR
     ) as ERC20Contract;
     this.daiContract = new web3.eth.Contract(
       ERC20.abi,
-      "0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359"
+      Addresses.DAI
     ) as ERC20Contract;
     this.pethContract = new web3.eth.Contract(
-      ERC20.abi,
-      "0xf53AD2c6851052A81B42133467480961B2321C09"
-    ) as ERC20Contract;
+      DSToken.abi,
+      Addresses.PETH
+    ) as DSTokenContract;
 
     this.initializeAccount();
   }
@@ -127,39 +130,20 @@ export class Store {
         ethPrice,
         mkrPrice,
         wethToPeth,
-        liquidationRatio,
-        ethBalance
+        liquidationRatio
       ] = await Promise.all([
         priceService.getEthPrice(),
         priceService.getMkrPrice(),
         priceService.getWethToPethRatio(),
-        cdpService.getLiquidationRatio(),
-        web3.eth.getBalance(accs[0])
+        cdpService.getLiquidationRatio()
       ]);
-
-      const mkr = await this.mkrContract!.methods.balanceOf(accs[0]).call({
-        from: accs[0]
-      });
-      const dai = await this.daiContract!.methods.balanceOf(accs[0]).call({
-        from: accs[0]
-      });
-      const peth = await this.pethContract!.methods.balanceOf(accs[0]).call({
-        from: accs[0]
-      });
 
       runInAction(() => {
         this.account.set(accs[0]);
         this.prices.set(new Prices(ethPrice, mkrPrice, wethToPeth));
         this.mkrSettings.set(new MkrSettings(liquidationRatio));
-        this.balances.set(
-          new Balances(
-            MKR.wei(mkr),
-            DAI.wei(dai),
-            ETH.wei(ethBalance),
-            PETH.wei(peth)
-          )
-        );
       });
+      await this.updateBalances();
       await this.updateCDPS();
       runInAction(() => {
         this.loading.set(false);
@@ -176,7 +160,7 @@ export class Store {
       const cdpInstance = await this.maker!.getCdp(cdp.id);
       return await cdpInstance.isSafe();
     } catch (e) {
-      //console.log(e, "Error");
+      console.log(e, "Error");
     }
   };
 
@@ -203,6 +187,31 @@ export class Store {
     });
   };
 
+  updateBalances = async () => {
+    const acc = this.account.get();
+    const mkr = await this.mkrContract!.methods.balanceOf(acc).call({
+      from: acc
+    });
+    const dai = await this.daiContract!.methods.balanceOf(acc).call({
+      from: acc
+    });
+    const peth = await this.pethContract!.methods.balanceOf(acc).call({
+      from: acc
+    });
+    const ethBalance = await this.web3!.eth.getBalance(acc);
+
+    runInAction(() => {
+      this.balances.set(
+        new Balances(
+          MKR.wei(mkr),
+          DAI.wei(dai),
+          ETH.wei(ethBalance),
+          PETH.wei(peth)
+        )
+      );
+    });
+  };
+
   createCDP = async (amountETH: number, amountDAI: number) => {
     const eth = this.web3!.utils.toWei(amountETH.toString(), "ether");
     const dai = amountDAI * Math.pow(10, 18);
@@ -212,6 +221,7 @@ export class Store {
       value: eth
     });
     await this.updateCDPS();
+    await this.updateBalances();
   };
 
   drawDAI = async (amountDAI: number, cdp: CDP) => {
@@ -219,6 +229,7 @@ export class Store {
       const cdpInstance = await this.maker!.getCdp(cdp.id);
       await cdpInstance.drawDai(amountDAI);
       await this.updateCDPS();
+      await this.updateBalances();
     } catch (e) {
       console.log(e, "Error drawing DAI");
     }
@@ -229,13 +240,13 @@ export class Store {
       const cdpInstance = await this.maker!.getCdp(cdp.id);
       await cdpInstance.wipeDai(amountDAI);
       await this.updateCDPS();
+      await this.updateBalances();
     } catch (e) {
       console.log(e, "Error repaying DAI");
     }
   };
 
   lockETH = async (amountETH: number, cdp: CDP) => {
-    //    console.log(this.web3.utils.fromAscii(cdp.id.toString()));
     try {
       const eth = this.web3!.utils.toWei(amountETH, "ether");
       await this.contract!.methods.lockETH(cdp.id, eth).send({
@@ -243,6 +254,7 @@ export class Store {
         value: eth
       });
       await this.updateCDPS();
+      await this.updateBalances();
     } catch (e) {
       console.log(e, "Error locking ETH");
     }
@@ -253,8 +265,40 @@ export class Store {
       const cdpInstance = await this.maker!.getCdp(cdp.id);
       await cdpInstance.freePeth(amountPETH);
       await this.updateCDPS();
+      await this.updateBalances();
     } catch (e) {
       console.log(e, "Error freeing PETH");
+    }
+  };
+
+  convertPETH = async () => {
+    try {
+      const balances = this.balances.get();
+      const peth = balances!.pethBalance;
+      const pethWei = peth.toNumber() * 10 ** 18;
+      this.pethContract!.methods.allowance(
+        this.account!.get(),
+        Addresses.Creator
+      )
+        .call({ from: this.account!.get() })
+        .then(async allowed => {
+          if (Number(allowed) !== 2 ** 256 - 1) {
+            this.pethContract!.methods.approve(Addresses.Creator)
+              .send({ from: this.account.get() })
+              .then(async () => {
+                await this.contract!.methods.convertPETHToETH(
+                  peth.toNumber()
+                ).send({ from: this.account.get() });
+              });
+          } else {
+            await this.contract!.methods.convertPETHToETH(
+              pethWei.toString()
+            ).send({ from: this.account.get() });
+          }
+        });
+      await this.updateBalances();
+    } catch (e) {
+      console.log(e, "Error converting PETH");
     }
   };
 
@@ -263,6 +307,7 @@ export class Store {
       const cdpInstance = await this.maker!.getCdp(cdp.id);
       await cdpInstance.shut();
       await this.updateCDPS();
+      await this.updateBalances();
     } catch (e) {
       console.log(e, "Error shutting CDP");
     }

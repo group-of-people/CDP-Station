@@ -2,12 +2,11 @@ pragma solidity ^0.4.24;
 import "./SaiTub.sol";
 import "./WETH.sol";
 
-contract CDPCreator {
+contract CDPCreator is DSMath {
     WETH9 public weth;
     ERC20 public peth;
     ERC20 public dai;
     SaiTub public tub;
-    DSMath public math;
 
     event CDPCreated(bytes32 id, address creator, uint256 dai);
 
@@ -17,20 +16,19 @@ contract CDPCreator {
         peth = ERC20(_peth);
         dai = ERC20(_dai);
         tub = SaiTub(_tub);
+
+        weth.approve(address(tub), uint(-1));
+        peth.approve(address(tub), uint(-1));
     }
 
-    function createCDP(uint256 amountETH, uint256 amountDAI) payable external {
-        require(amountETH >= 0.005 ether);
-        require(msg.value == amountETH);
+    function createCDP(uint256 amountDAI) payable external {
+        require(msg.value >= 0.005 ether);
         require(address(weth).call.value(msg.value)());
 
-        weth.approve(address(tub), amountETH);
-
-        uint256 amountPETH = (amountETH ** 2) / (tub.ask(amountETH));
-        tub.join(amountPETH);
-
         bytes32 cupID = tub.open();
-        peth.approve(address(tub), amountPETH);
+        
+        uint256 amountPETH = rdiv(msg.value, tub.per());
+        tub.join(amountPETH);
         tub.lock(cupID, amountPETH);
         tub.draw(cupID, amountDAI);
 
@@ -40,24 +38,19 @@ contract CDPCreator {
         emit CDPCreated(cupID, msg.sender, amountDAI);
     }
 
-    function lockETH(uint256 id, uint256 amountETH) payable external {
-        require(msg.value == amountETH);
+    function lockETH(uint256 id) payable external {
         require(address(weth).call.value(msg.value)());
-        weth.approve(address(tub), amountETH);
 
-        uint256 amountPETH = (amountETH ** 2) / (tub.ask(amountETH));
+        uint256 amountPETH = rdiv(msg.value, tub.per());
         tub.join(amountPETH);
 
-        peth.approve(address(tub), amountPETH);
         tub.lock(bytes32(id), amountPETH);
     }
 
-    function convertETHToPETH(uint256 amountETH) payable external {
-        require(msg.value == amountETH);
+    function convertETHToPETH() payable external {
         require(address(weth).call.value(msg.value)());
-        weth.approve(address(tub), amountETH);
 
-        uint256 amountPETH = (amountETH ** 2) / (tub.ask(amountETH));
+        uint256 amountPETH = rdiv(msg.value, tub.per());
         tub.join(amountPETH);
         peth.transfer(msg.sender, amountPETH);
     }
@@ -65,7 +58,6 @@ contract CDPCreator {
     function convertPETHToETH(uint256 amountPETH) external {
         require(peth.transferFrom(msg.sender, address(this), amountPETH));
         
-        peth.approve(address(tub), amountPETH);
         uint256 bid = tub.bid(amountPETH);
         tub.exit(amountPETH);
         weth.withdraw(bid);

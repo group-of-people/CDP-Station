@@ -35,9 +35,6 @@ class App extends Component<Props> {
     const store = this.props.store!;
     return (
       <Container>
-        <header className="App-header">
-          <h1 className="App-title">SettleCDP</h1>
-        </header>
         {store.noWeb3.get()
           ? this.renderNoWeb3()
           : store.locked.get()
