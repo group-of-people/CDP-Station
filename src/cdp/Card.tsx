@@ -1,8 +1,9 @@
 import React from "react";
 import { Card, Button } from "semantic-ui-react";
-import { observer } from "mobx-react";
+import { observer, inject } from "mobx-react";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import CDP from "../store/cdp";
+import { Store } from "../store";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
@@ -26,10 +27,8 @@ const Chart = ({ data }: { data: { name: string; value: number }[] }) => (
 );
 
 interface Props {
+  store?: Store;
   cdp: CDP;
-  onClick: (cdp: CDP) => void;
-  drawDAI: (cdp: CDP) => void;
-  repayDAI: (cdp: CDP) => void;
 }
 
 class CDPCard extends React.Component<Props> {
@@ -65,16 +64,16 @@ class CDPCard extends React.Component<Props> {
   }
 
   onClick = () => {
-    this.props.onClick(this.props.cdp);
+    this.props.store!.showDetails(this.props.cdp);
   };
 
   drawDai = () => {
-    this.props.drawDAI(this.props.cdp);
+    this.props.store!.showDraw(this.props.cdp);
   };
 
   repayDai = () => {
-    this.props.repayDAI(this.props.cdp);
+    this.props.store!.showRepay(this.props.cdp);
   };
 }
 
-export default observer(CDPCard);
+export default inject("store")(observer(CDPCard));

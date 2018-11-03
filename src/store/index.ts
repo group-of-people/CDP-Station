@@ -48,6 +48,12 @@ export class Store {
   showLockModal = observable.box(false);
   lockModalTargetCDP = observable.box<CDP | null>(null);
   showNewCDPModal = observable.box(false);
+  showDetailsModal = observable.box(false);
+  detailsModalTargetCDP = observable.box<CDP | null>(null);
+  showRepayModal = observable.box(false);
+  repayModalTargetCDP = observable.box<CDP | null>(null);
+  showDrawModal = observable.box(false);
+  drawModalTargetCDP = observable.box<CDP | null>(null);
   noWeb3 = observable.box(false);
 
   //contract typings
@@ -299,6 +305,48 @@ export class Store {
   hideNew = () => {
     runInAction(() => {
       this.showNewCDPModal.set(false);
+    });
+  };
+
+  showDetails = (cdp: CDP) => {
+    runInAction(() => {
+      this.detailsModalTargetCDP.set(cdp);
+      this.showDetailsModal.set(true);
+    });
+  };
+
+  hideDetails = () => {
+    runInAction(() => {
+      this.detailsModalTargetCDP.set(null);
+      this.showDetailsModal.set(false);
+    });
+  };
+
+  showRepay = (cdp: CDP) => {
+    runInAction(() => {
+      this.repayModalTargetCDP.set(cdp);
+      this.showRepayModal.set(true);
+    });
+  };
+
+  hideRepay = () => {
+    runInAction(() => {
+      this.repayModalTargetCDP.set(null);
+      this.showRepayModal.set(false);
+    });
+  };
+
+  showDraw = (cdp: CDP) => {
+    runInAction(() => {
+      this.drawModalTargetCDP.set(cdp);
+      this.showDrawModal.set(true);
+    });
+  };
+
+  hideDraw = () => {
+    runInAction(() => {
+      this.drawModalTargetCDP.set(null);
+      this.showDrawModal.set(false);
     });
   };
 }

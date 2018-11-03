@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import { Modal, Header, Button, Icon } from "semantic-ui-react";
-import { observer } from "mobx-react";
+import { observer, inject } from "mobx-react";
 import { Store, MKR } from "../../store";
 import CDP from "../../store/cdp";
 
 interface Props {
-  store: Store;
+  store?: Store;
   cdp: CDP;
 
   onRequestClose: () => void;
@@ -21,7 +21,7 @@ export class CDPDetails extends Component<Props, State> {
   };
 
   componentDidMount() {
-    this.props.store.maker!.getCdp(this.props.cdp.id).then(cdp => {
+    this.props.store!.maker!.getCdp(this.props.cdp.id).then(cdp => {
       cdp.getGovernanceFee(MKR).then(fee => {
         this.setState({ governanceFee: fee.toNumber() });
       });
@@ -42,7 +42,7 @@ export class CDPDetails extends Component<Props, State> {
               DAI Available -{" "}
               {(
                 cdp.daiLocked.get() /
-                  this.props.store.mkrSettings.get()!.liquidationRatio -
+                  this.props.store!.mkrSettings.get()!.liquidationRatio -
                 cdp.daiDebt.get().toNumber()
               ).toFixed(4)}{" "}
               DAI
@@ -53,7 +53,7 @@ export class CDPDetails extends Component<Props, State> {
               Liquidation Price - $
               {(
                 (cdp.daiDebt.get().toNumber() *
-                  this.props.store.mkrSettings.get()!.liquidationRatio) /
+                  this.props.store!.mkrSettings.get()!.liquidationRatio) /
                 cdp.ethLocked.get()
               ).toFixed(2)}
             </li>
@@ -118,17 +118,17 @@ export class CDPDetails extends Component<Props, State> {
   }
 
   onLock = async () => {
-    this.props.store.showLock(this.props.cdp);
+    this.props.store!.showLock(this.props.cdp);
   };
 
   onFree = () => {
-    this.props.store.showFree(this.props.cdp);
+    this.props.store!.showFree(this.props.cdp);
   };
 
   shutCDP = async () => {
-    await this.props.store.shutCDP(this.props.cdp);
+    await this.props.store!.shutCDP(this.props.cdp);
     this.props.onRequestClose();
   };
 }
 
-export default observer(CDPDetails);
+export default inject('store')(observer(CDPDetails));

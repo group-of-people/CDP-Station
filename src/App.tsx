@@ -1,12 +1,14 @@
 import React, { Component } from "react";
 import { Container, Loader, Dimmer, Icon } from "semantic-ui-react";
-import { inject } from "mobx-react";
+import { inject, observer } from "mobx-react";
 import Work from "./Components/Work";
 import Alert from "./Components/Alert";
 import FreePETH from "./cdp/Modals/Free";
 import LockETH from "./cdp/Modals/Lock";
 import NewCdpModal from "./cdp/Modals/Creator";
-import { observer } from "mobx-react";
+import CDPDetails from "./cdp/Modals/Details";
+import CDPDraw from "./cdp/Modals/Draw";
+import CDPRepay from "./cdp/Modals/Repay";
 import { Store } from "./store";
 
 function getURLParameter(name: string) {
@@ -30,7 +32,7 @@ class App extends Component<Props> {
   };
 
   render() {
-    const store  = this.props.store!;
+    const store = this.props.store!;
     return (
       <Container>
         <header className="App-header">
@@ -68,7 +70,7 @@ class App extends Component<Props> {
   }
 
   renderContent() {
-    const store  = this.props.store!;
+    const store = this.props.store!;
 
     return (
       <>
@@ -85,8 +87,24 @@ class App extends Component<Props> {
           />
         )}
         {!!store.showNewCDPModal.get() && (
-          <NewCdpModal
-            onRequestClose={store.hideNew}
+          <NewCdpModal onRequestClose={store.hideNew} />
+        )}
+        {!!store.showDetailsModal.get() && (
+          <CDPDetails
+            cdp={store.detailsModalTargetCDP.get()!}
+            onRequestClose={store.hideDetails}
+          />
+        )}
+        {!!store.showDrawModal.get() && (
+          <CDPDraw
+            cdp={store.drawModalTargetCDP.get()!}
+            onRequestClose={store.hideDraw}
+          />
+        )}
+        {!!store.showRepayModal.get() && (
+          <CDPRepay
+            cdp={store.repayModalTargetCDP.get()!}
+            onRequestClose={store.hideRepay}
           />
         )}
         {store.account.get() &&

@@ -1,30 +1,32 @@
 import React, { Component } from "react";
 import CDPList from "../cdp/List";
 import { Store } from "../store";
+import { inject, observer } from "mobx-react";
 
 interface Props {
-  store: Store;
+  store?: Store;
 }
 
-export default class Work extends Component<Props, {}> {
+export  class Work extends Component<Props, {}> {
   state = {
     showNewCDPModal: false
   };
   render() {
-    const balances = this.props.store.balances.get()!;
+    const prices = this.props.store!.prices.get()!
+    const balances = this.props.store!.balances.get()!;
     return (
       <>
         <div style={{ display: "inline" }}>
-          <div>Logged in as {this.props.store.account.get()}</div>
-          <div>{this.props.store.prices.get()!.ethPrice.toString()}</div>
-          <div>{this.props.store.prices.get()!.mkrPrice.toString()}</div>
+          <div>Logged in as {this.props.store!.account.get()}</div>
+          <div>{prices.ethPrice.toString()}</div>
+          <div>{prices.mkrPrice.toString()}</div>
           <div>
             Liquidation Ratio:{" "}
-            {this.props.store.mkrSettings.get()!.liquidationRatio}
+            {this.props.store!.mkrSettings.get()!.liquidationRatio}
           </div>
           <div>
             ETH/PETH Ratio:{" "}
-            {this.props.store.prices.get()!.wethToPeth.toFixed(4)}
+            {prices.wethToPeth.toFixed(4)}
           </div>
         </div>
         <div style={{ display: "inline" }}>
@@ -34,8 +36,10 @@ export default class Work extends Component<Props, {}> {
           <div>ETH Balance: {balances.ethBalance.toString(4)}</div>
         </div>
         <br />
-        <CDPList store={this.props.store} />
+        <CDPList />
       </>
     );
   }
 }
+
+export default inject('store')(observer(Work))

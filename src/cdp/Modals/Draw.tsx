@@ -1,23 +1,24 @@
 import React, { Component } from "react";
+import { inject, observer } from "mobx-react";
 import { Button, Modal, Header, Form } from "semantic-ui-react";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
-import {Store} from '../../store'
-import CDP from '../../store/cdp'
+import { Store } from "../../store";
+import CDP from "../../store/cdp";
 
 interface Props {
-  cdp: CDP
-  store: Store
+  cdp: CDP;
+  store?: Store;
 
-  onRequestClose: () => void
+  onRequestClose: () => void;
 }
 
 interface State {
-  amountDAI: string,
-  drawing: boolean
+  amountDAI: string;
+  drawing: boolean;
 }
 
-export default class Draw extends Component<Props, State> {
-  state:State = {
+export class Draw extends Component<Props, State> {
+  state: State = {
     amountDAI: "",
     drawing: false
   };
@@ -77,14 +78,19 @@ export default class Draw extends Component<Props, State> {
 
   drawDAI = async () => {
     this.setState({ drawing: true });
-    await this.props.store.drawDAI(parseInputFloat(this.state.amountDAI), this.props.cdp);
+    await this.props.store!.drawDAI(
+      parseInputFloat(this.state.amountDAI),
+      this.props.cdp
+    );
     this.props.onRequestClose();
   };
 
-  handleChange = (_e: any, { value }: {value: string}) => {
+  handleChange = (_e: any, { value }: { value: string }) => {
     if (!isValidFloatInputNumber(value)) {
       return;
     }
     this.setState({ amountDAI: value });
   };
 }
+
+export default inject("store")(observer(Draw));
