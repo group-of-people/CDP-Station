@@ -8,7 +8,7 @@ import { Store } from "../store";
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const Chart = ({ data }: { data: { name: string; value: number }[] }) => (
-  <PieChart height={200} width={260}>
+  <PieChart height={200} width={260} >
     <Pie
       startAngle={90}
       endAngle={450}
@@ -29,6 +29,7 @@ const Chart = ({ data }: { data: { name: string; value: number }[] }) => (
 interface Props {
   store?: Store;
   cdp: CDP;
+  mode: string;
 }
 
 class CDPCard extends React.Component<Props> {
@@ -36,18 +37,22 @@ class CDPCard extends React.Component<Props> {
     const { cdp } = this.props;
     return (
       <>
-        <Card onClick={this.onClick}>
-          <Chart
-            data={[
-              { name: "DAI Debt", value: cdp.daiDebt.get().toNumber() },
-              { name: "DAI Available", value: cdp.daiAvailable.get() }
-              // {name: "DAI Collateral", value: cdp.daiLocked - cdp.daiAvailable - cdp.daiDebt.toNumber()}
-            ]}
-          />
-          <Card.Content textAlign={"right"}>
+        <Card onClick={this.onClick} style={{ width: "40%" }}>
+          <Card.Content>
             <Card.Header>CDP {cdp.id} </Card.Header>
             <Card.Meta>{cdp.ethLocked.get().toFixed(4)} ETH </Card.Meta>
           </Card.Content>
+          <div>
+            {this.props.mode === "work" && (
+              <Chart
+                data={[
+                  { name: "DAI Debt", value: cdp.daiDebt.get().toNumber() },
+                  { name: "DAI Available", value: cdp.daiAvailable.get() }
+                  // {name: "DAI Collateral", value: cdp.daiLocked - cdp.daiAvailable - cdp.daiDebt.toNumber()}
+                ]}
+              />
+            )}
+          </div>
           <Card.Content extra>
             <div className="ui two buttons">
               <Button basic color="blue" onClick={this.drawDai}>

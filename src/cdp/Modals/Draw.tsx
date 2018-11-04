@@ -46,7 +46,7 @@ export class Draw extends Component<Props, State> {
             paddingBottom: "0"
           }}
         >
-          DAI Available: {this.props.cdp.daiAvailable.toString()}
+          DAI Available: {this.props.cdp.daiAvailable.get().toString()}
         </Header>
         <Modal.Content>
           <Form>

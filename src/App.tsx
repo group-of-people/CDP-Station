@@ -3,6 +3,7 @@ import { Container, Loader, Dimmer, Icon } from "semantic-ui-react";
 import { inject, observer } from "mobx-react";
 import Work from "./Components/Work";
 import Alert from "./Components/Alert";
+import Helper from "./Components/Helper";
 import FreePETH from "./cdp/Modals/Free";
 import LockETH from "./cdp/Modals/Lock";
 import NewCdpModal from "./cdp/Modals/Creator";
@@ -34,7 +35,7 @@ class App extends Component<Props> {
   render() {
     const store = this.props.store!;
     return (
-      <Container>
+      <Container style={{width: "99%"}}>
         {store.noWeb3.get()
           ? this.renderNoWeb3()
           : store.locked.get()
@@ -110,7 +111,10 @@ class App extends Component<Props> {
           )}
         {store.account.get() &&
           this.state.mode === "alerts" && <Alert store={store} />}
-        {/* {store.account.get() && this.state.mode === "helper" && <Helper />} */}
+        {store.account.get() &&
+          this.state.mode === "helper" && (
+            <Helper key={store.account.get()} store={store} />
+          )}
       </>
     );
   }

@@ -248,7 +248,7 @@ export class Store {
 
   lockETH = async (amountETH: number, cdp: CDP) => {
     try {
-      const eth = this.web3!.utils.toWei(amountETH, "ether");
+      const eth = this.web3!.utils.toWei(amountETH.toString(), "ether");
       await this.contract!.methods.lockETH(cdp.id, eth).send({
         from: this.account.get(),
         value: eth

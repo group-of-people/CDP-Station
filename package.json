@@ -2,7 +2,6 @@
   "name": "demo-ui-js-client",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:7000/",
   "dependencies": {
     "@makerdao/dai": "^0.9.5",
     "@types/jest": "23.3.9",

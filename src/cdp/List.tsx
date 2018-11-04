@@ -6,6 +6,7 @@ import { Store } from "../store";
 
 interface Props {
   store?: Store;
+  mode: string;
 }
 
 interface State {}
@@ -18,7 +19,7 @@ export class CDPList extends Component<Props, State> {
       <>
         <Card.Group>
           {this.props.store!.cdps.map(cdp => (
-            <CDPCard key={cdp.id} cdp={cdp} />
+            <CDPCard key={cdp.id} cdp={cdp} mode={this.props.mode} />
           ))}
           <Card onClick={this.props.store!.showNew}>
             <div

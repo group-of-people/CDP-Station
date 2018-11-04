@@ -15,13 +15,10 @@ export class Work extends Component<Props, {}> {
   render() {
     const prices = this.props.store!.prices.get()!;
     const balances = this.props.store!.balances.get()!;
-    console.log(balances.pethBalance);
     return (
       <>
         <div style={{ display: "inline" }}>
           <div>Logged in as {this.props.store!.account.get()}</div>
-          <div>{prices.ethPrice.toString()}</div>
-          <div>{prices.mkrPrice.toString()}</div>
           <div>
             Liquidation Ratio:{" "}
             {this.props.store!.mkrSettings.get()!.liquidationRatio}
@@ -42,7 +39,7 @@ export class Work extends Component<Props, {}> {
           <div>ETH Balance: {balances.ethBalance.toString(4)}</div>
         </div>
         <br />
-        <CDPList />
+        <CDPList mode={"work"} />
       </>
     );
   }

@@ -43,11 +43,8 @@ export class Repay extends Component<Props, State> {
             paddingBottom: "0"
           }}
         >
-          DAI Debt: {this.props.cdp.daiDebt.toString()}
+          DAI Debt: {this.props.cdp.daiDebt.get().toString()}
         </Header>
-        {/* <Header as="h5" style={{ color: "gray", display: "inline", paddingBottom: '0' }}>
-                    Governance Fee: {this.props.cdp.governanceFee.toString()}
-                </Header> */}
         <Header
           as="h5"
           style={{ color: "gray", display: "inline", paddingBottom: "0" }}
