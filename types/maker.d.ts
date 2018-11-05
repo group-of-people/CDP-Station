@@ -1,7 +1,9 @@
 declare module "@makerdao/dai" {
-  export class Currency {
+  export interface Currency {
     // FIXME stricter types
     static wei(amount: any): Currency;
+    (): Currency;
+
     toNumber(): number;
     toString(): string;
     toString(decimals: number): string;

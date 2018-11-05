@@ -1,9 +1,12 @@
 import React, { Component } from "react";
 import { Button, Modal, Header, Form, Message } from "semantic-ui-react";
 import { inject, observer } from "mobx-react";
-import { observable, computed } from "mobx";
+import { observable, autorun, IObservableValue } from "mobx";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 import { Store } from "../../store";
+import CDP from "../../store/cdp";
+import MkrSettings from "../../store/mkrSettings";
+import Prices from "../../store/prices";
 
 interface Props {
   store?: Store;
@@ -20,52 +23,49 @@ export class CDPCreator extends Component<Props, State> {
     creating: false
   };
   EthToLock = observable.box(
-    this.props.store!.balances
-      .get()!
+    this.props
+      .store!.balances.get()!
       .ethBalance.toNumber()
       .toString()
   );
   DaiToDraw = observable.box("0");
+  cdp = new CDP(
+    -1,
+    0,
+    0,
+    this.props.store!.prices as IObservableValue<Prices>,
+    this.props.store!.mkrSettings as IObservableValue<MkrSettings>
+  );
+  dispose = () => {};
 
-  daiTotal = computed(
-    () =>
-      parseInputFloat(this.EthToLock.get()) *
-      this.props.store!.prices.get()!.ethPrice.toNumber()
-  );
-  collateralization = computed(
-    () =>
-      this.daiTotal.get() && this.DaiToDraw.get()
-        ? (
-            (this.daiTotal.get() / parseInputFloat(this.DaiToDraw.get())) *
-            100
-          ).toFixed(2)
-        : 0
-  );
-  liquidation = computed(
-    () =>
-      this.daiTotal.get() && this.DaiToDraw.get()
-        ? (
-            (parseInputFloat(this.DaiToDraw.get()) *
-              this.props.store!.mkrSettings.get()!.liquidationRatio) /
-            parseInputFloat(this.EthToLock.get())
-          ).toFixed(2)
-        : null
-  );
+  componentDidMount() {
+    this.dispose = autorun(() => {
+      this.cdp.update(
+        parseInputFloat(this.EthToLock.get()),
+        parseInputFloat(this.DaiToDraw.get())
+      );
+    });
+  }
+
+  componentWillUnmount() {
+    this.dispose();
+  }
 
   render() {
     const { creating } = this.state;
-    const store = this.props.store!
+    const store = this.props.store!;
 
-    const minCollateralization = store.mkrSettings.get()!.liquidationRatio * 100;
+    const minCollateralization =
+      store.mkrSettings.get()!.liquidationRatio * 100;
     const ethBalance = store.balances.get()!.ethBalance.toNumber();
 
     let valid = false;
     let error = "";
     if (this.EthToLock.get() === "" || this.DaiToDraw.get() === "") {
       valid = false;
-    } else if (this.collateralization.get() < minCollateralization) {
+    } else if (this.cdp.collateralization.get() < minCollateralization) {
       error = `Collateralization < ${minCollateralization}%. You can draw up to ${(
-        this.daiTotal.get() / store.mkrSettings.get()!.liquidationRatio
+        this.cdp.daiLocked.get() / store.mkrSettings.get()!.liquidationRatio
       ).toFixed(2)} DAI.`;
       valid = false;
     } else if (ethBalance < parseInputFloat(this.EthToLock.get())) {
@@ -89,7 +89,7 @@ export class CDPCreator extends Component<Props, State> {
               marginRight: "3%"
             }}
           >
-            Collateralization: {this.collateralization.get()}%
+            Collateralization: {this.cdp.collateralization.get()}%
           </div>
         )}
         {!!this.DaiToDraw.get() && (
@@ -99,7 +99,7 @@ export class CDPCreator extends Component<Props, State> {
               marginRight: "3%"
             }}
           >
-            Liquidation Price: ${this.liquidation.get()}
+            Liquidation Price: ${this.cdp.liquidationPrice.get()}
           </div>
         )}
         <Modal.Content>
@@ -167,4 +167,4 @@ export class CDPCreator extends Component<Props, State> {
   };
 }
 
-export default inject('store')(observer(CDPCreator));
+export default inject("store")(observer(CDPCreator));

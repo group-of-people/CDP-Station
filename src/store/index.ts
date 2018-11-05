@@ -178,7 +178,9 @@ export class Store {
           .map(
             cdp =>
               new CDP(
-                cdp,
+                cdp.cupi,
+                cdp.ink,
+                cdp.art,
                 this.prices as IObservableValue<Prices>,
                 this.mkrSettings as IObservableValue<MkrSettings>
               )
