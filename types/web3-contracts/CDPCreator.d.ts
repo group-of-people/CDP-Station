@@ -12,24 +12,17 @@ export class CDPCreator {
   _address: string;
   options: contractOptions;
   methods: {
-    createCDP(
-      amountETH: number | string,
-      amountDAI: number | string
-    ): TransactionObject<void>;
+    createCDP(amountDAI: number | string): TransactionObject<void>;
 
-    lockETH(
-      id: number | string,
-      amountETH: number | string
-    ): TransactionObject<void>;
+    lockETH(id: number | string): TransactionObject<void>;
 
-    convertETHToPETH(amountETH: number | string): TransactionObject<void>;
+    convertETHToPETH(): TransactionObject<void>;
 
     convertPETHToETH(amountPETH: number | string): TransactionObject<void>;
 
     tub(): TransactionObject<string>;
     weth(): TransactionObject<string>;
     peth(): TransactionObject<string>;
-    math(): TransactionObject<string>;
     dai(): TransactionObject<string>;
   };
   deploy(options: {

@@ -216,7 +216,7 @@ export class Store {
     const eth = this.web3!.utils.toWei(amountETH.toString(), "ether");
     const dai = amountDAI * Math.pow(10, 18);
     const daiBN = Web3.utils.toBN(dai.toString());
-    await this.contract!.methods.createCDP(eth, daiBN.toString()).send({
+    await this.contract!.methods.createCDP(daiBN.toString()).send({
       from: this.account.get(),
       value: eth
     });
@@ -249,7 +249,7 @@ export class Store {
   lockETH = async (amountETH: number, cdp: CDP) => {
     try {
       const eth = this.web3!.utils.toWei(amountETH.toString(), "ether");
-      await this.contract!.methods.lockETH(cdp.id, eth).send({
+      await this.contract!.methods.lockETH(cdp.id).send({
         from: this.account.get(),
         value: eth
       });

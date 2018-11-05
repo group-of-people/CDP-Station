@@ -11,9 +11,6 @@ export class Alert extends Component<Props, {}> {
   render() {
     return (
       <>
-        <div>{this.props.store.prices.get()!.ethPrice.toString()}</div>
-        <div>{this.props.store.prices.get()!.mkrPrice.toString()}</div>
-
         <Table singleLine collapsing style={{ width: "85%" }}>
           <Table.Header>
             <Table.Row>

@@ -8,7 +8,7 @@ interface Props {
   store?: Store;
 }
 
-export class Work extends Component<Props, {}> {
+export class Helper extends Component<Props, {}> {
   state = {
     showNewCDPModal: false
   };
@@ -23,4 +23,4 @@ export class Work extends Component<Props, {}> {
   }
 }
 
-export default inject("store")(observer(Work));
+export default inject("store")(observer(Helper));
