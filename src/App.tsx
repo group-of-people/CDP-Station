@@ -1,15 +1,15 @@
 import React, { Component } from "react";
-import { Container, Loader, Dimmer, Icon } from "semantic-ui-react";
+import { Container, Loader, Dimmer, Icon } from "./ui";
 import { inject, observer } from "mobx-react";
 import Work from "./Components/Work";
 import Alert from "./Components/Alert";
 import Helper from "./Components/Helper";
-import FreePETH from "./cdp/Modals/Free";
-import LockETH from "./cdp/Modals/Lock";
-import NewCdpModal from "./cdp/Modals/Creator";
-import CDPDetails from "./cdp/Modals/Details";
-import CDPDraw from "./cdp/Modals/Draw";
-import CDPRepay from "./cdp/Modals/Repay";
+import FreePETH from "./cdp/Forms/Free";
+import LockETH from "./cdp/Forms/Lock";
+import NewCdpModal from "./cdp/Forms/Creator";
+import CDPDetails from "./cdp/Forms/Details";
+import CDPDraw from "./cdp/Forms/Draw";
+import CDPRepay from "./cdp/Forms/Repay";
 import { Store } from "./store";
 
 function getURLParameter(name: string) {
@@ -35,7 +35,7 @@ class App extends Component<Props> {
   render() {
     const store = this.props.store!;
     return (
-      <Container style={{width: "99%"}}>
+      <div>
         {store.noWeb3.get()
           ? this.renderNoWeb3()
           : store.locked.get()
@@ -43,7 +43,7 @@ class App extends Component<Props> {
             : !store.loading.get()
               ? this.renderContent()
               : this.renderLoading()}
-      </Container>
+      </div>
     );
   }
 
@@ -106,15 +106,11 @@ class App extends Component<Props> {
           />
         )}
         {store.account.get() &&
-          this.state.mode === "work" && (
-            <Work key={store.account.get()} store={store} />
-          )}
+          this.state.mode === "work" && <Work key={store.account.get()} />}
         {store.account.get() &&
-          this.state.mode === "alerts" && <Alert store={store} />}
+          this.state.mode === "alerts" && <Alert key={store.account.get()} />}
         {store.account.get() &&
-          this.state.mode === "helper" && (
-            <Helper key={store.account.get()} store={store} />
-          )}
+          this.state.mode === "helper" && <Helper key={store.account.get()} />}
       </>
     );
   }

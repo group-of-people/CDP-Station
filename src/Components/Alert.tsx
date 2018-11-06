@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import { Table } from "semantic-ui-react";
-import { observer } from "mobx-react";
+import { Table } from "../ui";
+import { observer, inject } from "mobx-react";
 import { Store } from "../store";
 
 interface Props {
-  store: Store;
+  store?: Store;
 }
 
 export class Alert extends Component<Props, {}> {
@@ -12,7 +12,7 @@ export class Alert extends Component<Props, {}> {
     return (
       <>
         <Table singleLine collapsing style={{ width: "85%" }}>
-          <Table.Header>
+          {/* <Table.Header>
             <Table.Row>
               <Table.HeaderCell>CDP</Table.HeaderCell>
               <Table.HeaderCell>Collateral</Table.HeaderCell>
@@ -43,11 +43,11 @@ export class Alert extends Component<Props, {}> {
                 </Table.Cell>
               </Table.Row>
             ))}
-          </Table.Body>
+          </Table.Body> */}
         </Table>
       </>
     );
   }
 }
 
-export default observer(Alert);
+export default inject("store")(observer(Alert));

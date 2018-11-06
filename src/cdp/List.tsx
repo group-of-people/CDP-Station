@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
-import { Icon, Card } from "semantic-ui-react";
 import CDPCard from "./Card";
+import NewCard from "./NewCard";
 import { Store } from "../store";
 
 interface Props {
@@ -17,32 +17,12 @@ export class CDPList extends Component<Props, State> {
   render() {
     return (
       <>
-        <Card.Group>
+        <div style={{ display: "flex" }}>
           {this.props.store!.cdps.map(cdp => (
             <CDPCard key={cdp.id} cdp={cdp} mode={this.props.mode} />
           ))}
-          <Card onClick={this.props.store!.showNew}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: 200
-              }}
-            >
-              <Icon name="add circle" size="massive" color={"yellow"} />
-            </div>
-            <Card.Content
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-            >
-              <Card.Header>New CDP</Card.Header>
-            </Card.Content>
-          </Card>
-        </Card.Group>
+          <NewCard />
+        </div>
       </>
     );
   }

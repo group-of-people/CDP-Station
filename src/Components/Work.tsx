@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import CDPList from "../cdp/List";
-import { Button } from "semantic-ui-react";
+import { Button } from "../ui";
 import { Store } from "../store";
 import { inject, observer } from "mobx-react";
 
@@ -31,7 +31,7 @@ export class Work extends Component<Props, {}> {
           <div>
             PETH Balance: {balances.pethBalance.toString(4)} {"   "}
             {!!balances.pethBalance.toNumber() && (
-              <Button size={"tiny"} onClick={this.props.store!.convertPETH}>
+              <Button onClick={this.props.store!.convertPETH}>
                 Convert PETH to ETH?
               </Button>
             )}
