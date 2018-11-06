@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Form } from "../../ui";
+import { Button, Input } from "../../ui";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 import { Store } from "../../store";
 import CDP from "../../store/cdp";
@@ -34,49 +34,23 @@ export class Repay extends Component<Props, State> {
     }
 
     return (
-      <div />
-      // <Modal open closeIcon onClose={this.props.onRequestClose}>
-      //   <Header>Repay (requires MKR)</Header>
-      //   <Header
-      //     as="h5"
-      //     style={{
-      //       display: "inline",
-      //       paddingBottom: "0"
-      //     }}
-      //   >
-      //     DAI Debt: {this.props.cdp.daiDebt.get().toString()}
-      //   </Header>
-      //   <Header
-      //     as="h5"
-      //     style={{ color: "gray", display: "inline", paddingBottom: "0" }}
-      //   >
-      //     MKR Balance: {this.props.store!.balances.get()!.mkrBalance.toString(4)}
-      //   </Header>
-      //   {/* <Modal.Content>
-      //     <Form>
-      //       <Form.Input
-      //         name={"amountDAI"}
-      //         label={"DAI to repay"}
-      //         placeholder="DAI to repay"
-      //         value={this.state.amountDAI}
-      //         onChange={this.handleChange}
-      //       />
-      //     </Form>
-      //   </Modal.Content>
-      //   <Modal.Actions>
-      //     <Button
-      //       primary
-      //       loading={this.state.repaying}
-      //       disabled={!valid}
-      //       onClick={this.repayDAI}
-      //     >
-      //       Repay DAI
-      //     </Button>
-      //     <Button color="red" onClick={this.props.onRequestClose}>
-      //       Cancel
-      //     </Button>
-      //   </Modal.Actions> */}
-      // </Modal>
+      <div>
+        Repay (requires MKR) <br />
+        DAI Debt: {this.props.cdp.daiDebt.get().toString()} <br />
+        MKR Balance: {this.props.store!.balances.get()!.mkrBalance.toString(4)}
+        <br />
+        <Input
+          label={"DAI to repay"}
+          value={this.state.amountDAI}
+          onChange={this.handleChange}
+        />
+        <Button disabled={!valid} onClick={this.repayDAI}>
+          Repay DAI
+        </Button>
+        <Button red onClick={this.props.onRequestClose}>
+          Cancel
+        </Button>
+      </div>
     );
   }
 
@@ -89,7 +63,8 @@ export class Repay extends Component<Props, State> {
     this.props.onRequestClose();
   };
 
-  handleChange = (_e: any, { value }: { value: string }) => {
+  handleChange = (e: React.FormEvent<HTMLInputElement>) => {
+    const value = e.currentTarget.value;
     if (!isValidFloatInputNumber(value)) {
       return;
     }

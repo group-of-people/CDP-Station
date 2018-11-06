@@ -37,19 +37,6 @@ export class CDPDetails extends Component<Props, State> {
       //   <Header>CDP #{cdp.id}</Header>
       //   {/* <Modal.Content>
       //     <ul style={{ width: "40%", display: "inline-block" }}>
-      //       <li>CDP - {cdp.id}</li>
-      //       <li>Debt - {cdp.daiDebt.get().toString(4)}</li>
-      //       <li>
-      //         DAI Available -{" "}
-      //         {(
-      //           cdp.daiLocked.get() /
-      //             this.props.store!.mkrSettings.get()!.liquidationRatio -
-      //           cdp.daiDebt.get().toNumber()
-      //         ).toFixed(4)}{" "}
-      //         DAI
-      //       </li>
-      //       <li>Collateral ETH - {cdp.ethLocked.get().toFixed(4)} ETH</li>
-      //       <li>Collateral DAI - {cdp.daiLocked.get().toFixed(4)} DAI</li>
       //       <li>
       //         Liquidation Price - $
       //         {(
@@ -117,14 +104,6 @@ export class CDPDetails extends Component<Props, State> {
       // </Modal>
     );
   }
-
-  onLock = async () => {
-    this.props.store!.showLock(this.props.cdp);
-  };
-
-  onFree = () => {
-    this.props.store!.showFree(this.props.cdp);
-  };
 
   shutCDP = async () => {
     await this.props.store!.shutCDP(this.props.cdp);

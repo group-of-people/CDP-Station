@@ -46,17 +46,6 @@ export class Store {
   balances: IObservableValue<Balances | null> = observable.box(null);
 
   // UI State
-  showFreeModal = observable.box(false);
-  freeModalTargetCDP = observable.box<CDP | null>(null);
-  showLockModal = observable.box(false);
-  lockModalTargetCDP = observable.box<CDP | null>(null);
-  showNewCDPModal = observable.box(false);
-  showDetailsModal = observable.box(false);
-  detailsModalTargetCDP = observable.box<CDP | null>(null);
-  showRepayModal = observable.box(false);
-  repayModalTargetCDP = observable.box<CDP | null>(null);
-  showDrawModal = observable.box(false);
-  drawModalTargetCDP = observable.box<CDP | null>(null);
   noWeb3 = observable.box(false);
 
   //contract typings
@@ -313,87 +302,5 @@ export class Store {
     } catch (e) {
       console.log(e, "Error shutting CDP");
     }
-  };
-
-  showFree = (cdp: CDP) => {
-    runInAction(() => {
-      this.freeModalTargetCDP.set(cdp);
-      this.showFreeModal.set(true);
-    });
-  };
-
-  hideFree = () => {
-    runInAction(() => {
-      this.freeModalTargetCDP.set(null);
-      this.showFreeModal.set(false);
-    });
-  };
-
-  showLock = (cdp: CDP) => {
-    runInAction(() => {
-      this.lockModalTargetCDP.set(cdp);
-      this.showLockModal.set(true);
-    });
-  };
-
-  hideLock = () => {
-    runInAction(() => {
-      this.lockModalTargetCDP.set(null);
-      this.showLockModal.set(false);
-    });
-  };
-
-  showNew = () => {
-    runInAction(() => {
-      this.showNewCDPModal.set(true);
-    });
-  };
-
-  hideNew = () => {
-    runInAction(() => {
-      this.showNewCDPModal.set(false);
-    });
-  };
-
-  showDetails = (cdp: CDP) => {
-    runInAction(() => {
-      this.detailsModalTargetCDP.set(cdp);
-      this.showDetailsModal.set(true);
-    });
-  };
-
-  hideDetails = () => {
-    runInAction(() => {
-      this.detailsModalTargetCDP.set(null);
-      this.showDetailsModal.set(false);
-    });
-  };
-
-  showRepay = (cdp: CDP) => {
-    runInAction(() => {
-      this.repayModalTargetCDP.set(cdp);
-      this.showRepayModal.set(true);
-    });
-  };
-
-  hideRepay = () => {
-    runInAction(() => {
-      this.repayModalTargetCDP.set(null);
-      this.showRepayModal.set(false);
-    });
-  };
-
-  showDraw = (cdp: CDP) => {
-    runInAction(() => {
-      this.drawModalTargetCDP.set(cdp);
-      this.showDrawModal.set(true);
-    });
-  };
-
-  hideDraw = () => {
-    runInAction(() => {
-      this.drawModalTargetCDP.set(null);
-      this.showDrawModal.set(false);
-    });
   };
 }

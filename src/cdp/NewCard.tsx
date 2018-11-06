@@ -1,5 +1,6 @@
-import * as React from "react";
+import React from "react";
 import { Card } from "../ui";
+import Creator from "./Forms/Creator";
 
 export default class NewCard extends React.Component {
   state = {
@@ -8,7 +9,17 @@ export default class NewCard extends React.Component {
   render() {
     const { showForm } = this.state;
     return (
-      <Card flipped={!!showForm} onClick={this.onClick}>
+      <Card
+        flipped={!!showForm}
+        backside={
+          <Creator
+            onRequestClose={() => {
+              this.setState({ showForm: false });
+            }}
+          />
+        }
+        onClick={!showForm ? this.onClick : void 0}
+      >
         <div
           style={{
             display: "flex",

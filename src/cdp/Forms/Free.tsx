@@ -54,55 +54,33 @@ export class Free extends Component<Props, State> {
     }
 
     return (
-      <div />
-      // <Modal open closeIcon onClose={this.props.onRequestClose}>
-      //   <Header>Free PETH</Header>
-      //   <Header
-      //     as="h5"
-      //     style={{
-      //       color: "gray",
-      //       display: "inline",
-      //       paddingBottom: "0"
-      //     }}
-      //   >
-      //     Locked: {cdp.pethLocked.get().toNumber().toFixed(4)} PETH (
-      //     {cdp.ethLocked.get().toFixed(4)} ETH)
-      //   </Header>
-      //   {/* <Modal.Content>
-      //     <Form>
-      //       <Form.Field>
-      //         <label>PETH to free</label>
-      //         <Input
-      //           name={"amountPETH"}
-      //           label={{ basic: true, content: `${amountETH.toFixed(4)} ETH` }}
-      //           labelPosition={"right"}
-      //           placeholder="PETH to free"
-      //           value={this.state.amountPETH}
-      //           onChange={this.handleChange}
-      //         />
-      //       </Form.Field>
-      //       {!valid &&
-      //         error && (
-      //           <Message visible error>
-      //             {error}
-      //           </Message>
-      //         )}
-      //     </Form>
-      //   </Modal.Content>
-      //   <Modal.Actions>
-      //     <Button
-      //       primary
-      //       loading={this.state.freeing}
-      //       disabled={!valid}
-      //       onClick={this.freePETH}
-      //     >
-      //       Free PETH
-      //     </Button>
-      //     <Button color="red" onClick={this.props.onRequestClose}>
-      //       Cancel
-      //     </Button>
-      //   </Modal.Actions> */}
-      // </Modal>
+      <div>
+        Free PETH <br />
+        Locked:{" "}
+        {cdp.pethLocked
+          .get()
+          .toNumber()
+          .toFixed(4)}{" "}
+        PETH ({cdp.ethLocked.get().toFixed(4)} ETH)
+        <Input
+          label={"PETH to free"}
+          previewContent={`${amountETH.toFixed(4)} ETH`}
+          value={this.state.amountPETH}
+          onChange={this.handleChange}
+        />
+        {!valid &&
+          error && (
+            <Message visible error>
+              {error}
+            </Message>
+          )}
+        <Button disabled={!valid} onClick={this.freePETH}>
+          Free PETH
+        </Button>
+        <Button red onClick={this.props.onRequestClose}>
+          Cancel
+        </Button>
+      </div>
     );
   }
 
@@ -115,7 +93,8 @@ export class Free extends Component<Props, State> {
     this.props.onRequestClose();
   };
 
-  handleChange = (_e: any, { value }: { value: string }) => {
+  handleChange = (e: React.FormEvent<HTMLInputElement>) => {
+    const value = e.currentTarget.value;
     if (!isValidFloatInputNumber(value)) {
       return;
     }

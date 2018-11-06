@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Form, Input, Message } from "../../ui";
+import { Button, Input, Message } from "../../ui";
 import { inject, observer } from "mobx-react";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 import { Store } from "../../store";
@@ -48,53 +48,30 @@ export class Lock extends Component<Props, State> {
     }
 
     return (
-      <div />
-      // <Modal open closeIcon onClose={this.props.onRequestClose}>
-      //   <Header>Lock ETH</Header>
-      //   <Header
-      //     as="h5"
-      //     style={{
-      //       display: "inline",
-      //       paddingBottom: "0"
-      //     }}
-      //   >
-      //     Locked: {pethLocked.toString(4)} ({ethLocked.toFixed(4)} ETH)
-      //   </Header>
-      //   {/* <Modal.Content>
-      //     <Form>
-      //       <Form.Field>
-      //         <label>ETH to lock</label>
-      //         <Input
-      //           name={"amountETH"}
-      //           label={{ basic: true, content: `${amountPETH} PETH` }}
-      //           labelPosition={"right"}
-      //           placeholder="ETH to lock"
-      //           value={this.state.amountETH}
-      //           onChange={this.handleChange}
-      //         />
-      //       </Form.Field>
-      //       {!valid &&
-      //         error && (
-      //           <Message visible error>
-      //             {error}
-      //           </Message>
-      //         )}
-      //     </Form>
-      //   </Modal.Content>
-      //   <Modal.Actions>
-      //     <Button
-      //       primary
-      //       loading={this.state.locking}
-      //       disabled={!valid}
-      //       onClick={this.lockETH}
-      //     >
-      //       Lock ETH
-      //     </Button>
-      //     <Button color="red" onClick={this.props.onRequestClose}>
-      //       Cancel
-      //     </Button>
-      //   </Modal.Actions> */}
-      // </Modal>
+      <div>
+        Lock Eth <br /> Locked: {pethLocked.toString(4)} ({ethLocked.toFixed(4)}{" "}
+        ETH)
+        <div>
+          <Input
+            label={"ETH to lock"}
+            previewContent={`${amountPETH} PETH`}
+            value={this.state.amountETH}
+            onChange={this.handleChange}
+          />
+          {!valid &&
+            error && (
+              <Message visible error>
+                {error}
+              </Message>
+            )}
+        </div>
+        <Button disabled={!valid} onClick={this.lockETH}>
+          Lock ETH
+        </Button>
+        <Button red onClick={this.props.onRequestClose}>
+          Cancel
+        </Button>
+      </div>
     );
   }
 
@@ -107,7 +84,8 @@ export class Lock extends Component<Props, State> {
     this.props.onRequestClose();
   };
 
-  handleChange = (_e: any, { value }: { value: string }) => {
+  handleChange = (e: React.FormEvent<HTMLInputElement>) => {
+    const value = e.currentTarget.value;
     if (!isValidFloatInputNumber(value)) {
       return;
     }

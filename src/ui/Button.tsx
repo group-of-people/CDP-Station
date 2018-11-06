@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import styled from "styled-components";
 
 interface StyledProps {
@@ -15,10 +15,12 @@ const StyledButton = styled.button`
   border-radius: 2px;
   padding: 5px;
   font-weight: bold;
+  cursor: pointer;
 `;
 
 interface Props {
   children?: React.ReactNode;
+  disabled?: boolean;
 
   red?: boolean;
 
@@ -27,7 +29,10 @@ interface Props {
 
 export default function Button(props: Props) {
   return (
-    <StyledButton red={!!props.red} onClick={props.onClick}>
+    <StyledButton
+      red={!!props.red}
+      onClick={props.disabled ? void 0 : props.onClick}
+    >
       {props.children}
     </StyledButton>
   );

@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import styled from "styled-components";
 
 interface SceneProps {
@@ -41,6 +41,7 @@ interface Props {
   extra?: React.ReactNode;
 
   flipped?: boolean;
+  backside?: React.ReactNode;
 
   onClick?: () => void;
 }
@@ -66,7 +67,7 @@ export default function Card(props: Props) {
             transform: "rotateY(180deg)"
           }}
         >
-          flipped
+          {props.backside}
         </Side>
       </CardSidesContainer>
     </Scene>

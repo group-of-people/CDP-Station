@@ -39,6 +39,13 @@ export default class CDP {
     return this.pethLocked.get().toNumber() * this.prices.get().wethToPeth;
   });
 
+  ethAvailable = computed(() => {
+    return (
+      this.ethLocked.get() / this.mkrSettings.get().liquidationRatio -
+      this.daiDebt.get().toNumber() / this.prices.get().ethPrice.toNumber()
+    );
+  });
+
   daiLocked = computed(() => {
     return (
       this.pethLocked.get().toNumber() *
@@ -70,7 +77,7 @@ export default class CDP {
   );
 
   update = action((ethLocked: number, daiDebt: number) => {
-    this.pethLocked.set(PETH(ethLocked / this.prices.get().wethToPeth))
-    this.daiDebt.set(DAI(daiDebt))
-  })
+    this.pethLocked.set(PETH(ethLocked / this.prices.get().wethToPeth));
+    this.daiDebt.set(DAI(daiDebt));
+  });
 }

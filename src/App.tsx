@@ -1,16 +1,11 @@
 import React, { Component } from "react";
-import { Container, Loader, Dimmer, Icon } from "./ui";
+import { Loader, Dimmer } from "./ui";
 import { inject, observer } from "mobx-react";
 import Work from "./Components/Work";
 import Alert from "./Components/Alert";
 import Helper from "./Components/Helper";
-import FreePETH from "./cdp/Forms/Free";
-import LockETH from "./cdp/Forms/Lock";
-import NewCdpModal from "./cdp/Forms/Creator";
-import CDPDetails from "./cdp/Forms/Details";
-import CDPDraw from "./cdp/Forms/Draw";
-import CDPRepay from "./cdp/Forms/Repay";
 import { Store } from "./store";
+import { Lock as LockIcon } from "styled-icons/fa-solid";
 
 function getURLParameter(name: string) {
   const match = new RegExp("[?|&]" + name + "=([^&;]+?)(&|#|;|$)").exec(
@@ -49,7 +44,7 @@ class App extends Component<Props> {
 
   renderNoWeb3() {
     return (
-      <Dimmer active>
+      <Dimmer>
         No web3 found. Please use MetaMask or compatible dApp browser.
       </Dimmer>
     );
@@ -57,8 +52,8 @@ class App extends Component<Props> {
 
   renderLocked() {
     return (
-      <Dimmer active>
-        <Icon name="lock" size={"big"} />
+      <Dimmer>
+        <LockIcon size={36} />
         <div style={{ marginTop: 10 }}> MetaMask is locked.</div>
       </Dimmer>
     );
@@ -72,39 +67,6 @@ class App extends Component<Props> {
 
     return (
       <>
-        {!!store.showLockModal.get() && (
-          <LockETH
-            cdp={store.lockModalTargetCDP.get()!}
-            onRequestClose={store.hideLock}
-          />
-        )}
-        {!!store.showFreeModal.get() && (
-          <FreePETH
-            cdp={store.freeModalTargetCDP.get()!}
-            onRequestClose={store.hideFree}
-          />
-        )}
-        {!!store.showNewCDPModal.get() && (
-          <NewCdpModal onRequestClose={store.hideNew} />
-        )}
-        {!!store.showDetailsModal.get() && (
-          <CDPDetails
-            cdp={store.detailsModalTargetCDP.get()!}
-            onRequestClose={store.hideDetails}
-          />
-        )}
-        {!!store.showDrawModal.get() && (
-          <CDPDraw
-            cdp={store.drawModalTargetCDP.get()!}
-            onRequestClose={store.hideDraw}
-          />
-        )}
-        {!!store.showRepayModal.get() && (
-          <CDPRepay
-            cdp={store.repayModalTargetCDP.get()!}
-            onRequestClose={store.hideRepay}
-          />
-        )}
         {store.account.get() &&
           this.state.mode === "work" && <Work key={store.account.get()} />}
         {store.account.get() &&

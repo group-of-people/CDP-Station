@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { inject, observer } from "mobx-react";
-import { Button, Form } from "../../ui";
+import { Button, Input } from "../../ui";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 import { Store } from "../../store";
 import CDP from "../../store/cdp";
@@ -36,44 +36,22 @@ export class Draw extends Component<Props, State> {
     }
 
     return (
-      <div />
-      // <Modal open closeIcon onClose={this.props.onRequestClose}>
-      //   <Header>Draw DAI</Header>
-      //   <Header
-      //     as="h5"
-      //     style={{
-      //       color: "gray",
-      //       display: "inline",
-      //       paddingBottom: "0"
-      //     }}
-      //   >
-      //     DAI Available: {this.props.cdp.daiAvailable.get().toString()}
-      //   </Header>
-      //   {/* <Modal.Content>
-      //     <Form>
-      //       <Form.Input
-      //         name={"amountDAI"}
-      //         label={"DAI to draw"}
-      //         placeholder="DAI to draw"
-      //         value={this.state.amountDAI}
-      //         onChange={this.handleChange}
-      //       />
-      //     </Form>
-      //   </Modal.Content>
-      //   <Modal.Actions>
-      //     <Button
-      //       primary
-      //       loading={this.state.drawing}
-      //       disabled={!valid}
-      //       onClick={this.drawDAI}
-      //     >
-      //       Draw DAI
-      //     </Button>
-      //     <Button color="red" onClick={this.props.onRequestClose}>
-      //       Cancel
-      //     </Button>
-      //   </Modal.Actions> */}
-      // </Modal>
+      <div>
+        Draw DAI
+        <br />
+        DAI Available: {this.props.cdp.daiAvailable.get().toString()}
+        <Input
+          label={"DAI to draw"}
+          value={this.state.amountDAI}
+          onChange={this.handleChange}
+        />
+        <Button disabled={!valid} onClick={this.drawDAI}>
+          Draw DAI
+        </Button>
+        <Button red onClick={this.props.onRequestClose}>
+          Cancel
+        </Button>
+      </div>
     );
   }
 
@@ -86,7 +64,8 @@ export class Draw extends Component<Props, State> {
     this.props.onRequestClose();
   };
 
-  handleChange = (_e: any, { value }: { value: string }) => {
+  handleChange = (e: React.FormEvent<HTMLInputElement>) => {
+    const value = e.currentTarget.value;
     if (!isValidFloatInputNumber(value)) {
       return;
     }
