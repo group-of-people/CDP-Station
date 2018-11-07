@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Input } from "../../ui";
+import { Button, Input, Header } from "../../ui";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 import { Store } from "../../store";
 import CDP from "../../store/cdp";
@@ -34,23 +34,28 @@ export class Repay extends Component<Props, State> {
     }
 
     return (
-      <div>
-        Repay (requires MKR) <br />
-        DAI Debt: {this.props.cdp.daiDebt.get().toString()} <br />
-        MKR Balance: {this.props.store!.balances.get()!.mkrBalance.toString(4)}
-        <br />
-        <Input
-          label={"DAI to repay"}
-          value={this.state.amountDAI}
-          onChange={this.handleChange}
-        />
-        <Button disabled={!valid} onClick={this.repayDAI}>
-          Repay DAI
-        </Button>
-        <Button red onClick={this.props.onRequestClose}>
-          Cancel
-        </Button>
-      </div>
+      <>
+        <div style={{ flex: 1 }}>
+          <Header>Repay (requires MKR)</Header>
+          DAI Debt: {this.props.cdp.daiDebt.get().toString()} <br />
+          MKR Balance:{" "}
+          {this.props.store!.balances.get()!.mkrBalance.toString(4)}
+          <Input
+            label={"DAI to repay"}
+            unit={"DAI"}
+            value={this.state.amountDAI}
+            onChange={this.handleChange}
+          />
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <Button red onClick={this.props.onRequestClose}>
+            Cancel
+          </Button>
+          <Button disabled={!valid} onClick={this.repayDAI}>
+            Repay DAI
+          </Button>
+        </div>
+      </>
     );
   }
 

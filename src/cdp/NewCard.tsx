@@ -1,6 +1,7 @@
 import React from "react";
 import { Card } from "../ui";
 import Creator from "./Forms/Creator";
+import { AddCircleOutline as PlusCircleIcon } from "styled-icons/material";
 
 export default class NewCard extends React.Component {
   state = {
@@ -23,20 +24,13 @@ export default class NewCard extends React.Component {
         <div
           style={{
             display: "flex",
+            flex: 1,
+            flexDirection: "column",
             justifyContent: "center",
-            alignItems: "center",
-            height: 200
+            alignItems: "center"
           }}
         >
-          +
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center"
-          }}
-        >
+          <PlusCircleIcon size={150} />
           New CDP
         </div>
       </Card>

@@ -2,7 +2,7 @@ import React from "react";
 import { observer, inject } from "mobx-react";
 import styled from "styled-components";
 import { PieChart, Pie, Cell } from "recharts";
-import { Card, Button } from "../ui";
+import { Card, Button, Header } from "../ui";
 import CDP from "../store/cdp";
 import { Store } from "../store";
 import Lock from "./Forms/Lock";
@@ -67,7 +67,7 @@ class CDPCard extends React.Component<Props, State> {
           extra={
             this.props.mode === "work" ? (
               <div>
-                CDP {cdp.id}
+                <Header>CDP {cdp.id}</Header>
                 <Chart
                   data={[
                     { name: "DAI Available", value: cdp.daiAvailable.get() },
@@ -108,7 +108,7 @@ class CDPCard extends React.Component<Props, State> {
 
     return (
       <InfoContainer>
-        <div>ETH</div>
+        <Header>ETH</Header>
         <Row>
           <RowCell>
             <div>{cdp.ethLocked.get().toFixed(2)} Locked </div>
@@ -123,7 +123,7 @@ class CDPCard extends React.Component<Props, State> {
             </Button>
           </RowCell>
         </Row>
-        <div>DAI</div>
+        <Header>DAI</Header>
         <Row>
           <RowCell>
             <div>{cdp.daiLocked.get().toFixed(2)} Generated</div>

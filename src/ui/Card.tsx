@@ -29,8 +29,11 @@ const CardSidesContainer = styled.div`
 
 const Side = styled.div`
   position: absolute;
+  display: flex;
+  flex-direction: column;
   height: 100%;
   width: 100%;
+  padding: 20px;
   background-color: #394349;
   backface-visibility: hidden;
 `;
@@ -58,13 +61,13 @@ export default function Card(props: Props) {
       {!!props.extra && <Extra>{props.extra}</Extra>}
       <CardSidesContainer
         style={{
-          transform: props.flipped ? "rotateY(180deg)" : "rotateY(0deg)"
+          transform: props.flipped ? "rotateY(-180deg)" : "rotateY(0deg)"
         }}
       >
         <Side>{props.children}</Side>
         <Side
           style={{
-            transform: "rotateY(180deg)"
+            transform: "rotateY(-180deg)"
           }}
         >
           {props.backside}

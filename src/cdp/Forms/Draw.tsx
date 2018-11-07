@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { inject, observer } from "mobx-react";
-import { Button, Input } from "../../ui";
+import { Button, Input, Header } from "../../ui";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 import { Store } from "../../store";
 import CDP from "../../store/cdp";
@@ -36,22 +36,26 @@ export class Draw extends Component<Props, State> {
     }
 
     return (
-      <div>
-        Draw DAI
-        <br />
-        DAI Available: {this.props.cdp.daiAvailable.get().toString()}
-        <Input
-          label={"DAI to draw"}
-          value={this.state.amountDAI}
-          onChange={this.handleChange}
-        />
-        <Button disabled={!valid} onClick={this.drawDAI}>
-          Draw DAI
-        </Button>
-        <Button red onClick={this.props.onRequestClose}>
-          Cancel
-        </Button>
-      </div>
+      <>
+        <div style={{ flex: 1 }}>
+          <Header>Draw DAI</Header>
+          DAI Available: {this.props.cdp.daiAvailable.get().toString()}
+          <Input
+            label={"DAI to draw"}
+            unit={"DAI"}
+            value={this.state.amountDAI}
+            onChange={this.handleChange}
+          />
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <Button red onClick={this.props.onRequestClose}>
+            Cancel
+          </Button>
+          <Button disabled={!valid} onClick={this.drawDAI}>
+            Draw DAI
+          </Button>
+        </div>
+      </>
     );
   }
 

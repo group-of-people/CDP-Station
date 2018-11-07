@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Form, Input, Message } from "../../ui";
+import { Button, Input, Message, Header } from "../../ui";
 import { inject, observer } from "mobx-react";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 import { Store } from "../../store";
@@ -54,33 +54,38 @@ export class Free extends Component<Props, State> {
     }
 
     return (
-      <div>
-        Free PETH <br />
-        Locked:{" "}
-        {cdp.pethLocked
-          .get()
-          .toNumber()
-          .toFixed(4)}{" "}
-        PETH ({cdp.ethLocked.get().toFixed(4)} ETH)
-        <Input
-          label={"PETH to free"}
-          previewContent={`${amountETH.toFixed(4)} ETH`}
-          value={this.state.amountPETH}
-          onChange={this.handleChange}
-        />
-        {!valid &&
-          error && (
-            <Message visible error>
-              {error}
-            </Message>
-          )}
-        <Button disabled={!valid} onClick={this.freePETH}>
-          Free PETH
-        </Button>
-        <Button red onClick={this.props.onRequestClose}>
-          Cancel
-        </Button>
-      </div>
+      <>
+        <div style={{ flex: 1 }}>
+          <Header>Free PETH</Header>
+          Locked:{" "}
+          {cdp.pethLocked
+            .get()
+            .toNumber()
+            .toFixed(4)}{" "}
+          PETH ({cdp.ethLocked.get().toFixed(4)} ETH)
+          <Input
+            label={"PETH to free"}
+            unit={"PETH"}
+            previewContent={`${amountETH.toFixed(4)} ETH`}
+            value={this.state.amountPETH}
+            onChange={this.handleChange}
+          />
+          {!valid &&
+            error && (
+              <Message visible error>
+                {error}
+              </Message>
+            )}
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <Button red onClick={this.props.onRequestClose}>
+            Cancel
+          </Button>
+          <Button disabled={!valid} onClick={this.freePETH}>
+            Free PETH
+          </Button>
+        </div>
+      </>
     );
   }
 

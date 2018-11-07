@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Input, Message } from "../../ui";
+import { Button, Input, Message, Header } from "../../ui";
 import { inject, observer } from "mobx-react";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 import { Store } from "../../store";
@@ -48,12 +48,13 @@ export class Lock extends Component<Props, State> {
     }
 
     return (
-      <div>
-        Lock Eth <br /> Locked: {pethLocked.toString(4)} ({ethLocked.toFixed(4)}{" "}
-        ETH)
-        <div>
+      <>
+        <div style={{ flex: 1 }}>
+          <Header>Lock Eth</Header>
+          Locked: {pethLocked.toString(4)} ({ethLocked.toFixed(4)} ETH)
           <Input
             label={"ETH to lock"}
+            unit={"ETH"}
             previewContent={`${amountPETH} PETH`}
             value={this.state.amountETH}
             onChange={this.handleChange}
@@ -65,13 +66,15 @@ export class Lock extends Component<Props, State> {
               </Message>
             )}
         </div>
-        <Button disabled={!valid} onClick={this.lockETH}>
-          Lock ETH
-        </Button>
-        <Button red onClick={this.props.onRequestClose}>
-          Cancel
-        </Button>
-      </div>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <Button red onClick={this.props.onRequestClose}>
+            Cancel
+          </Button>
+          <Button disabled={!valid} onClick={this.lockETH}>
+            Lock ETH
+          </Button>
+        </div>
+      </>
     );
   }
 

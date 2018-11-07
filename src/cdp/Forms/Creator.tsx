@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Input, Message } from "../../ui";
+import { Button, Input, Message, Header } from "../../ui";
 import { inject, observer } from "mobx-react";
 import { observable, autorun, IObservableValue } from "mobx";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
@@ -14,19 +14,16 @@ interface Props {
   onRequestClose: () => void;
 }
 
-interface State {
-  creating: boolean;
-}
+interface State {}
 
 export class CDPCreator extends Component<Props, State> {
-  state: State = {
-    creating: false
-  };
+  state: State = {};
   EthToLock = observable.box(
-    this.props
-      .store!.balances.get()!
-      .ethBalance.toNumber()
-      .toString()
+    (
+      Math.floor(
+        this.props.store!.balances.get()!.ethBalance.toNumber() * 100
+      ) / 100
+    ).toFixed(2)
   );
   DaiToDraw = observable.box("0");
   cdp = new CDP(
@@ -52,7 +49,6 @@ export class CDPCreator extends Component<Props, State> {
   }
 
   render() {
-    const { creating } = this.state;
     const store = this.props.store!;
 
     const minCollateralization =
@@ -79,52 +75,47 @@ export class CDPCreator extends Component<Props, State> {
     }
 
     return (
-      <div>
-        Open a New CDP
-        {!!this.DaiToDraw.get() && (
-          <div
-            style={{
-              display: "inline",
-              marginLeft: "3%",
-              marginRight: "3%"
-            }}
-          >
-            Collateralization: {this.cdp.collateralization.get()}%
-          </div>
-        )}
-        {!!this.DaiToDraw.get() && (
-          <div
-            style={{
-              display: "inline",
-              marginRight: "3%"
-            }}
-          >
-            Liquidation Price: ${this.cdp.liquidationPrice.get()}
-          </div>
-        )}
-        <Input
-          label={"ETH to lock up"}
-          value={this.EthToLock.get()}
-          onChange={this.handleEthChange}
-        />
-        <Input
-          label={"DAI to draw"}
-          value={this.DaiToDraw.get()}
-          onChange={this.handleDaiChange}
-        />
-        {!valid &&
-          error && (
-            <Message visible error>
-              {error}
-            </Message>
+      <>
+        <div style={{ flex: 1 }}>
+          <Header>Open a New CDP</Header>
+          <Input
+            label={"ETH to lock up"}
+            unit={"ETH"}
+            value={this.EthToLock.get()}
+            onChange={this.handleEthChange}
+          />
+          <Input
+            label={"DAI to draw"}
+            unit={"DAI"}
+            value={this.DaiToDraw.get()}
+            onChange={this.handleDaiChange}
+          />
+          {!valid &&
+            error && (
+              <Message visible error>
+                {error}
+              </Message>
+            )}
+          {!!this.DaiToDraw.get() && (
+            <div
+              style={{
+                display: "inline",
+                marginRight: "3%"
+              }}
+            >
+              Liquidation Price: ${this.cdp.liquidationPrice.get()}
+            </div>
           )}
-        <Button disabled={!valid} onClick={this.createCDP}>
-          CreateCDP
-        </Button>
-        <Button red onClick={this.props.onRequestClose}>
-          Cancel
-        </Button>
-      </div>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <Button red onClick={this.props.onRequestClose}>
+            Cancel
+          </Button>
+          <Button disabled={!valid} onClick={this.createCDP}>
+            CreateCDP
+          </Button>
+        </div>
+      </>
     );
   }
 
