@@ -25,13 +25,28 @@ const RowCell = styled.div`
   flex: 1;
 `;
 
+interface LegendItemProps {
+  color: string;
+}
+
+const LegendItem = styled.div`
+  &:before {
+    content: ' ';
+    background-color: ${(props: LegendItemProps) => props.color}
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+    margin-right: 5px;
+  }
+`;
+
 const Chart = ({ data }: { data: { name: string; value: number }[] }) => (
-  <PieChart height={260} width={260}>
+  <PieChart height={220} width={220} style={{ margin: "auto" }}>
     <Pie
       startAngle={90}
       endAngle={450}
       data={data}
-      outerRadius={130}
+      outerRadius={110}
       fill="#8884d8"
       isAnimationActive={false}
       dataKey={"value"}
@@ -66,16 +81,23 @@ class CDPCard extends React.Component<Props, State> {
           backside={this.renderView()}
           extra={
             this.props.mode === "work" ? (
-              <div>
+              <div style={{ padding: 20 }}>
                 <Header>CDP {cdp.id}</Header>
-                <Chart
-                  data={[
-                    { name: "DAI Available", value: cdp.daiAvailable.get() },
-                    { name: "DAI Debt", value: cdp.daiDebt.get().toNumber() }
-                    // {name: "DAI Collateral", value: cdp.daiLocked - cdp.daiAvailable - cdp.daiDebt.toNumber()}
-                  ]}
-                />
-                Risk: low
+                <div style={{ marginBottom: 10 }}>
+                  <Chart
+                    data={[
+                      { name: "DAI Available", value: cdp.daiAvailable.get() },
+                      { name: "DAI Debt", value: cdp.daiDebt.get().toNumber() }
+                      // {name: "DAI Collateral", value: cdp.daiLocked - cdp.daiAvailable - cdp.daiDebt.toNumber()}
+                    ]}
+                  />
+                </div>
+                <div
+                  style={{ display: "flex", justifyContent: "space-around" }}
+                >
+                  <LegendItem color={COLORS[0]}>Available</LegendItem>
+                  <LegendItem color={COLORS[1]}>Debt</LegendItem>
+                </div>
               </div>
             ) : (
               void 0

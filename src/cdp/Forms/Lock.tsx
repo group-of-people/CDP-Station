@@ -31,9 +31,6 @@ export class Lock extends Component<Props, State> {
     const amountETH = parseInputFloat(this.state.amountETH);
 
     const wethToPeth = store.prices.get()!.wethToPeth;
-    const amountPETH = (amountETH / wethToPeth).toFixed(4);
-
-    const pethLocked = this.props.cdp.pethLocked.get();
     const ethLocked = this.props.cdp.ethLocked.get();
 
     const ethBalance = store.balances.get()!.ethBalance.toNumber();
@@ -51,11 +48,10 @@ export class Lock extends Component<Props, State> {
       <>
         <div style={{ flex: 1 }}>
           <Header>Lock Eth</Header>
-          Locked: {pethLocked.toString(4)} ({ethLocked.toFixed(4)} ETH)
+          Locked: {ethLocked.toFixed(4)} ETH
           <Input
             label={"ETH to lock"}
             unit={"ETH"}
-            previewContent={`${amountPETH} PETH`}
             value={this.state.amountETH}
             onChange={this.handleChange}
           />

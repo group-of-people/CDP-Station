@@ -13,23 +13,21 @@ interface Props {
 }
 
 interface State {
-  amountPETH: string;
-  freeing: boolean;
+  amountETH: string;
 }
 
 export class Free extends Component<Props, State> {
   state: State = {
-    amountPETH: "0",
-    freeing: false
+    amountETH: "0"
   };
 
   render() {
     const { cdp } = this.props;
     const store = this.props.store!;
-    const amountPETH = parseInputFloat(this.state.amountPETH);
+    const amountETH = parseInputFloat(this.state.amountETH);
     const ethPrice = store.prices.get()!.ethPrice.toNumber();
     const wethToPeth = store.prices.get()!.wethToPeth;
-    const amountETH = amountPETH * wethToPeth;
+    const amountPETH = amountETH / wethToPeth;
     const DAICollateralAfterFree =
       (cdp.pethLocked.get().toNumber() - amountPETH) * wethToPeth * ethPrice;
     const maxDrawnDAIAfterFree =
@@ -49,7 +47,7 @@ export class Free extends Component<Props, State> {
       error = `CDP will become unsafe. You can free at most ${freeablePETH.toFixed(
         4
       )} PETH`;
-    } else if (amountPETH <= 0 || this.state.amountPETH === "") {
+    } else if (amountPETH <= 0 || this.state.amountETH === "") {
       valid = false;
     }
 
@@ -57,17 +55,11 @@ export class Free extends Component<Props, State> {
       <>
         <div style={{ flex: 1 }}>
           <Header>Free PETH</Header>
-          Locked:{" "}
-          {cdp.pethLocked
-            .get()
-            .toNumber()
-            .toFixed(4)}{" "}
-          PETH ({cdp.ethLocked.get().toFixed(4)} ETH)
+          Locked: {cdp.ethLocked.get().toFixed(4)} ETH
           <Input
-            label={"PETH to free"}
-            unit={"PETH"}
-            previewContent={`${amountETH.toFixed(4)} ETH`}
-            value={this.state.amountPETH}
+            label={"ETH to free"}
+            unit={"ETH"}
+            value={this.state.amountETH}
             onChange={this.handleChange}
           />
           {!valid &&
@@ -82,7 +74,7 @@ export class Free extends Component<Props, State> {
             Cancel
           </Button>
           <Button disabled={!valid} onClick={this.freePETH}>
-            Free PETH
+            Free Eth
           </Button>
         </div>
       </>
@@ -90,9 +82,8 @@ export class Free extends Component<Props, State> {
   }
 
   freePETH = async () => {
-    this.setState({ freeing: true });
-    await this.props.store!.freePETH(
-      parseInputFloat(this.state.amountPETH),
+    await this.props.store!.freeETH(
+      parseInputFloat(this.state.amountETH),
       this.props.cdp
     );
     this.props.onRequestClose();
@@ -103,7 +94,7 @@ export class Free extends Component<Props, State> {
     if (!isValidFloatInputNumber(value)) {
       return;
     }
-    this.setState({ amountPETH: value });
+    this.setState({ amountETH: value });
   };
 }
 

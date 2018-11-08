@@ -251,6 +251,10 @@ export class Store {
     }
   };
 
+  freeETH = async (amountETH: number, cdp: CDP) => {
+    throw new Error("implement me");
+  };
+
   freePETH = async (amountPETH: number, cdp: CDP) => {
     try {
       const cdpInstance = await this.maker!.getCdp(cdp.id);
