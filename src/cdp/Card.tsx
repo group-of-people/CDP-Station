@@ -10,7 +10,7 @@ import Free from "./Forms/Free";
 import Draw from "./Forms/Draw";
 import Repay from "./Forms/Repay";
 
-const COLORS = ["#00C49F", "#0088FE", "#FFBB28", "#FF8042"];
+const COLORS = ["#88C142", "#E04980", "#FFBB28", "#FF8042"];
 
 const InfoContainer = styled.div`
   display: flex;
@@ -133,13 +133,15 @@ class CDPCard extends React.Component<Props, State> {
         <Header>ETH</Header>
         <Row>
           <RowCell>
-            <div>{cdp.ethLocked.get().toFixed(2)} Locked </div>
+            <div style={{ color: "#929292" }}>Locked:</div>
+            <div>{cdp.ethLocked.get().toFixed(2)}</div>
             <Button onClick={() => this.setState({ view: "deposit" })}>
               Deposit
             </Button>
           </RowCell>
           <RowCell>
-            <div>{cdp.ethAvailable.get().toFixed(2)} Available </div>
+            <div style={{ color: "#929292" }}>Available:</div>
+            <div>{cdp.ethAvailable.get().toFixed(2)} </div>
             <Button red onClick={() => this.setState({ view: "withdraw" })}>
               Withdraw
             </Button>
@@ -148,13 +150,15 @@ class CDPCard extends React.Component<Props, State> {
         <Header>DAI</Header>
         <Row>
           <RowCell>
-            <div>{cdp.daiLocked.get().toFixed(2)} Generated</div>
+            <div style={{ color: "#929292" }}>Generated:</div>
+            <div>{cdp.daiLocked.get().toFixed(2)} </div>
             <Button onClick={() => this.setState({ view: "payback" })}>
               Payback
             </Button>
           </RowCell>
           <RowCell>
-            <div>{cdp.daiAvailable.get().toFixed(2)} Available</div>
+            <div style={{ color: "#929292" }}>Available:</div>
+            <div>{cdp.daiAvailable.get().toFixed(2)}</div>
             <Button red onClick={() => this.setState({ view: "generate" })}>
               Generate
             </Button>

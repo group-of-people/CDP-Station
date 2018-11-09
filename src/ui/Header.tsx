@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-const DimmerContainer = styled.h1`
+const StyledHeader = styled.div`
   color: #ededed;
   font-size: 30px;
 `;
@@ -10,10 +10,6 @@ interface Props {
   children?: React.ReactNode;
 }
 
-export default function Dimmer(props: Props) {
-  return (
-    <DimmerContainer>
-      <div>{props.children}</div>
-    </DimmerContainer>
-  );
+export default function Header(props: Props) {
+  return <StyledHeader>{props.children}</StyledHeader>;
 }

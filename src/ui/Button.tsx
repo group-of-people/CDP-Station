@@ -7,14 +7,13 @@ interface StyledProps {
 
 const StyledButton = styled.button`
   text-transform: uppercase;
-  min-width: 100px;
+  min-width: 120px;
   background: transparent;
-  color: ${(props: StyledProps) => (props.red ? "#DD0426" : "#14CC60")};
-  border: 2px solid
-    ${(props: StyledProps) => (props.red ? "#DD0426" : "#14CC60")};
+  color: ${(props: StyledProps) => (props.red ? "#E04980" : "#88C142")};
+  border: 1px solid
+    ${(props: StyledProps) => (props.red ? "#E04980" : "#88C142")};
   border-radius: 2px;
   padding: 5px;
-  font-weight: bold;
   cursor: pointer;
 `;
 
