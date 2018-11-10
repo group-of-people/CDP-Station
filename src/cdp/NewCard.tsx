@@ -3,9 +3,13 @@ import { Card } from "../ui";
 import Creator from "./Forms/Creator";
 import { AddCircleOutline as PlusCircleIcon } from "styled-icons/material";
 
-export default class NewCard extends React.Component {
+interface Props {
+  flipped?: boolean;
+}
+
+export default class NewCard extends React.Component<Props> {
   state = {
-    showForm: false
+    showForm: !!this.props.flipped
   };
   render() {
     const { showForm } = this.state;

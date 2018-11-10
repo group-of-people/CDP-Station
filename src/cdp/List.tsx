@@ -19,7 +19,7 @@ export class CDPList extends Component<Props, State> {
       <>
         <div style={{ display: "flex" }}>
           {this.props.store!.cdps.map(cdp => (
-            <CDPCard key={cdp.id} cdp={cdp} mode={this.props.mode} />
+            <CDPCard key={cdp.id} cdp={cdp} wide={this.props.mode === "work"} />
           ))}
           <NewCard />
         </div>

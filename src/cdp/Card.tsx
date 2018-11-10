@@ -61,7 +61,8 @@ const Chart = ({ data }: { data: { name: string; value: number }[] }) => (
 interface Props {
   store?: Store;
   cdp: CDP;
-  mode: string;
+  wide?: boolean;
+  view?: "details" | "deposit" | "withdraw" | "payback" | "generate";
 }
 
 interface State {
@@ -70,7 +71,7 @@ interface State {
 
 class CDPCard extends React.Component<Props, State> {
   state: State = {
-    view: "details"
+    view: this.props.view || "details"
   };
   render() {
     const { cdp } = this.props;
@@ -80,7 +81,7 @@ class CDPCard extends React.Component<Props, State> {
           flipped={this.state.view !== "details"}
           backside={this.renderView()}
           extra={
-            this.props.mode === "work" ? (
+            this.props.wide !== false ? (
               <div style={{ padding: 20 }}>
                 <Header>CDP {cdp.id}</Header>
                 <div style={{ marginBottom: 10 }}>
