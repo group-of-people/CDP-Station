@@ -59,7 +59,7 @@ class App extends Component<Props> {
     );
   }
   renderLoading() {
-    return <Loader active />;
+    return <Loader />;
   }
 
   renderContent() {

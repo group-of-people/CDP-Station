@@ -17,6 +17,7 @@ export class Work extends Component<Props, {}> {
     const balances = this.props.store!.balances.get()!;
     return (
       <>
+        <CDPList mode={"work"} />
         <div style={{ display: "inline" }}>
           <div>Logged in as {this.props.store!.account.get()}</div>
         </div>
@@ -34,8 +35,6 @@ export class Work extends Component<Props, {}> {
 
           <div>ETH Balance: {balances.ethBalance.toString(4)}</div>
         </div>
-        <br />
-        <CDPList mode={"work"} />
       </>
     );
   }

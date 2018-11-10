@@ -115,17 +115,11 @@ export class Store {
       await this.maker.authenticate();
       const priceService = this.maker.service("price");
       const cdpService = this.maker.service("cdp");
-      const [
-        ethPrice,
-        mkrPrice,
-        wethToPeth,
-        liquidationRatio
-      ] = await Promise.all([
-        priceService.getEthPrice(),
-        priceService.getMkrPrice(),
-        priceService.getWethToPethRatio(),
-        cdpService.getLiquidationRatio()
-      ]);
+      const ethPrice = await priceService.getEthPrice();
+      const mkrPrice = await priceService.getMkrPrice();
+
+      const wethToPeth = await priceService.getWethToPethRatio();
+      const liquidationRatio = await cdpService.getLiquidationRatio();
 
       runInAction(() => {
         this.account.set(accs[0]);
