@@ -54,7 +54,7 @@ export class Free extends Component<Props, State> {
     return (
       <>
         <div style={{ flex: 1 }}>
-          <Header>Free PETH</Header>
+          <Header>Free ETH</Header>
           Locked: {cdp.ethLocked.get().toFixed(4)} ETH
           <Input
             label={"ETH to free"}

@@ -82,8 +82,18 @@ class CDPCard extends React.Component<Props, State> {
           backside={this.renderView()}
           extra={
             this.props.wide !== false ? (
-              <div style={{ padding: 20 }}>
-                <Header>CDP {cdp.id}</Header>
+              <div
+                style={{
+                  padding: 20,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-around",
+                  height: "100%"
+                }}
+              >
+                <div style={{ textAlign: "center" }}>
+                  <Header>CDP {cdp.id}</Header>
+                </div>
                 <div style={{ marginBottom: 10 }}>
                   <Chart
                     data={[
