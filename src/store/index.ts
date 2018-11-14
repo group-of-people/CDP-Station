@@ -19,6 +19,7 @@ import Addresses from "./addresses.json";
 declare global {
   interface Window {
     web3: Web3 | undefined;
+    ethereum: Web3 | undefined;
   }
 }
 
@@ -55,36 +56,50 @@ export class Store {
   pethContract: DSTokenContract | null = null;
 
   constructor() {
+    this.enableWeb3().then(() => {
+      this.contract = new this.web3!.eth.Contract(
+        CDPCreatorBuild.abi,
+        Addresses.Creator
+      ) as CDPCreatorContract;
+      this.mkrContract = new this.web3!.eth.Contract(
+        ERC20.abi,
+        Addresses.MKR
+      ) as ERC20Contract;
+      this.daiContract = new this.web3!.eth.Contract(
+        ERC20.abi,
+        Addresses.DAI
+      ) as ERC20Contract;
+      this.pethContract = new this.web3!.eth.Contract(
+        DSToken.abi,
+        Addresses.PETH
+      ) as DSTokenContract;
+
+      this.initializeAccount();
+    });
+  }
+
+  enableWeb3 = async () => {
     var web3 = window.web3;
     // Checking if Web3 has been injected by the browser (Mist/MetaMask)
     if (typeof web3 !== "undefined") {
-      web3 = new Web3(web3.currentProvider);
-
-      console.log("Injected web3 detected.");
+      if (window.ethereum) {
+        // @ts-ignore
+        this.web3 = new Web3(window.ethereum);
+        try {
+          // @ts-ignore
+          await window.ethereum.enable();
+        } catch (e) {
+          console.log(e, "Metamask locked");
+        }
+      } else {
+        this.web3 = new Web3(web3.currentProvider);
+        console.log("Injected web3 detected.");
+      }
     } else {
       this.noWeb3.set(true);
       return;
     }
-    this.web3 = web3;
-    this.contract = new web3.eth.Contract(
-      CDPCreatorBuild.abi,
-      Addresses.Creator
-    ) as CDPCreatorContract;
-    this.mkrContract = new web3.eth.Contract(
-      ERC20.abi,
-      Addresses.MKR
-    ) as ERC20Contract;
-    this.daiContract = new web3.eth.Contract(
-      ERC20.abi,
-      Addresses.DAI
-    ) as ERC20Contract;
-    this.pethContract = new web3.eth.Contract(
-      DSToken.abi,
-      Addresses.PETH
-    ) as DSTokenContract;
-
-    this.initializeAccount();
-  }
+  };
 
   initializeAccount = async () => {
     let web3 = this.web3!;
