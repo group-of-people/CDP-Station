@@ -120,7 +120,7 @@ const Side = styled.div`
   flex-direction: column;
   height: 100%;
   width: 100%;
-  padding: 20px;
+  padding: 30px 20px;
   background-color: ${CARD_PRIMARY};
   backface-visibility: hidden;
   box-shadow: ${(props: SideProps) =>

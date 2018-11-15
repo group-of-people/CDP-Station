@@ -48,13 +48,13 @@ export class Lock extends Component<Props, State> {
       <>
         <div style={{ flex: 1 }}>
           <Header>Lock Eth</Header>
-          Locked: {ethLocked.toFixed(4)} ETH
           <Input
             label={"ETH to lock"}
             unit={"ETH"}
             value={this.state.amountETH}
             onChange={this.handleChange}
           />
+          Locked: {ethLocked.toFixed(4)} ETH
           {!valid &&
             error && (
               <Message visible error>

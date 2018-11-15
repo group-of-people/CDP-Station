@@ -16,7 +16,7 @@ const InfoContainer = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  justify-content: center;
+  justify-content: space-between;
 `;
 const Row = styled.div`
   display: flex;
@@ -30,6 +30,10 @@ interface LegendItemProps {
 }
 
 const LegendItem = styled.div`
+  height: 30px;
+  display: flex;
+  align-items: center;
+  
   &:before {
     content: ' ';
     background-color: ${(props: LegendItemProps) => props.color}
@@ -84,10 +88,10 @@ class CDPCard extends React.Component<Props, State> {
             this.props.wide !== false ? (
               <div
                 style={{
-                  padding: 20,
+                  padding: "30px 20px",
                   display: "flex",
                   flexDirection: "column",
-                  justifyContent: "space-around",
+                  justifyContent: "space-between",
                   height: "100%"
                 }}
               >
@@ -141,40 +145,68 @@ class CDPCard extends React.Component<Props, State> {
 
     return (
       <InfoContainer>
-        <Header>ETH</Header>
-        <Row>
-          <RowCell>
-            <div style={{ color: "#929292" }}>Locked:</div>
-            <div>{cdp.ethLocked.get().toFixed(2)}</div>
-            <Button onClick={() => this.setState({ view: "deposit" })}>
-              Deposit
-            </Button>
-          </RowCell>
-          <RowCell>
-            <div style={{ color: "#929292" }}>Available:</div>
-            <div>{cdp.ethAvailable.get().toFixed(2)} </div>
-            <Button red onClick={() => this.setState({ view: "withdraw" })}>
-              Withdraw
-            </Button>
-          </RowCell>
-        </Row>
-        <Header>DAI</Header>
-        <Row>
-          <RowCell>
-            <div style={{ color: "#929292" }}>Generated:</div>
-            <div>{cdp.daiLocked.get().toFixed(2)} </div>
-            <Button onClick={() => this.setState({ view: "payback" })}>
-              Payback
-            </Button>
-          </RowCell>
-          <RowCell>
-            <div style={{ color: "#929292" }}>Available:</div>
-            <div>{cdp.daiAvailable.get().toFixed(2)}</div>
-            <Button red onClick={() => this.setState({ view: "generate" })}>
-              Generate
-            </Button>
-          </RowCell>
-        </Row>
+        <div>
+          <Header>ETH</Header>
+          <Row>
+            <RowCell>
+              <div style={{ color: "#b5b5b5", marginTop: 5 }}>Locked:</div>
+              <div style={{ marginBottom: 10 }}>
+                {cdp.ethLocked.get().toFixed(2)}
+              </div>
+              <Button onClick={() => this.setState({ view: "deposit" })}>
+                Deposit
+              </Button>
+            </RowCell>
+            <RowCell>
+              <div style={{ color: "#b5b5b5", marginTop: 5 }}>Available:</div>
+              <div style={{ marginBottom: 10 }}>
+                {cdp.ethAvailable.get().toFixed(2)}{" "}
+              </div>
+              <Button red onClick={() => this.setState({ view: "withdraw" })}>
+                Withdraw
+              </Button>
+            </RowCell>
+          </Row>
+        </div>
+        <div>
+          <Header>DAI</Header>
+          <Row>
+            <RowCell>
+              <div style={{ color: "#b5b5b5", marginTop: 5 }}>Generated:</div>
+              <div style={{ marginBottom: 10 }}>
+                {cdp.daiLocked.get().toFixed(2)}{" "}
+              </div>
+              <Button onClick={() => this.setState({ view: "payback" })}>
+                Payback
+              </Button>
+            </RowCell>
+            <RowCell>
+              <div style={{ color: "#b5b5b5", marginTop: 5 }}>Available:</div>
+              <div style={{ marginBottom: 10 }}>
+                {cdp.daiAvailable.get().toFixed(2)}
+              </div>
+              <Button red onClick={() => this.setState({ view: "generate" })}>
+                Generate
+              </Button>
+            </RowCell>
+          </Row>
+        </div>
+        <div>
+          <div
+            style={{
+              color: "#b5b5b5",
+              marginTop: 10,
+              fontSize: 20,
+              marginBottom: 5
+            }}
+          >
+            Liquidation Price
+          </div>
+
+          <Row>
+            <div>{cdp.liquidationPrice.get()} USD/ETH</div>
+          </Row>
+        </div>
       </InfoContainer>
     );
   }
