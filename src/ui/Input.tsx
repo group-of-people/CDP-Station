@@ -52,7 +52,7 @@ const Unit = styled.div`
 `;
 
 interface Props {
-  label: string;
+  label?: string;
   value: string;
   unit: string;
   previewContent?: React.ReactNode;
@@ -62,7 +62,7 @@ interface Props {
 export default function Input(props: Props) {
   return (
     <Wrapper>
-      <Label>{props.label}</Label>
+      {!!props.label && <Label>{props.label}</Label>}
       <StyledInputWrapper>
         <div
           style={{

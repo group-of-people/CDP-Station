@@ -38,21 +38,22 @@ export class Draw extends Component<Props, State> {
     return (
       <>
         <div style={{ flex: 1 }}>
-          <Header>Draw DAI</Header>
-          DAI Available: {this.props.cdp.daiAvailable.get().toString()}
-          <Input
-            label={"DAI to draw"}
-            unit={"DAI"}
-            value={this.state.amountDAI}
-            onChange={this.handleChange}
-          />
+          <Header>Generate</Header>
+          <div style={{ marginTop: 20 }}>
+            <Input
+              unit={"DAI"}
+              value={this.state.amountDAI}
+              onChange={this.handleChange}
+            />
+          </div>
+          DAI Available: {this.props.cdp.daiAvailable.get().toFixed(2)}
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <Button red onClick={this.props.onRequestClose}>
             Cancel
           </Button>
           <Button disabled={!valid} onClick={this.drawDAI}>
-            Draw DAI
+            Generate
           </Button>
         </div>
       </>

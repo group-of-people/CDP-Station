@@ -54,14 +54,15 @@ export class Free extends Component<Props, State> {
     return (
       <>
         <div style={{ flex: 1 }}>
-          <Header>Free ETH</Header>
+          <Header>Withdraw</Header>
+          <div style={{ marginTop: 20 }}>
+            <Input
+              unit={"ETH"}
+              value={this.state.amountETH}
+              onChange={this.handleChange}
+            />
+          </div>
           Locked: {cdp.ethLocked.get().toFixed(4)} ETH
-          <Input
-            label={"ETH to free"}
-            unit={"ETH"}
-            value={this.state.amountETH}
-            onChange={this.handleChange}
-          />
           {!valid &&
             error && (
               <Message visible error>
@@ -74,7 +75,7 @@ export class Free extends Component<Props, State> {
             Cancel
           </Button>
           <Button disabled={!valid} onClick={this.freePETH}>
-            Free Eth
+            Withdraw
           </Button>
         </div>
       </>
