@@ -18,22 +18,24 @@ export class Work extends Component<Props, {}> {
     return (
       <>
         <CDPList mode={"work"} />
-        <div style={{ display: "inline" }}>
-          <div>Logged in as {this.props.store!.account.get()}</div>
-        </div>
-        <div style={{ display: "inline" }}>
-          <div>DAI Balance: {balances.daiBalance.toString(4)}</div>
-          <div>MKR Balance: {balances.mkrBalance.toString(4)}</div>
-          {!!balances.pethBalance.toNumber() && (
-            <div>
-              PETH Balance: {balances.pethBalance.toString(4)} {"   "}
-              <Button onClick={this.props.store!.convertPETH}>
-                Convert PETH to ETH?
-              </Button>
-            </div>
-          )}
+        <div style={{ position: "fixed" }}>
+          <div style={{ display: "inline" }}>
+            <div>Logged in as {this.props.store!.account.get()}</div>
+          </div>
+          <div style={{ display: "inline" }}>
+            <div>DAI Balance: {balances.daiBalance.toString(4)}</div>
+            <div>MKR Balance: {balances.mkrBalance.toString(4)}</div>
+            {!!balances.pethBalance.toNumber() && (
+              <div>
+                PETH Balance: {balances.pethBalance.toString(4)} {"   "}
+                <Button onClick={this.props.store!.convertPETH}>
+                  Convert PETH to ETH?
+                </Button>
+              </div>
+            )}
 
-          <div>ETH Balance: {balances.ethBalance.toString(4)}</div>
+            <div>ETH Balance: {balances.ethBalance.toString(4)}</div>
+          </div>
         </div>
       </>
     );

@@ -15,6 +15,7 @@ import Prices from "./prices";
 import MkrSettings from "./mkrSettings";
 import Balances from "./balances";
 import Addresses from "./addresses.json";
+import Approvals from "./approvals";
 
 declare global {
   interface Window {
@@ -45,6 +46,7 @@ export class Store {
   prices: IObservableValue<Prices | null> = observable.box(null);
   mkrSettings: IObservableValue<MkrSettings | null> = observable.box(null);
   balances: IObservableValue<Balances | null> = observable.box(null);
+  approvals: IObservableValue<Approvals | null> = observable.box(null);
 
   // UI State
   noWeb3 = observable.box(false);
@@ -143,6 +145,7 @@ export class Store {
       });
       await this.updateBalances();
       await this.updateCDPS();
+      await this.getApprovals();
       runInAction(() => {
         this.loading.set(false);
         this.locked.set(false);
@@ -207,6 +210,45 @@ export class Store {
           DAI.wei(dai),
           ETH.wei(ethBalance),
           PETH.wei(peth)
+        )
+      );
+    });
+  };
+
+  getApprovals = async () => {
+    const acc = this.account.get();
+    const mkr = await this.mkrContract!.methods.allowance(
+      acc,
+      Addresses.TUB
+    ).call({
+      from: acc
+    });
+    const dai = await this.daiContract!.methods.allowance(
+      acc,
+      Addresses.TUB
+    ).call({
+      from: acc
+    });
+    const peth = await this.pethContract!.methods.allowance(
+      acc,
+      Addresses.TUB
+    ).call({
+      from: acc
+    });
+    const pethCreator = await this.pethContract!.methods.allowance(
+      acc,
+      Addresses.Creator
+    ).call({
+      from: acc
+    });
+
+    runInAction(() => {
+      this.approvals.set(
+        new Approvals(
+          MKR.wei(mkr),
+          DAI.wei(dai),
+          PETH.wei(peth),
+          PETH.wei(pethCreator)
         )
       );
     });
