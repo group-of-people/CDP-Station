@@ -30,7 +30,6 @@ export class Lock extends Component<Props, State> {
     const store = this.props.store!;
     const amountETH = parseInputFloat(this.state.amountETH);
 
-    const wethToPeth = store.prices.get()!.wethToPeth;
     const ethLocked = this.props.cdp.ethLocked.get();
 
     const ethBalance = store.balances.get()!.ethBalance.toNumber();
@@ -39,7 +38,7 @@ export class Lock extends Component<Props, State> {
     let error = "";
     if (amountETH > ethBalance) {
       valid = false;
-      error = `You can lock up to ${ethBalance.toFixed(4)} ETH`;
+      error = `You can deposit up to ${ethBalance.toFixed(4)} ETH`;
     } else if (!amountETH || amountETH < 0) {
       valid = false;
     }
@@ -47,7 +46,7 @@ export class Lock extends Component<Props, State> {
     return (
       <>
         <div style={{ flex: 1 }}>
-          <Header>Lock</Header>
+          <Header>Deposit</Header>
           <div style={{ marginTop: 20 }}>
             <Input
               unit={"ETH"}
