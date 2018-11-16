@@ -51,10 +51,19 @@ export class Repay extends Component<Props, State> {
           {this.props.store!.balances.get()!.mkrBalance.toString(4)}
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <Button red onClick={this.props.onRequestClose}>
+          <Button
+            color={"gray"}
+            style={"muted"}
+            onClick={this.props.onRequestClose}
+          >
             Cancel
           </Button>
-          <Button disabled={!valid} onClick={this.repayDAI}>
+          <Button
+            color={"green"}
+            style={"primary"}
+            disabled={!valid}
+            onClick={this.repayDAI}
+          >
             Repay
           </Button>
         </div>

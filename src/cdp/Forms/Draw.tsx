@@ -49,10 +49,19 @@ export class Draw extends Component<Props, State> {
           DAI Available: {this.props.cdp.daiAvailable.get().toFixed(2)}
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <Button red onClick={this.props.onRequestClose}>
+          <Button
+            color={"gray"}
+            style={"muted"}
+            onClick={this.props.onRequestClose}
+          >
             Cancel
           </Button>
-          <Button disabled={!valid} onClick={this.drawDAI}>
+          <Button
+            color={"green"}
+            style={"primary"}
+            disabled={!valid}
+            onClick={this.drawDAI}
+          >
             Generate
           </Button>
         </div>

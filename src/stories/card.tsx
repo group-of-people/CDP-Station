@@ -13,9 +13,9 @@ const mockStore = {
   balances: {
     get() {
       return {
-        ethBalance: ETH("55"),
-        daiBalance: ETH("132"),
-        mkrBalance: ETH("77")
+        ethBalance: ETH("12345.1234567890123456789"),
+        daiBalance: ETH("123456.1234567890123456789"),
+        mkrBalance: ETH("654321.1234567890123456789")
       };
     }
   },
@@ -51,8 +51,8 @@ storiesOf("Cards", module)
           cdp={
             new CDP(
               1543,
-              5 * 10 ** 18,
-              850 * 10 ** 18,
+              50000.123456789 * 10 ** 18,
+              8500000.123456789 * 10 ** 18,
               mockStore.prices as any,
               mockStore.mkrSettings as any
             )

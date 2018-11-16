@@ -10,7 +10,7 @@ import Free from "./Forms/Free";
 import Draw from "./Forms/Draw";
 import Repay from "./Forms/Repay";
 
-const COLORS = ["#88C142", "#E04980", "#FFBB28", "#FF8042"];
+const COLORS = ["#66BB6A", "#E04980", "#FFBB28", "#FF8042"];
 
 const InfoContainer = styled.div`
   display: flex;
@@ -162,7 +162,10 @@ class CDPCard extends React.Component<Props, State> {
               <div style={{ marginBottom: 10 }}>
                 {cdp.ethAvailable.get().toFixed(2)}{" "}
               </div>
-              <Button red onClick={() => this.setState({ view: "withdraw" })}>
+              <Button
+                color={"red"}
+                onClick={() => this.setState({ view: "withdraw" })}
+              >
                 Withdraw
               </Button>
             </RowCell>
@@ -185,7 +188,10 @@ class CDPCard extends React.Component<Props, State> {
               <div style={{ marginBottom: 10 }}>
                 {cdp.daiAvailable.get().toFixed(2)}
               </div>
-              <Button red onClick={() => this.setState({ view: "generate" })}>
+              <Button
+                color={"red"}
+                onClick={() => this.setState({ view: "generate" })}
+              >
                 Generate
               </Button>
             </RowCell>

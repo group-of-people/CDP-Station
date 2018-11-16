@@ -63,18 +63,22 @@ export class Free extends Component<Props, State> {
             />
           </div>
           Locked: {cdp.ethLocked.get().toFixed(4)} ETH
-          {!valid &&
-            error && (
-              <Message visible error>
-                {error}
-              </Message>
-            )}
+          {!valid && error && <Message>{error}</Message>}
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <Button red onClick={this.props.onRequestClose}>
+          <Button
+            color={"gray"}
+            style={"muted"}
+            onClick={this.props.onRequestClose}
+          >
             Cancel
           </Button>
-          <Button disabled={!valid} onClick={this.freePETH}>
+          <Button
+            color={"green"}
+            style={"primary"}
+            disabled={!valid}
+            onClick={this.freePETH}
+          >
             Withdraw
           </Button>
         </div>

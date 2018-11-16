@@ -1,3 +1,0 @@
-```js
-<Button>Test</Button>
-```
