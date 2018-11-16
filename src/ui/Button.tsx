@@ -28,19 +28,23 @@ function getColor(props: StyledProps) {
   }
 }
 
-function getBackgroundColor(props: StyledProps) {
+function getColorWithAlpha(props: StyledProps, alpha: number) {
+  switch (props.color) {
+    case "red":
+      return `rgba(224, 73, 128, ${alpha})`;
+    case "green":
+      return `rgba(67, 160, 71, ${alpha})`;
+    default:
+      return white;
+  }
+}
+
+function getBackgroundColor(props: StyledProps, alpha: number = 1) {
   switch (props.type) {
     case "primary":
-      switch (props.color) {
-        case "red":
-          return red;
-        case "green":
-          return green;
-        case "gray":
-          return gray;
-      }
+      return getColorWithAlpha(props, alpha);
   }
-  return "transparent";
+  return alpha ? getColorWithAlpha(props, alpha) : "transparent";
 }
 
 function getBorder(props: StyledProps) {
@@ -54,17 +58,32 @@ function getBorder(props: StyledProps) {
 const StyledButton = styled.button`
   text-transform: uppercase;
   min-width: 120px;
-  background: ${(props: StyledProps) => getBackgroundColor(props)};
+  min-height: 30px;
+  background: ${(props: StyledProps) =>
+    getBackgroundColor(props, props.type !== "primary" ? 0 : 1)};
   color: ${(props: StyledProps) => getColor(props)};
   border: ${(props: StyledProps) => getBorder(props)};
   border-radius: 2px;
-  padding: 5px;
+  padding: 5px 10px;
   cursor: pointer;
 
   &:hover {
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.24);
-    transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-    border: 1px solid ${gray};
+    background: ${(props: StyledProps) =>
+      getBackgroundColor(
+        props,
+        props.type === "muted" ? 0 : !props.type ? 0.08 : 0.9
+      )};
+  }
+`;
+
+const StyledDisabledButton = styled(StyledButton)`
+  background-color: gray;
+  border: 0;
+  color: ${gray};
+  cursor: default;
+
+  &:hover {
+    background: gray;
   }
 `;
 
@@ -78,13 +97,14 @@ interface Props {
 }
 
 export default function Button(props: Props) {
+  const Component = props.disabled ? StyledDisabledButton : StyledButton;
   return (
-    <StyledButton
+    <Component
       type={props.style}
       color={props.color || "green"}
       onClick={props.disabled ? void 0 : props.onClick}
     >
       {props.children}
-    </StyledButton>
+    </Component>
   );
 }
