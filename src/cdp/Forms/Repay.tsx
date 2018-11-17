@@ -39,13 +39,11 @@ export class Repay extends Component<Props, State> {
           <Header>
             Repay <span style={{ fontSize: 16 }}> (requires MKR)</span>
           </Header>
-          <div style={{ marginTop: 20 }}>
-            <Input
-              unit={"DAI"}
-              value={this.state.amountDAI}
-              onChange={this.handleChange}
-            />
-          </div>
+          <Input
+            unit={"DAI"}
+            value={this.state.amountDAI}
+            onChange={this.handleChange}
+          />
           DAI Debt: {this.props.cdp.daiDebt.get().toString()} <br />
           MKR Balance:{" "}
           {this.props.store!.balances.get()!.mkrBalance.toString(4)}

@@ -85,15 +85,15 @@ export class CDPCreator extends Component<Props, State> {
         ) : (
           <>
             <div style={{ flex: 1 }}>
-              <Header>Open a New CDP</Header>
+              <Header>New CDP</Header>
               <Input
-                label={"ETH to lock up"}
+                label={"Deposit:"}
                 unit={"ETH"}
                 value={this.EthToLock.get()}
                 onChange={this.handleEthChange}
               />
               <Input
-                label={"DAI to draw"}
+                label={"Generate:"}
                 unit={"DAI"}
                 value={this.DaiToDraw.get()}
                 onChange={this.handleDaiChange}

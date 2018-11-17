@@ -55,13 +55,11 @@ export class Free extends Component<Props, State> {
       <>
         <div style={{ flex: 1 }}>
           <Header>Withdraw</Header>
-          <div style={{ marginTop: 20 }}>
-            <Input
-              unit={"ETH"}
-              value={this.state.amountETH}
-              onChange={this.handleChange}
-            />
-          </div>
+          <Input
+            unit={"ETH"}
+            value={this.state.amountETH}
+            onChange={this.handleChange}
+          />
           Locked: {cdp.ethLocked.get().toFixed(4)} ETH
           {!valid && error && <Message>{error}</Message>}
         </div>

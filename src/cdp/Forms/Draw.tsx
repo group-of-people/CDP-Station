@@ -39,13 +39,11 @@ export class Draw extends Component<Props, State> {
       <>
         <div style={{ flex: 1 }}>
           <Header>Generate</Header>
-          <div style={{ marginTop: 20 }}>
-            <Input
-              unit={"DAI"}
-              value={this.state.amountDAI}
-              onChange={this.handleChange}
-            />
-          </div>
+          <Input
+            unit={"DAI"}
+            value={this.state.amountDAI}
+            onChange={this.handleChange}
+          />
           DAI Available: {this.props.cdp.daiAvailable.get().toFixed(2)}
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>

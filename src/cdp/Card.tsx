@@ -2,7 +2,7 @@ import React from "react";
 import { observer, inject } from "mobx-react";
 import styled from "styled-components";
 import { PieChart, Pie, Cell } from "recharts";
-import { Card, Button, Header } from "../ui";
+import { Card, Button, Header, Header2 } from "../ui";
 import CDP from "../store/cdp";
 import { Store } from "../store";
 import Lock from "./Forms/Lock";
@@ -79,10 +79,11 @@ class CDPCard extends React.Component<Props, State> {
   };
   render() {
     const { cdp } = this.props;
+    const isFlipped = this.state.view !== "details";
     return (
       <>
         <Card
-          flipped={this.state.view !== "details"}
+          flipped={isFlipped}
           backside={this.renderView()}
           extra={
             this.props.wide !== false ? (
@@ -95,8 +96,14 @@ class CDPCard extends React.Component<Props, State> {
                   height: "100%"
                 }}
               >
-                <div style={{ textAlign: "center" }}>
-                  <Header>CDP {cdp.id}</Header>
+                <div
+                  style={{
+                    textAlign: "center",
+                    marginTop: isFlipped ? 4 : 0,
+                    transition: "all 0.3s"
+                  }}
+                >
+                  <Header2>CDP {cdp.id}</Header2>
                 </div>
                 <div style={{ marginBottom: 10 }}>
                   <Chart
@@ -146,7 +153,7 @@ class CDPCard extends React.Component<Props, State> {
     return (
       <InfoContainer>
         <div>
-          <Header>ETH</Header>
+          <Header2>ETH</Header2>
           <Row>
             <RowCell>
               <div style={{ color: "#b5b5b5", marginTop: 5 }}>Locked:</div>
@@ -172,7 +179,7 @@ class CDPCard extends React.Component<Props, State> {
           </Row>
         </div>
         <div>
-          <Header>DAI</Header>
+          <Header2>DAI</Header2>
           <Row>
             <RowCell>
               <div style={{ color: "#b5b5b5", marginTop: 5 }}>Generated:</div>

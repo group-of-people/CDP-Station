@@ -2,13 +2,14 @@ import React from "react";
 import styled from "styled-components";
 
 const Wrapper = styled.div`
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 `;
 
 const Label = styled.label`
   margin-left: 2px;
-  font-size: 24px;
-  color: #929292;
+  margin-bottom: 5px;
+  font-size: 20px;
+  color: #d1d1d1;
   display: block;
 `;
 
