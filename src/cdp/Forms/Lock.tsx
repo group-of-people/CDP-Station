@@ -4,6 +4,7 @@ import { inject, observer } from "mobx-react";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 import { Store } from "../../store";
 import CDP from "../../store/cdp";
+import { MaxHint } from "./common";
 
 interface Props {
   store?: Store;
@@ -35,13 +36,14 @@ export class Lock extends Component<Props, State> {
     const ethBalance = store.balances.get()!.ethBalance.toNumber();
 
     let valid = true;
-    let error = "";
+    let amountValid = true;
     if (amountETH > ethBalance) {
-      valid = false;
-      error = `You can deposit up to ${ethBalance.toFixed(4)} ETH`;
+      amountValid = false;
     } else if (!amountETH || amountETH < 0) {
       valid = false;
     }
+
+    valid = valid && amountValid;
 
     return (
       <>
@@ -51,9 +53,14 @@ export class Lock extends Component<Props, State> {
             unit={"ETH"}
             value={this.state.amountETH}
             onChange={this.handleChange}
-          />
+            error={!amountValid}
+          >
+            <MaxHint
+              value={ethBalance}
+              onChange={(amountETH: string) => this.setState({ amountETH })}
+            />
+          </Input>
           Locked: {ethLocked.toFixed(4)} ETH
-          {!valid && error && <Message>{error}</Message>}
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <Button

@@ -4,6 +4,7 @@ import { Button, Input, Header } from "../../ui";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 import { Store } from "../../store";
 import CDP from "../../store/cdp";
+import { MaxHint } from "./common";
 
 interface Props {
   cdp: CDP;
@@ -24,15 +25,14 @@ export class Draw extends Component<Props, State> {
   };
 
   render() {
-    let valid = false;
+    let valid = true;
+    let inputValid = true;
     const amountDAI = parseInputFloat(this.state.amountDAI);
-    if (
-      amountDAI &&
-      this.props.cdp.daiAvailable.get() >= amountDAI &&
-      amountDAI > 0 &&
-      this.state.amountDAI !== ""
-    ) {
-      valid = true;
+    if (this.props.cdp.daiAvailable.get() < amountDAI) {
+      inputValid = false;
+      valid = false;
+    } else if (amountDAI < 0 || !this.state.amountDAI) {
+      valid = false;
     }
 
     return (
@@ -43,8 +43,13 @@ export class Draw extends Component<Props, State> {
             unit={"DAI"}
             value={this.state.amountDAI}
             onChange={this.handleChange}
-          />
-          DAI Available: {this.props.cdp.daiAvailable.get().toFixed(2)}
+            error={!inputValid}
+          >
+            <MaxHint
+              value={this.props.cdp.daiAvailable.get()}
+              onChange={(amountDAI: string) => this.setState({ amountDAI })}
+            />
+          </Input>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <Button

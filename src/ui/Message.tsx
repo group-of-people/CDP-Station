@@ -1,4 +1,3 @@
-import React from "react";
 import styled from "styled-components";
 //import { Alert } from "styled-icons/octicons";
 //import { ErrorOutline as Alert } from "styled-icons/material";

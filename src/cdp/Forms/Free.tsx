@@ -4,6 +4,7 @@ import { inject, observer } from "mobx-react";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 import { Store } from "../../store";
 import CDP from "../../store/cdp";
+import { MaxHint } from "./common";
 
 interface Props {
   store?: Store;
@@ -36,17 +37,19 @@ export class Free extends Component<Props, State> {
       (cdp.daiDebt.get().toNumber() / ethPrice / wethToPeth) *
       store.mkrSettings.get()!.liquidationRatio;
     const freeablePETH = cdp.pethLocked.get().toNumber() - minPETHCollateral;
-    let valid = true;
-    let error = "";
 
+    let valid = true;
+    let inputValid = true;
     if (amountPETH > cdp.pethLocked.get().toNumber()) {
       valid = false;
-      error = "CDP has less PETH locked than selected";
+      inputValid = false;
+      // error = "CDP has less PETH locked than selected";
     } else if (maxDrawnDAIAfterFree < cdp.daiDebt.get().toNumber()) {
       valid = false;
-      error = `CDP will become unsafe. You can free at most ${freeablePETH.toFixed(
-        4
-      )} PETH`;
+      inputValid = false;
+      // error = `CDP will become unsafe. You can free at most ${freeablePETH.toFixed(
+      //   4
+      // )} PETH`;
     } else if (amountPETH <= 0 || this.state.amountETH === "") {
       valid = false;
     }
@@ -59,9 +62,14 @@ export class Free extends Component<Props, State> {
             unit={"ETH"}
             value={this.state.amountETH}
             onChange={this.handleChange}
-          />
+            error={!inputValid}
+          >
+            <MaxHint
+              value={freeablePETH * wethToPeth}
+              onChange={(amountETH: string) => this.setState({ amountETH })}
+            />
+          </Input>
           Locked: {cdp.ethLocked.get().toFixed(4)} ETH
-          {!valid && error && <Message>{error}</Message>}
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <Button

@@ -33,13 +33,10 @@ const StyledInput = styled.input`
   overflow: hidden;
 `;
 
-const Preview = styled.div`
+const Hint = styled.div`
   padding: 0 5px;
-  display: flex;
-  color: #929292;
-  border-left: 2px solid #434b53;
-  height: 100%;
-  align-items: center;
+  color: ${(props: { error: boolean }) => (props.error ? "#EF5350" : "#d1d1d1")}
+  text-align: right;
 `;
 
 const Unit = styled.div`
@@ -56,7 +53,8 @@ interface Props {
   label?: string;
   value: string;
   unit: string;
-  previewContent?: React.ReactNode;
+  error?: boolean;
+  children?: React.ReactNode;
   onChange: (e: React.FormEvent<HTMLInputElement>) => void;
 }
 
@@ -80,8 +78,8 @@ export default function Input(props: Props) {
           />
           <Unit>{props.unit}</Unit>
         </div>
-        {!!props.previewContent && <Preview>{props.previewContent}</Preview>}
       </StyledInputWrapper>
+      {!!props.children && <Hint error={!!props.error}>{props.children}</Hint>}
     </Wrapper>
   );
 }
