@@ -1,4 +1,6 @@
 import React from "react";
+import styled from "styled-components";
+import CDP from "../../store/cdp";
 
 interface MaxHintProps {
   value: number;
@@ -21,5 +23,26 @@ export function MaxHint(props: MaxHintProps) {
         {value.toFixed(4)}
       </span>
     </>
+  );
+}
+
+export const Label = styled.div`
+  color: #b5b5b5;
+  margin-top: 10px;
+  font-size: 20px;
+  margin-bottom: 5px;
+`;
+
+interface Props {
+  cdp: CDP;
+}
+
+export function LiquidationPrice(props: Props) {
+  const { cdp } = props;
+  return (
+    <div>
+      <Label> Liquidation Price</Label>
+      {cdp.liquidationPrice.get()} USD/ETH
+    </div>
   );
 }

@@ -4,7 +4,7 @@ import { inject, observer } from "mobx-react";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 import { Store } from "../../store";
 import CDP from "../../store/cdp";
-import { MaxHint } from "./common";
+import { MaxHint, Label, LiquidationPrice } from "./common";
 
 interface Props {
   store?: Store;
@@ -60,7 +60,9 @@ export class Lock extends Component<Props, State> {
               onChange={(amountETH: string) => this.setState({ amountETH })}
             />
           </Input>
-          Locked: {ethLocked.toFixed(4)} ETH
+          <Label>Locked</Label>
+          {ethLocked.toFixed(4)} ETH
+          <LiquidationPrice cdp={this.props.cdp} />
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <Button

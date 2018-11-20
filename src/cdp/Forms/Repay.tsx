@@ -4,6 +4,7 @@ import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 import { Store } from "../../store";
 import CDP from "../../store/cdp";
 import { inject, observer } from "mobx-react";
+import { Label, LiquidationPrice } from "./common";
 
 interface Props {
   store?: Store;
@@ -44,9 +45,11 @@ export class Repay extends Component<Props, State> {
             value={this.state.amountDAI}
             onChange={this.handleChange}
           />
-          DAI Debt: {this.props.cdp.daiDebt.get().toString()} <br />
-          MKR Balance:{" "}
+          <Label>DAI Debt</Label>
+          {this.props.cdp.daiDebt.get().toString()}
+          <Label>MKR Balance</Label>
           {this.props.store!.balances.get()!.mkrBalance.toString(4)}
+          <LiquidationPrice cdp={this.props.cdp} />
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <Button

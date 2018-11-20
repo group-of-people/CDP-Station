@@ -9,6 +9,7 @@ import Lock from "./Forms/Lock";
 import Free from "./Forms/Free";
 import Draw from "./Forms/Draw";
 import Repay from "./Forms/Repay";
+import { LiquidationPrice } from "./Forms/common";
 
 const COLORS = ["#66BB6A", "#E04980", "#FFBB28", "#FF8042"];
 
@@ -204,22 +205,7 @@ class CDPCard extends React.Component<Props, State> {
             </RowCell>
           </Row>
         </div>
-        <div>
-          <div
-            style={{
-              color: "#b5b5b5",
-              marginTop: 10,
-              fontSize: 20,
-              marginBottom: 5
-            }}
-          >
-            Liquidation Price
-          </div>
-
-          <Row>
-            <div>{cdp.liquidationPrice.get()} USD/ETH</div>
-          </Row>
-        </div>
+        <LiquidationPrice cdp={cdp} />
       </InfoContainer>
     );
   }

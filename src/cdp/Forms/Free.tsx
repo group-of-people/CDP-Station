@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import { Button, Input, Message, Header } from "../../ui";
+import { Button, Input, Header } from "../../ui";
 import { inject, observer } from "mobx-react";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 import { Store } from "../../store";
 import CDP from "../../store/cdp";
-import { MaxHint } from "./common";
+import { MaxHint, Label, LiquidationPrice } from "./common";
 
 interface Props {
   store?: Store;
@@ -69,7 +69,9 @@ export class Free extends Component<Props, State> {
               onChange={(amountETH: string) => this.setState({ amountETH })}
             />
           </Input>
-          Locked: {cdp.ethLocked.get().toFixed(4)} ETH
+          <Label>Locked</Label>
+          {cdp.ethLocked.get().toFixed(4)} ETH
+          <LiquidationPrice cdp={this.props.cdp} />
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <Button

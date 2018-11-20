@@ -4,7 +4,7 @@ import { Button, Input, Header } from "../../ui";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 import { Store } from "../../store";
 import CDP from "../../store/cdp";
-import { MaxHint } from "./common";
+import { MaxHint, Label, LiquidationPrice } from "./common";
 
 interface Props {
   cdp: CDP;
@@ -20,7 +20,15 @@ interface State {
 
 export class Draw extends Component<Props, State> {
   state: State = {
-    amountDAI: "",
+    // FIXME dont use a constant here
+    amountDAI:
+      this.props.cdp.daiLocked.get() / 2 -
+        this.props.cdp.daiDebt.get().toNumber() >
+      0
+        ? "" +
+          (this.props.cdp.daiLocked.get() / 2 -
+            this.props.cdp.daiDebt.get().toNumber())
+        : "",
     drawing: false
   };
 
@@ -50,6 +58,9 @@ export class Draw extends Component<Props, State> {
               onChange={(amountDAI: string) => this.setState({ amountDAI })}
             />
           </Input>
+          <Label>DAI Debt</Label>
+          {this.props.cdp.daiDebt.get().toString()}
+          <LiquidationPrice cdp={this.props.cdp} />
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <Button
