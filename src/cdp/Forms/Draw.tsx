@@ -7,8 +7,10 @@ import CDP from "../../store/cdp";
 import { MaxHint, Label, LiquidationPrice } from "./common";
 
 interface Props {
-  cdp: CDP;
   store?: Store;
+
+  cdp: CDP;
+  previewCdp: CDP;
 
   onRequestClose: () => void;
 }
@@ -21,14 +23,14 @@ interface State {
 export class Draw extends Component<Props, State> {
   state: State = {
     // FIXME dont use a constant here
-    amountDAI:
-      this.props.cdp.daiLocked.get() / 2 -
-        this.props.cdp.daiDebt.get().toNumber() >
-      0
-        ? "" +
-          (this.props.cdp.daiLocked.get() / 2 -
-            this.props.cdp.daiDebt.get().toNumber())
-        : "",
+    //   this.props.cdp.daiLocked.get() / 2 -
+    //   this.props.cdp.daiDebt.get().toNumber() >
+    // 0
+    //   ? "" +
+    //     (this.props.cdp.daiLocked.get() / 2 -
+    //       this.props.cdp.daiDebt.get().toNumber())
+    //   : "",
+    amountDAI: "",
     drawing: false
   };
 
@@ -55,12 +57,10 @@ export class Draw extends Component<Props, State> {
           >
             <MaxHint
               value={this.props.cdp.daiAvailable.get()}
-              onChange={(amountDAI: string) => this.setState({ amountDAI })}
+              onChange={(amountDAI: string) => this.onChange(amountDAI)}
             />
           </Input>
-          <Label>DAI Debt</Label>
-          {this.props.cdp.daiDebt.get().toString()}
-          <LiquidationPrice cdp={this.props.cdp} />
+          <LiquidationPrice cdp={this.props.previewCdp} />
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <Button
@@ -97,7 +97,17 @@ export class Draw extends Component<Props, State> {
     if (!isValidFloatInputNumber(value)) {
       return;
     }
-    this.setState({ amountDAI: value });
+
+    this.onChange(value);
+  };
+
+  onChange = (value: string) => {
+    this.setState({ amountDAI: value }, () => {
+      this.props.previewCdp.update(
+        this.props.previewCdp.ethLocked.get(),
+        this.props.cdp.daiDebt.get().toNumber() + parseInputFloat(value)
+      );
+    });
   };
 }
 

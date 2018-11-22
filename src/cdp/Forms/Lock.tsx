@@ -1,14 +1,15 @@
 import React, { Component } from "react";
-import { Button, Input, Message, Header } from "../../ui";
+import { Button, Input, Header } from "../../ui";
 import { inject, observer } from "mobx-react";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 import { Store } from "../../store";
 import CDP from "../../store/cdp";
-import { MaxHint, Label, LiquidationPrice } from "./common";
+import { MaxHint, LiquidationPrice } from "./common";
 
 interface Props {
   store?: Store;
   cdp: CDP;
+  previewCdp: CDP;
 
   onRequestClose: () => void;
 }
@@ -30,8 +31,6 @@ export class Lock extends Component<Props, State> {
   render() {
     const store = this.props.store!;
     const amountETH = parseInputFloat(this.state.amountETH);
-
-    const ethLocked = this.props.cdp.ethLocked.get();
 
     const ethBalance = store.balances.get()!.ethBalance.toNumber();
 
@@ -57,12 +56,10 @@ export class Lock extends Component<Props, State> {
           >
             <MaxHint
               value={ethBalance}
-              onChange={(amountETH: string) => this.setState({ amountETH })}
+              onChange={(amountETH: string) => this.onChange(amountETH)}
             />
           </Input>
-          <Label>Locked</Label>
-          {ethLocked.toFixed(4)} ETH
-          <LiquidationPrice cdp={this.props.cdp} />
+          <LiquidationPrice cdp={this.props.previewCdp} />
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <Button
@@ -99,7 +96,17 @@ export class Lock extends Component<Props, State> {
     if (!isValidFloatInputNumber(value)) {
       return;
     }
-    this.setState({ amountETH: value });
+
+    this.onChange(value);
+  };
+
+  onChange = (value: string) => {
+    this.setState({ amountETH: value }, () => {
+      this.props.previewCdp.update(
+        parseInputFloat(value),
+        this.props.previewCdp.daiDebt.get().toNumber()
+      );
+    });
   };
 }
 

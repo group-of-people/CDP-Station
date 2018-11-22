@@ -4,11 +4,12 @@ import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
 import { Store } from "../../store";
 import CDP from "../../store/cdp";
 import { inject, observer } from "mobx-react";
-import { Label, LiquidationPrice } from "./common";
+import { LiquidationPrice, MaxHint } from "./common";
 
 interface Props {
   store?: Store;
   cdp: CDP;
+  previewCdp: CDP;
 
   onRequestClose: () => void;
 }
@@ -20,10 +21,7 @@ interface State {
 
 export class Repay extends Component<Props, State> {
   state: State = {
-    amountDAI: Math.min(
-      this.props.store!.balances.get()!.daiBalance.toNumber(),
-      this.props.cdp.daiDebt.get().toNumber()
-    ).toString(),
+    amountDAI: "",
     repaying: false
   };
 
@@ -33,6 +31,11 @@ export class Repay extends Component<Props, State> {
     if (amountDAI > 0 && this.props.cdp.daiDebt.get().toNumber() >= amountDAI) {
       valid = true;
     }
+
+    const max = Math.min(
+      this.props.store!.balances.get()!.daiBalance.toNumber(),
+      this.props.cdp.daiDebt.get().toNumber()
+    );
 
     return (
       <>
@@ -44,12 +47,13 @@ export class Repay extends Component<Props, State> {
             unit={"DAI"}
             value={this.state.amountDAI}
             onChange={this.handleChange}
-          />
-          <Label>DAI Debt</Label>
-          {this.props.cdp.daiDebt.get().toString()}
-          <Label>MKR Balance</Label>
-          {this.props.store!.balances.get()!.mkrBalance.toString(4)}
-          <LiquidationPrice cdp={this.props.cdp} />
+          >
+            <MaxHint
+              value={max}
+              onChange={(amountDAI: string) => this.onChange(amountDAI)}
+            />
+          </Input>
+          <LiquidationPrice cdp={this.props.previewCdp} />
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <Button
@@ -86,7 +90,20 @@ export class Repay extends Component<Props, State> {
     if (!isValidFloatInputNumber(value)) {
       return;
     }
-    this.setState({ amountDAI: value });
+
+    this.onChange(value);
+  };
+
+  onChange = (value: string) => {
+    this.setState({ amountDAI: value }, () => {
+      this.props.previewCdp.update(
+        this.props.previewCdp.ethLocked.get(),
+        Math.max(
+          0,
+          this.props.cdp.daiDebt.get().toNumber() - parseInputFloat(value)
+        )
+      );
+    });
   };
 }
 

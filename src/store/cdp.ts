@@ -80,4 +80,14 @@ export default class CDP {
     this.pethLocked.set(PETH(ethLocked / this.prices.get().wethToPeth));
     this.daiDebt.set(DAI(daiDebt));
   });
+
+  clone = () => {
+    return new CDP(
+      this.id,
+      this.pethLocked.get().toNumber() * 10 ** 18,
+      this.daiDebt.get().toNumber() * 10 ** 18,
+      this.prices,
+      this.mkrSettings
+    );
+  };
 }
