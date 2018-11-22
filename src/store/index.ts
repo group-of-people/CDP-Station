@@ -6,9 +6,13 @@ import Maker, { Currency } from "@makerdao/dai";
 import CDPCreatorBuild from "!json-loader!../abi/CDPCreator.abi";
 import ERC20 from "!json-loader!../abi/ERC20.abi";
 import DSToken from "!json-loader!../abi/DSToken.abi";
+import ProxyRegistry from "!json-loader!../abi/ProxyRegistry.abi";
+import DSProxy from "!json-loader!../abi/DSProxy.abi";
 import { DSToken as DSTokenContract } from "../../types/web3-contracts/DSToken";
 import { ERC20 as ERC20Contract } from "../../types/web3-contracts/ERC20";
 import { CDPCreator as CDPCreatorContract } from "../../types/web3-contracts/CDPCreator";
+import { ProxyRegistry as ProxyRegistryContract } from "../../types/web3-contracts/ProxyRegistry";
+import { DSProxy as DSProxyContract } from "../../types/web3-contracts/DSProxy";
 import CDP, { RawCDP } from "./cdp";
 
 import Prices from "./prices";
@@ -56,6 +60,8 @@ export class Store {
   mkrContract: ERC20Contract | null = null;
   daiContract: ERC20Contract | null = null;
   pethContract: DSTokenContract | null = null;
+  registry: ProxyRegistryContract | null = null;
+  proxy: DSProxyContract | null = null;
 
   constructor() {
     this.enableWeb3().then(() => {
@@ -75,6 +81,10 @@ export class Store {
         DSToken.abi,
         Addresses.PETH
       ) as DSTokenContract;
+      this.registry = new this.web3!.eth.Contract(
+        ProxyRegistry,
+        Addresses.Registry
+      ) as ProxyRegistryContract;
 
       this.initializeAccount();
     });
@@ -137,6 +147,10 @@ export class Store {
 
       const wethToPeth = await priceService.getWethToPethRatio();
       const liquidationRatio = await cdpService.getLiquidationRatio();
+      const proxyAdd = await this.registry!.methods.proxies(accs[0]).call();
+      if (proxyAdd !== "0x0000000000000000000000000000000000000000") {
+        this.proxy = new this.web3!.eth.Contract(DSProxy, proxyAdd) as DSProxy;
+      }
 
       runInAction(() => {
         this.account.set(accs[0]);
@@ -170,7 +184,16 @@ export class Store {
     const cdpsResponse = await fetch(
       `https://dai-service.makerdao.com/cups/conditions=lad:${acc.toLowerCase()}/sort=cupi:asc`
     );
-    const cdps = (await cdpsResponse.json()) as { results: RawCDP[] };
+    let cdps = (await cdpsResponse.json()) as { results: RawCDP[] };
+
+    if (this.proxy) {
+      const proxyCdpsRes = await fetch(
+        `https://dai-service.makerdao.com/cups/conditions=lad:${this.proxy._address.toLowerCase()}/sort=cupi:asc`
+      );
+
+      const proxyCdps = (await proxyCdpsRes.json()) as { results: RawCDP[] };
+      cdps.results = cdps.results.concat(proxyCdps.results);
+    }
 
     runInAction(() => {
       this.cdps.replace(
@@ -183,7 +206,8 @@ export class Store {
                 cdp.ink,
                 cdp.art,
                 this.prices as IObservableValue<Prices>,
-                this.mkrSettings as IObservableValue<MkrSettings>
+                this.mkrSettings as IObservableValue<MkrSettings>,
+                cdp.lad
               )
           )
       );

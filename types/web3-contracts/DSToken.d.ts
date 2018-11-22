@@ -68,7 +68,7 @@ export class DSToken {
       options?: {
         filter?: object;
         fromBlock?: BlockType;
-        topics?: string[];
+        topics?: (null | string)[];
       },
       cb?: Callback<EventLog>
     ): EventEmitter;
@@ -77,7 +77,7 @@ export class DSToken {
       options?: {
         filter?: object;
         fromBlock?: BlockType;
-        topics?: string[];
+        topics?: (null | string)[];
       },
       cb?: Callback<EventLog>
     ): EventEmitter;
@@ -86,7 +86,7 @@ export class DSToken {
       options?: {
         filter?: object;
         fromBlock?: BlockType;
-        topics?: string[];
+        topics?: (null | string)[];
       },
       cb?: Callback<EventLog>
     ): EventEmitter;
@@ -95,7 +95,7 @@ export class DSToken {
       options?: {
         filter?: object;
         fromBlock?: BlockType;
-        topics?: string[];
+        topics?: (null | string)[];
       },
       cb?: Callback<EventLog>
     ): EventEmitter;
@@ -104,7 +104,7 @@ export class DSToken {
       options?: {
         filter?: object;
         fromBlock?: BlockType;
-        topics?: string[];
+        topics?: (null | string)[];
       },
       cb?: Callback<EventLog>
     ): EventEmitter;
@@ -113,7 +113,7 @@ export class DSToken {
       options?: {
         filter?: object;
         fromBlock?: BlockType;
-        topics?: string[];
+        topics?: (null | string)[];
       },
       cb?: Callback<EventLog>
     ): EventEmitter;
@@ -122,7 +122,7 @@ export class DSToken {
       options?: {
         filter?: object;
         fromBlock?: BlockType;
-        topics?: string[];
+        topics?: (null | string)[];
       },
       cb?: Callback<EventLog>
     ) => EventEmitter;
@@ -133,7 +133,7 @@ export class DSToken {
       filter?: object;
       fromBlock?: BlockType;
       toBlock?: BlockType;
-      topics?: string[];
+      topics?: (null | string)[];
     },
     cb?: Callback<EventLog[]>
   ): Promise<EventLog[]>;

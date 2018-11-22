@@ -37,7 +37,7 @@ export class ERC20 {
       options?: {
         filter?: object;
         fromBlock?: BlockType;
-        topics?: string[];
+        topics?: (null | string)[];
       },
       cb?: Callback<EventLog>
     ): EventEmitter;
@@ -46,7 +46,7 @@ export class ERC20 {
       options?: {
         filter?: object;
         fromBlock?: BlockType;
-        topics?: string[];
+        topics?: (null | string)[];
       },
       cb?: Callback<EventLog>
     ): EventEmitter;
@@ -55,7 +55,7 @@ export class ERC20 {
       options?: {
         filter?: object;
         fromBlock?: BlockType;
-        topics?: string[];
+        topics?: (null | string)[];
       },
       cb?: Callback<EventLog>
     ) => EventEmitter;
@@ -66,7 +66,7 @@ export class ERC20 {
       filter?: object;
       fromBlock?: BlockType;
       toBlock?: BlockType;
-      topics?: string[];
+      topics?: (null | string)[];
     },
     cb?: Callback<EventLog[]>
   ): Promise<EventLog[]>;

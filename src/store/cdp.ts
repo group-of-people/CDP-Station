@@ -11,6 +11,7 @@ export interface RawCDP {
   art: number;
   cupi: number;
   closed: boolean;
+  lad: string;
 }
 
 export default class CDP {
@@ -20,19 +21,22 @@ export default class CDP {
 
   prices: IObservableValue<Prices>;
   mkrSettings: IObservableValue<MkrSettings>;
+  lad: string;
 
   constructor(
     id: number,
     pethLocked: number,
     daiDebt: number,
     prices: IObservableValue<Prices>,
-    mkrSettings: IObservableValue<MkrSettings>
+    mkrSettings: IObservableValue<MkrSettings>,
+    lad: string
   ) {
     this.id = id;
     this.pethLocked = observable.box(PETH.wei(pethLocked));
     this.daiDebt = observable.box(DAI.wei(daiDebt));
     this.prices = prices;
     this.mkrSettings = mkrSettings;
+    this.lad = lad;
   }
 
   ethLocked = computed(() => {

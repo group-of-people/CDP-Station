@@ -35,7 +35,8 @@ export class CDPCreator extends Component<Props, State> {
     0,
     0,
     this.props.store!.prices as IObservableValue<Prices>,
-    this.props.store!.mkrSettings as IObservableValue<MkrSettings>
+    this.props.store!.mkrSettings as IObservableValue<MkrSettings>,
+    "0x0000000000000000000000000000000000000000"
   );
   dispose = () => {};
 

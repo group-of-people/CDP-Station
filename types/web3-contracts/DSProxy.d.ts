@@ -7,30 +7,41 @@ import { Callback, EventLog } from "web3/types";
 import { EventEmitter } from "events";
 import { Provider } from "web3/providers";
 
-export class CDPCreator {
+export class DSProxy {
   constructor(jsonInterface: any[], address?: string, options?: CustomOptions);
   _address: string;
   options: contractOptions;
   methods: {
-    createCDP(amountDAI: number | string): TransactionObject<void>;
+    setOwner(owner_: string): TransactionObject<void>;
 
-    lockETH(id: number | string): TransactionObject<void>;
+    execute(
+      _target: string,
+      _data: (string | number[])[]
+    ): TransactionObject<string>;
 
-    convertETHToPETH(): TransactionObject<void>;
+    setAuthority(authority_: string): TransactionObject<void>;
 
-    convertPETHToETH(amountPETH: number | string): TransactionObject<void>;
+    setCache(_cacheAddr: string): TransactionObject<boolean>;
 
-    tub(): TransactionObject<string>;
-    weth(): TransactionObject<string>;
-    peth(): TransactionObject<string>;
-    dai(): TransactionObject<string>;
+    cache(): TransactionObject<string>;
+    owner(): TransactionObject<string>;
+    authority(): TransactionObject<string>;
   };
   deploy(options: {
     data: string;
     arguments: any[];
   }): TransactionObject<Contract>;
   events: {
-    CDPCreated(
+    LogSetAuthority(
+      options?: {
+        filter?: object;
+        fromBlock?: BlockType;
+        topics?: (null | string)[];
+      },
+      cb?: Callback<EventLog>
+    ): EventEmitter;
+
+    LogSetOwner(
       options?: {
         filter?: object;
         fromBlock?: BlockType;

@@ -7,38 +7,20 @@ import { Callback, EventLog } from "web3/types";
 import { EventEmitter } from "events";
 import { Provider } from "web3/providers";
 
-export class CDPCreator {
+export class ProxyRegistry {
   constructor(jsonInterface: any[], address?: string, options?: CustomOptions);
   _address: string;
   options: contractOptions;
   methods: {
-    createCDP(amountDAI: number | string): TransactionObject<void>;
+    proxies(arg0: string): TransactionObject<string>;
 
-    lockETH(id: number | string): TransactionObject<void>;
-
-    convertETHToPETH(): TransactionObject<void>;
-
-    convertPETHToETH(amountPETH: number | string): TransactionObject<void>;
-
-    tub(): TransactionObject<string>;
-    weth(): TransactionObject<string>;
-    peth(): TransactionObject<string>;
-    dai(): TransactionObject<string>;
+    build(): TransactionObject<string>;
   };
   deploy(options: {
     data: string;
     arguments: any[];
   }): TransactionObject<Contract>;
   events: {
-    CDPCreated(
-      options?: {
-        filter?: object;
-        fromBlock?: BlockType;
-        topics?: (null | string)[];
-      },
-      cb?: Callback<EventLog>
-    ): EventEmitter;
-
     allEvents: (
       options?: {
         filter?: object;

@@ -54,7 +54,8 @@ storiesOf("Cards", module)
               50000.123456789 * 10 ** 18,
               8500000.123456789 * 10 ** 18,
               mockStore.prices as any,
-              mockStore.mkrSettings as any
+              mockStore.mkrSettings as any,
+              "0x0000000000000000000000000000000000000000"
             )
           }
         />
@@ -65,7 +66,8 @@ storiesOf("Cards", module)
               5 * 10 ** 18,
               20 * 10 ** 18,
               mockStore.prices as any,
-              mockStore.mkrSettings as any
+              mockStore.mkrSettings as any,
+              "0x0000000000000000000000000000000000000000"
             )
           }
           view={"deposit"}
@@ -77,7 +79,8 @@ storiesOf("Cards", module)
               5 * 10 ** 18,
               20 * 10 ** 18,
               mockStore.prices as any,
-              mockStore.mkrSettings as any
+              mockStore.mkrSettings as any,
+              "0x0000000000000000000000000000000000000000"
             )
           }
           view={"withdraw"}
@@ -89,7 +92,8 @@ storiesOf("Cards", module)
               5 * 10 ** 18,
               200 * 10 ** 18,
               mockStore.prices as any,
-              mockStore.mkrSettings as any
+              mockStore.mkrSettings as any,
+              "0x0000000000000000000000000000000000000000"
             )
           }
           view={"payback"}
@@ -101,7 +105,8 @@ storiesOf("Cards", module)
               5 * 10 ** 18,
               20 * 10 ** 18,
               mockStore.prices as any,
-              mockStore.mkrSettings as any
+              mockStore.mkrSettings as any,
+              "0x0000000000000000000000000000000000000000"
             )
           }
           view={"generate"}
@@ -119,7 +124,8 @@ storiesOf("Cards", module)
               5 * 10 ** 18,
               850 * 10 ** 18,
               mockStore.prices as any,
-              mockStore.mkrSettings as any
+              mockStore.mkrSettings as any,
+              "0x0000000000000000000000000000000000000000"
             )
           }
           wide={false}
@@ -131,7 +137,8 @@ storiesOf("Cards", module)
               5 * 10 ** 18,
               20 * 10 ** 18,
               mockStore.prices as any,
-              mockStore.mkrSettings as any
+              mockStore.mkrSettings as any,
+              "0x0000000000000000000000000000000000000000"
             )
           }
           wide={false}
@@ -144,7 +151,8 @@ storiesOf("Cards", module)
               5 * 10 ** 18,
               20 * 10 ** 18,
               mockStore.prices as any,
-              mockStore.mkrSettings as any
+              mockStore.mkrSettings as any,
+              "0x0000000000000000000000000000000000000000"
             )
           }
           wide={false}
@@ -157,7 +165,8 @@ storiesOf("Cards", module)
               5 * 10 ** 18,
               200 * 10 ** 18,
               mockStore.prices as any,
-              mockStore.mkrSettings as any
+              mockStore.mkrSettings as any,
+              "0x0000000000000000000000000000000000000000"
             )
           }
           wide={false}
@@ -170,7 +179,8 @@ storiesOf("Cards", module)
               5 * 10 ** 18,
               20 * 10 ** 18,
               mockStore.prices as any,
-              mockStore.mkrSettings as any
+              mockStore.mkrSettings as any,
+              "0x0000000000000000000000000000000000000000"
             )
           }
           wide={false}
