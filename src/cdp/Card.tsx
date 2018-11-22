@@ -63,24 +63,30 @@ const Chart = ({ data }: { data: { name: string; value: number }[] }) => (
   </PieChart>
 );
 
+type VIEWS = "details" | "deposit" | "withdraw" | "payback" | "generate";
+
 interface Props {
   store?: Store;
   cdp: CDP;
   wide?: boolean;
-  view?: "details" | "deposit" | "withdraw" | "payback" | "generate";
+  view?: VIEWS;
 }
 
 interface State {
-  view: "details" | "deposit" | "withdraw" | "payback" | "generate";
+  view: VIEWS;
 }
 
 class CDPCard extends React.Component<Props, State> {
   state: State = {
     view: this.props.view || "details"
   };
+
+  previewCdp: CDP = this.props.cdp.clone();
+
   render() {
-    const { cdp } = this.props;
+    const cdp = this.previewCdp;
     const isFlipped = this.state.view !== "details";
+
     return (
       <>
         <Card
@@ -136,13 +142,37 @@ class CDPCard extends React.Component<Props, State> {
   renderView() {
     switch (this.state.view) {
       case "deposit":
-        return <Lock cdp={this.props.cdp} onRequestClose={this.flipBack} />;
+        return (
+          <Lock
+            previewCdp={this.previewCdp}
+            cdp={this.props.cdp}
+            onRequestClose={this.flipBack}
+          />
+        );
       case "withdraw":
-        return <Free cdp={this.props.cdp} onRequestClose={this.flipBack} />;
+        return (
+          <Free
+            previewCdp={this.previewCdp}
+            cdp={this.props.cdp}
+            onRequestClose={this.flipBack}
+          />
+        );
       case "payback":
-        return <Repay cdp={this.props.cdp} onRequestClose={this.flipBack} />;
+        return (
+          <Repay
+            previewCdp={this.previewCdp}
+            cdp={this.props.cdp}
+            onRequestClose={this.flipBack}
+          />
+        );
       case "generate":
-        return <Draw cdp={this.props.cdp} onRequestClose={this.flipBack} />;
+        return (
+          <Draw
+            previewCdp={this.previewCdp}
+            cdp={this.props.cdp}
+            onRequestClose={this.flipBack}
+          />
+        );
       default:
         return null;
     }
@@ -161,19 +191,14 @@ class CDPCard extends React.Component<Props, State> {
               <div style={{ marginBottom: 10 }}>
                 {cdp.ethLocked.get().toFixed(2)}
               </div>
-              <Button onClick={() => this.setState({ view: "deposit" })}>
-                Deposit
-              </Button>
+              <Button onClick={() => this.switchTo("deposit")}>Deposit</Button>
             </RowCell>
             <RowCell>
               <div style={{ color: "#b5b5b5", marginTop: 5 }}>Available:</div>
               <div style={{ marginBottom: 10 }}>
                 {cdp.ethAvailable.get().toFixed(2)}{" "}
               </div>
-              <Button
-                color={"red"}
-                onClick={() => this.setState({ view: "withdraw" })}
-              >
+              <Button color={"red"} onClick={() => this.switchTo("withdraw")}>
                 Withdraw
               </Button>
             </RowCell>
@@ -187,19 +212,14 @@ class CDPCard extends React.Component<Props, State> {
               <div style={{ marginBottom: 10 }}>
                 {cdp.daiLocked.get().toFixed(2)}{" "}
               </div>
-              <Button onClick={() => this.setState({ view: "payback" })}>
-                Payback
-              </Button>
+              <Button onClick={() => this.switchTo("payback")}>Payback</Button>
             </RowCell>
             <RowCell>
               <div style={{ color: "#b5b5b5", marginTop: 5 }}>Available:</div>
               <div style={{ marginBottom: 10 }}>
                 {cdp.daiAvailable.get().toFixed(2)}
               </div>
-              <Button
-                color={"red"}
-                onClick={() => this.setState({ view: "generate" })}
-              >
+              <Button color={"red"} onClick={() => this.switchTo("generate")}>
                 Generate
               </Button>
             </RowCell>
@@ -209,6 +229,11 @@ class CDPCard extends React.Component<Props, State> {
       </InfoContainer>
     );
   }
+
+  switchTo = (view: VIEWS) => {
+    this.previewCdp = this.props.cdp.clone();
+    this.setState({ view });
+  };
 
   flipBack = () => {
     this.setState({

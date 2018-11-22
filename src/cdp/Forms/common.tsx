@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import CDP from "../../store/cdp";
+import { observer } from "mobx-react";
 
 interface MaxHintProps {
   value: number;
@@ -37,7 +38,7 @@ interface Props {
   cdp: CDP;
 }
 
-export function LiquidationPrice(props: Props) {
+function LiquidationPriceSFC(props: Props) {
   const { cdp } = props;
   return (
     <div>
@@ -46,3 +47,5 @@ export function LiquidationPrice(props: Props) {
     </div>
   );
 }
+
+export const LiquidationPrice = observer(LiquidationPriceSFC);

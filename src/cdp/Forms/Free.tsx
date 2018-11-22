@@ -9,6 +9,7 @@ import { MaxHint, Label, LiquidationPrice } from "./common";
 interface Props {
   store?: Store;
   cdp: CDP;
+  previewCdp: CDP;
 
   onRequestClose: () => void;
 }
@@ -66,12 +67,10 @@ export class Free extends Component<Props, State> {
           >
             <MaxHint
               value={freeablePETH * wethToPeth}
-              onChange={(amountETH: string) => this.setState({ amountETH })}
+              onChange={(amountETH: string) => this.onChange(amountETH)}
             />
           </Input>
-          <Label>Locked</Label>
-          {cdp.ethLocked.get().toFixed(4)} ETH
-          <LiquidationPrice cdp={this.props.cdp} />
+          <LiquidationPrice cdp={this.props.previewCdp} />
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <Button
@@ -107,7 +106,17 @@ export class Free extends Component<Props, State> {
     if (!isValidFloatInputNumber(value)) {
       return;
     }
-    this.setState({ amountETH: value });
+
+    this.onChange(value);
+  };
+
+  onChange = (value: string) => {
+    this.setState({ amountETH: value }, () => {
+      this.props.previewCdp.update(
+        Math.max(0, this.props.cdp.ethLocked.get() - parseInputFloat(value)),
+        this.props.previewCdp.daiDebt.get().toNumber()
+      );
+    });
   };
 }
 
