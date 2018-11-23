@@ -20,6 +20,7 @@ import MkrSettings from "./mkrSettings";
 import Balances from "./balances";
 import Addresses from "./addresses.json";
 import Approvals from "./approvals";
+import { TransactionReceipt } from "web3/types";
 
 declare global {
   interface Window {
@@ -54,6 +55,7 @@ export class Store {
 
   // UI State
   noWeb3 = observable.box(false);
+  pendingTxs = observable.map<number, [string, "lock"]>({});
 
   //contract typings
   contract: CDPCreatorContract | null = null;
@@ -315,10 +317,18 @@ export class Store {
   lockETH = async (amountETH: number, cdp: CDP) => {
     try {
       const eth = this.web3!.utils.toWei(amountETH.toString(), "ether");
-      await this.contract!.methods.lockETH(cdp.id).send({
-        from: this.account.get(),
-        value: eth
-      });
+      this.pendingTxs.set(cdp.id, ["", "lock"]);
+      await this.contract!.methods.lockETH(cdp.id)
+        .send({
+          from: this.account.get(),
+          value: eth
+        })
+        .on("transactionHash", (hash: string) => {
+          this.pendingTxs.set(cdp.id, [hash, "lock"]);
+        })
+        .on("receipt", (receipt: TransactionReceipt) => {
+          this.pendingTxs.delete(cdp.id);
+        });
       await this.updateCDPS();
       await this.updateBalances();
     } catch (e) {

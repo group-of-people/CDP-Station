@@ -84,7 +84,7 @@ export class Lock extends Component<Props, State> {
 
   lockETH = async () => {
     this.setState({ locking: true });
-    await this.props.store!.lockETH(
+    this.props.store!.lockETH(
       parseInputFloat(this.state.amountETH),
       this.props.cdp
     );

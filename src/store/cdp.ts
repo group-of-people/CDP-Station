@@ -91,7 +91,8 @@ export default class CDP {
       this.pethLocked.get().toNumber() * 10 ** 18,
       this.daiDebt.get().toNumber() * 10 ** 18,
       this.prices,
-      this.mkrSettings
+      this.mkrSettings,
+      this.lad
     );
   };
 }

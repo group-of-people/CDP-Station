@@ -33,6 +33,18 @@ const mockStore = {
         ethPrice: ETH("200")
       };
     }
+  },
+  pendingTxs: {
+    _pendingTxs: {} as any,
+    get(key: any): any {
+      return this._pendingTxs[key];
+    },
+    set(key: any, value: any) {
+      this._pendingTxs[key] = value;
+    }
+  },
+  lockETH(amountETH: number, cdp: CDP) {
+    this.pendingTxs.set(cdp.id, ["hash", "lock"]);
   }
 };
 

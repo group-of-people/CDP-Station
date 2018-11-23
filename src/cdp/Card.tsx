@@ -179,10 +179,17 @@ class CDPCard extends React.Component<Props, State> {
   }
 
   renderDetails() {
-    const { cdp } = this.props;
-
+    const { cdp, store } = this.props;
+    const pendingTx = store!.pendingTxs.get(cdp.id);
+    const hasPendingTx = !!pendingTx;
     return (
       <InfoContainer>
+        {hasPendingTx && (
+          <div>
+            Deposit pending{" "}
+            <a href={`https://etherscan.io/tx/${pendingTx![0]}`}>View Tx</a>
+          </div>
+        )}
         <div>
           <Header2>ETH</Header2>
           <Row>
@@ -191,16 +198,22 @@ class CDPCard extends React.Component<Props, State> {
               <div style={{ marginBottom: 10 }}>
                 {cdp.ethLocked.get().toFixed(2)}
               </div>
-              <Button onClick={() => this.switchTo("deposit")}>Deposit</Button>
+              {!hasPendingTx && (
+                <Button onClick={() => this.switchTo("deposit")}>
+                  Deposit
+                </Button>
+              )}
             </RowCell>
             <RowCell>
               <div style={{ color: "#b5b5b5", marginTop: 5 }}>Available:</div>
               <div style={{ marginBottom: 10 }}>
                 {cdp.ethAvailable.get().toFixed(2)}{" "}
               </div>
-              <Button color={"red"} onClick={() => this.switchTo("withdraw")}>
-                Withdraw
-              </Button>
+              {!hasPendingTx && (
+                <Button color={"red"} onClick={() => this.switchTo("withdraw")}>
+                  Withdraw
+                </Button>
+              )}
             </RowCell>
           </Row>
         </div>
@@ -212,16 +225,22 @@ class CDPCard extends React.Component<Props, State> {
               <div style={{ marginBottom: 10 }}>
                 {cdp.daiLocked.get().toFixed(2)}{" "}
               </div>
-              <Button onClick={() => this.switchTo("payback")}>Payback</Button>
+              {!hasPendingTx && (
+                <Button onClick={() => this.switchTo("payback")}>
+                  Payback
+                </Button>
+              )}
             </RowCell>
             <RowCell>
               <div style={{ color: "#b5b5b5", marginTop: 5 }}>Available:</div>
               <div style={{ marginBottom: 10 }}>
                 {cdp.daiAvailable.get().toFixed(2)}
               </div>
-              <Button color={"red"} onClick={() => this.switchTo("generate")}>
-                Generate
-              </Button>
+              {!hasPendingTx && (
+                <Button color={"red"} onClick={() => this.switchTo("generate")}>
+                  Generate
+                </Button>
+              )}
             </RowCell>
           </Row>
         </div>
