@@ -1,4 +1,5 @@
 import React from "react";
+import { observable } from "mobx";
 import { Provider } from "mobx-react";
 import { storiesOf } from "@storybook/react";
 import "sanitize.css";
@@ -34,17 +35,12 @@ const mockStore = {
       };
     }
   },
-  pendingTxs: {
-    _pendingTxs: {} as any,
-    get(key: any): any {
-      return this._pendingTxs[key];
-    },
-    set(key: any, value: any) {
-      this._pendingTxs[key] = value;
-    }
-  },
+  pendingTxs: observable.map({}),
   lockETH(amountETH: number, cdp: CDP) {
     this.pendingTxs.set(cdp.id, ["hash", "lock"]);
+    setTimeout(() => {
+      this.pendingTxs.set(cdp.id, null);
+    }, 5000);
   }
 };
 

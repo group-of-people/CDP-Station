@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { Button, Input, Message, Header, Loader } from "../../ui";
+import { Button, Input, Message, Header } from "../../ui";
+import { Block as Loader } from "../../ui/Loader";
 import { inject, observer } from "mobx-react";
 import { observable, autorun, IObservableValue } from "mobx";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";

@@ -2,7 +2,8 @@ import React from "react";
 import { observer, inject } from "mobx-react";
 import styled from "styled-components";
 import { PieChart, Pie, Cell } from "recharts";
-import { Card, Button, Header, Header2 } from "../ui";
+import { Card, Button, Header2 } from "../ui";
+import { Circular as Loader } from "../ui/Loader";
 import CDP from "../store/cdp";
 import { Store } from "../store";
 import Lock from "./Forms/Lock";
@@ -185,9 +186,15 @@ class CDPCard extends React.Component<Props, State> {
     return (
       <InfoContainer>
         {hasPendingTx && (
-          <div>
-            Deposit pending{" "}
-            <a href={`https://etherscan.io/tx/${pendingTx![0]}`}>View Tx</a>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Loader color={"#90A4AE"} /> Deposit pending&nbsp;
+            <a
+              target="_blank"
+              rel="noopener"
+              href={`https://etherscan.io/tx/${pendingTx![0]}`}
+            >
+              View Tx
+            </a>
           </div>
         )}
         <div>

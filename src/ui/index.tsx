@@ -9,7 +9,6 @@ export { default as Card } from "./Card";
 export { default as Dimmer } from "./Dimmer";
 export { default as Input } from "./Input";
 export { Header, Header2 } from "./Header";
-export { default as Loader } from "./Loader";
 export { Message } from "./Message";
 
 export function Container(props: any) {
