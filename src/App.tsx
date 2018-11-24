@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { Loader, Dimmer } from "./ui";
+import { Dimmer } from "./ui";
+import { Block as Loader } from "./ui/Loader";
 import { inject, observer } from "mobx-react";
 import Work from "./Components/Work";
 import Alert from "./Components/Alert";
