@@ -16,7 +16,7 @@ declare module "@makerdao/dai" {
     async freePeth(amount: number): void;
     async shut(): void;
 
-    async getGovernanceFee(currency: typeof Currency): Promise<Currency>
+    async getGovernanceFee(currency: typeof Currency): Promise<Currency>;
   }
 
   class PriceService {
@@ -27,6 +27,11 @@ declare module "@makerdao/dai" {
 
   class CDPService {
     getLiquidationRatio(): number;
+  }
+
+  class CDPService {
+    listen(p: Promise<any>, config: any): void;
+    async confirm(p: Propmise<any>): void;
   }
 
   class Maker {
@@ -44,6 +49,7 @@ declare module "@makerdao/dai" {
 
     service(service: "price"): PriceService;
     service(service: "cdp"): CDPService;
+    service(service: "transactionManager"): TransactionManagerService;
   }
 
   export default Maker;

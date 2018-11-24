@@ -21,6 +21,7 @@ import Balances from "./balances";
 import Addresses from "./addresses.json";
 import Approvals from "./approvals";
 import { TransactionReceipt } from "web3/types";
+import { TransactionObject } from "web3/eth/types";
 
 declare global {
   interface Window {
@@ -55,7 +56,10 @@ export class Store {
 
   // UI State
   noWeb3 = observable.box(false);
-  pendingTxs = observable.map<number, [string, "lock"]>({});
+  pendingTxs = observable.map<
+    number,
+    [string, "lock" | "free" | "draw" | "repay"]
+  >({});
 
   //contract typings
   contract: CDPCreatorContract | null = null;
@@ -295,7 +299,20 @@ export class Store {
   drawDAI = async (amountDAI: number, cdp: CDP) => {
     try {
       const cdpInstance = await this.maker!.getCdp(cdp.id);
-      await cdpInstance.drawDai(amountDAI);
+      this.pendingTxs.set(cdp.id, ["", "draw"]);
+      const txMgr = this.maker!.service("transactionManager");
+      const draw = cdpInstance.drawDai(amountDAI);
+
+      txMgr.listen(draw, {
+        pending: (tx: { hash: string }) => {
+          this.pendingTxs.set(cdp.id, [tx.hash, "draw"]);
+        },
+        confirmed: () => {
+          this.pendingTxs.delete(cdp.id);
+        }
+      });
+
+      await txMgr.confirm(draw);
       await this.updateCDPS();
       await this.updateBalances();
     } catch (e) {
@@ -306,7 +323,20 @@ export class Store {
   repayDAI = async (amountDAI: number, cdp: CDP) => {
     try {
       const cdpInstance = await this.maker!.getCdp(cdp.id);
-      await cdpInstance.wipeDai(amountDAI);
+      this.pendingTxs.set(cdp.id, ["", "repay"]);
+      const txMgr = this.maker!.service("transactionManager");
+
+      const wipe = cdpInstance.wipeDai(amountDAI);
+      txMgr.listen(wipe, {
+        pending: (tx: { hash: string }) => {
+          this.pendingTxs.set(cdp.id, [tx.hash, "repay"]);
+        },
+        confirmed: () => {
+          this.pendingTxs.delete(cdp.id);
+        }
+      });
+
+      await txMgr.confirm(wipe);
       await this.updateCDPS();
       await this.updateBalances();
     } catch (e) {

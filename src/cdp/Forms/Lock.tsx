@@ -16,7 +16,6 @@ interface Props {
 
 interface State {
   amountETH: string;
-  locking: boolean;
 }
 
 export class Lock extends Component<Props, State> {
@@ -24,8 +23,7 @@ export class Lock extends Component<Props, State> {
     amountETH: this.props
       .store!.balances.get()!
       .ethBalance.toNumber()
-      .toString(),
-    locking: false
+      .toString()
   };
 
   render() {
@@ -82,8 +80,7 @@ export class Lock extends Component<Props, State> {
     );
   }
 
-  lockETH = async () => {
-    this.setState({ locking: true });
+  lockETH = () => {
     this.props.store!.lockETH(
       parseInputFloat(this.state.amountETH),
       this.props.cdp

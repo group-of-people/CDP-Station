@@ -84,7 +84,7 @@ export class Free extends Component<Props, State> {
             color={"green"}
             style={"primary"}
             disabled={!valid}
-            onClick={this.freePETH}
+            onClick={this.freeETH}
           >
             Withdraw
           </Button>
@@ -93,8 +93,8 @@ export class Free extends Component<Props, State> {
     );
   }
 
-  freePETH = async () => {
-    await this.props.store!.freeETH(
+  freeETH = () => {
+    this.props.store!.freeETH(
       parseInputFloat(this.state.amountETH),
       this.props.cdp
     );

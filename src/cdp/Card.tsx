@@ -77,6 +77,21 @@ interface State {
   view: VIEWS;
 }
 
+function getPendingMessage(txType: "lock" | "free" | "draw" | "repay") {
+  switch (txType) {
+    case "lock":
+      return "Pending Deposit";
+    case "free":
+      return "Pending Withdrawal";
+    case "draw":
+      return "Pending Generation";
+    case "repay":
+      return "Pending Repayment";
+    default:
+      return "Pending";
+  }
+}
+
 class CDPCard extends React.Component<Props, State> {
   state: State = {
     view: this.props.view || "details"
@@ -187,7 +202,8 @@ class CDPCard extends React.Component<Props, State> {
       <InfoContainer>
         {hasPendingTx && (
           <div style={{ display: "flex", alignItems: "center" }}>
-            <Loader color={"#90A4AE"} /> Deposit pending&nbsp;
+            <Loader color={"#90A4AE"} /> {getPendingMessage(pendingTx![1])}
+            &nbsp;
             <a
               target="_blank"
               rel="noopener"

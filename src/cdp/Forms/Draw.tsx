@@ -17,7 +17,6 @@ interface Props {
 
 interface State {
   amountDAI: string;
-  drawing: boolean;
 }
 
 export class Draw extends Component<Props, State> {
@@ -30,8 +29,7 @@ export class Draw extends Component<Props, State> {
     //     (this.props.cdp.daiLocked.get() / 2 -
     //       this.props.cdp.daiDebt.get().toNumber())
     //   : "",
-    amountDAI: "",
-    drawing: false
+    amountDAI: ""
   };
 
   render() {
@@ -84,8 +82,7 @@ export class Draw extends Component<Props, State> {
   }
 
   drawDAI = async () => {
-    this.setState({ drawing: true });
-    await this.props.store!.drawDAI(
+    this.props.store!.drawDAI(
       parseInputFloat(this.state.amountDAI),
       this.props.cdp
     );

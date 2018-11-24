@@ -41,6 +41,24 @@ const mockStore = {
     setTimeout(() => {
       this.pendingTxs.set(cdp.id, null);
     }, 5000);
+  },
+  freeETH(amountETH: number, cdp: CDP) {
+    this.pendingTxs.set(cdp.id, ["hash", "free"]);
+    setTimeout(() => {
+      this.pendingTxs.set(cdp.id, null);
+    }, 5000);
+  },
+  repayDAI(amountETH: number, cdp: CDP) {
+    this.pendingTxs.set(cdp.id, ["hash", "repay"]);
+    setTimeout(() => {
+      this.pendingTxs.set(cdp.id, null);
+    }, 5000);
+  },
+  drawDAI(amountETH: number, cdp: CDP) {
+    this.pendingTxs.set(cdp.id, ["hash", "draw"]);
+    setTimeout(() => {
+      this.pendingTxs.set(cdp.id, null);
+    }, 5000);
   }
 };
 

@@ -16,13 +16,11 @@ interface Props {
 
 interface State {
   amountDAI: string;
-  repaying: boolean;
 }
 
 export class Repay extends Component<Props, State> {
   state: State = {
-    amountDAI: "",
-    repaying: false
+    amountDAI: ""
   };
 
   render() {
@@ -76,9 +74,8 @@ export class Repay extends Component<Props, State> {
     );
   }
 
-  repayDAI = async () => {
-    this.setState({ repaying: true });
-    await this.props.store!.repayDAI(
+  repayDAI = () => {
+    this.props.store!.repayDAI(
       parseInputFloat(this.state.amountDAI),
       this.props.cdp
     );
