@@ -30,7 +30,12 @@ export class Work extends Component<Props, {}> {
                 PETH Balance: {balances.pethBalance.toString(4)} {"   "}
                 <Button
                   style={"primary"}
-                  onClick={this.props.store!.convertPETH}
+                  onClick={() => {
+                    this.props.store!.convertPETH(
+                      0,
+                      balances.pethBalance.toNumber()
+                    );
+                  }}
                 >
                   Convert PETH to ETH?
                 </Button>
