@@ -77,8 +77,12 @@ interface State {
   view: VIEWS;
 }
 
-function getPendingMessage(txType: "lock" | "free" | "draw" | "repay") {
+function getPendingMessage(
+  txType: "lock" | "free" | "draw" | "repay" | "create"
+) {
   switch (txType) {
+    case "create":
+      return "Pending creation";
     case "lock":
       return "Pending Deposit";
     case "free":
@@ -126,7 +130,7 @@ class CDPCard extends React.Component<Props, State> {
                     transition: "all 0.3s"
                   }}
                 >
-                  <Header2>CDP {cdp.id}</Header2>
+                  <Header2>{cdp.id < 0 ? "New CDP" : `CDP ${cdp.id}`}</Header2>
                 </div>
                 <div style={{ marginBottom: 10 }}>
                   <Chart
