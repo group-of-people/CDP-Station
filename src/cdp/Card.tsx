@@ -77,7 +77,9 @@ interface State {
   view: VIEWS;
 }
 
-function getPendingMessage(txType: "lock" | "free" | "draw" | "repay") {
+function getPendingMessage(
+  txType: "lock" | "free" | "draw" | "repay" | "approve" | "convert"
+) {
   switch (txType) {
     case "lock":
       return "Pending Deposit";
@@ -87,6 +89,10 @@ function getPendingMessage(txType: "lock" | "free" | "draw" | "repay") {
       return "Pending Generation";
     case "repay":
       return "Pending Repayment";
+    case "approve":
+      return "Pending Approve";
+    case "convert":
+      return "Pending Conversion";
     default:
       return "Pending";
   }

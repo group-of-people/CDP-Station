@@ -58,7 +58,7 @@ export class Store {
   noWeb3 = observable.box(false);
   pendingTxs = observable.map<
     number,
-    [string, "lock" | "free" | "draw" | "repay"]
+    [string, "lock" | "free" | "draw" | "repay" | "approve" | "convert"]
   >({});
 
   //contract typings
@@ -367,7 +367,33 @@ export class Store {
   };
 
   freeETH = async (amountETH: number, cdp: CDP) => {
-    throw new Error("implement me");
+    try {
+      const peth = amountETH / this.prices.get()!.wethToPeth;
+      const cdpInstance = await this.maker!.getCdp(cdp.id);
+      this.pendingTxs.set(cdp.id, ["", "free"]);
+      const txMgr = this.maker!.service("transactionManager");
+
+      const free = cdpInstance.freePeth(peth);
+      txMgr.listen(free, {
+        pending: (tx: { hash: string }) => {
+          this.pendingTxs.set(cdp.id, [tx.hash, "free"]);
+        },
+        confirmed: async () => {
+          this.pendingTxs.delete(cdp.id);
+
+          try {
+            await this.convertPETH(cdp.id, peth);
+          } catch (e) {
+            console.log(e, "Error Converting PETH");
+          }
+        }
+      });
+      await txMgr.confirm(free);
+      await this.updateCDPS();
+      await this.updateBalances();
+    } catch (e) {
+      console.log(e, "Error freeing PETH");
+    }
   };
 
   freePETH = async (amountPETH: number, cdp: CDP) => {
@@ -381,11 +407,10 @@ export class Store {
     }
   };
 
-  convertPETH = async () => {
+  convertPETH = async (cdp: number | 0, peth: number) => {
     try {
       const balances = this.balances.get();
-      const peth = balances!.pethBalance;
-      const pethWei = peth.toNumber() * 10 ** 18;
+      const pethWei = peth * 10 ** 18;
       this.pethContract!.methods.allowance(
         this.account!.get(),
         Addresses.Creator
@@ -393,20 +418,43 @@ export class Store {
         .call({ from: this.account!.get() })
         .then(async allowed => {
           if (Number(allowed) !== 2 ** 256 - 1) {
+            this.pendingTxs.set(cdp, ["", "approve"]);
             this.pethContract!.methods.approve(Addresses.Creator)
               .send({ from: this.account.get() })
-              .then(async () => {
+              .on("transactionHash", (hash: string) => {
+                this.pendingTxs.set(cdp, [hash, "approve"]);
+              })
+              .on("receipt", async (receipt: TransactionReceipt) => {
+                this.pendingTxs.delete(cdp);
+                this.pendingTxs.set(cdp, ["", "convert"]);
                 await this.contract!.methods.convertPETHToETH(
-                  peth.toNumber()
-                ).send({ from: this.account.get() });
+                  pethWei.toString()
+                )
+                  .send({
+                    from: this.account.get()
+                  })
+                  .on("transactionHash", (hash: string) => {
+                    this.pendingTxs.set(cdp, [hash, "convert"]);
+                  })
+                  .on("receipt", (receipt: TransactionReceipt) => {
+                    this.pendingTxs.delete(cdp);
+                  });
               });
           } else {
-            await this.contract!.methods.convertPETHToETH(
-              pethWei.toString()
-            ).send({ from: this.account.get() });
+            this.pendingTxs.set(cdp, ["", "convert"]);
+            await this.contract!.methods.convertPETHToETH(pethWei.toString())
+              .send({
+                from: this.account.get()
+              })
+              .on("transactionHash", (hash: string) => {
+                this.pendingTxs.set(cdp, [hash, "convert"]);
+              })
+              .on("receipt", async (receipt: TransactionReceipt) => {
+                this.pendingTxs.delete(cdp);
+                await this.updateBalances();
+              });
           }
         });
-      await this.updateBalances();
     } catch (e) {
       console.log(e, "Error converting PETH");
     }

@@ -100,7 +100,7 @@ export class Lock extends Component<Props, State> {
   onChange = (value: string) => {
     this.setState({ amountETH: value }, () => {
       this.props.previewCdp.update(
-        parseInputFloat(value),
+        parseInputFloat(value) + this.props.cdp.ethLocked.get(),
         this.props.previewCdp.daiDebt.get().toNumber()
       );
     });
