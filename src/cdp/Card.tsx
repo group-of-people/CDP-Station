@@ -204,6 +204,8 @@ class CDPCard extends React.Component<Props, State> {
     const { cdp, store } = this.props;
     const pendingTx = store!.pendingTxs.get(cdp.id);
     const hasPendingTx = !!pendingTx;
+    const proxy = store!.account.get().toLowerCase() != cdp.lad;
+
     return (
       <InfoContainer>
         {hasPendingTx && (
@@ -227,22 +229,27 @@ class CDPCard extends React.Component<Props, State> {
               <div style={{ marginBottom: 10 }}>
                 {cdp.ethLocked.get().toFixed(2)}
               </div>
-              {!hasPendingTx && (
-                <Button onClick={() => this.switchTo("deposit")}>
-                  Deposit
-                </Button>
-              )}
+              {!hasPendingTx &&
+                !proxy && (
+                  <Button onClick={() => this.switchTo("deposit")}>
+                    Deposit
+                  </Button>
+                )}
             </RowCell>
             <RowCell>
               <div style={{ color: "#b5b5b5", marginTop: 5 }}>Available:</div>
               <div style={{ marginBottom: 10 }}>
                 {cdp.ethAvailable.get().toFixed(2)}{" "}
               </div>
-              {!hasPendingTx && (
-                <Button color={"red"} onClick={() => this.switchTo("withdraw")}>
-                  Withdraw
-                </Button>
-              )}
+              {!hasPendingTx &&
+                !proxy && (
+                  <Button
+                    color={"red"}
+                    onClick={() => this.switchTo("withdraw")}
+                  >
+                    Withdraw
+                  </Button>
+                )}
             </RowCell>
           </Row>
         </div>
@@ -254,22 +261,27 @@ class CDPCard extends React.Component<Props, State> {
               <div style={{ marginBottom: 10 }}>
                 {cdp.daiLocked.get().toFixed(2)}{" "}
               </div>
-              {!hasPendingTx && (
-                <Button onClick={() => this.switchTo("payback")}>
-                  Payback
-                </Button>
-              )}
+              {!hasPendingTx &&
+                !proxy && (
+                  <Button onClick={() => this.switchTo("payback")}>
+                    Payback
+                  </Button>
+                )}
             </RowCell>
             <RowCell>
               <div style={{ color: "#b5b5b5", marginTop: 5 }}>Available:</div>
               <div style={{ marginBottom: 10 }}>
                 {cdp.daiAvailable.get().toFixed(2)}
               </div>
-              {!hasPendingTx && (
-                <Button color={"red"} onClick={() => this.switchTo("generate")}>
-                  Generate
-                </Button>
-              )}
+              {!hasPendingTx &&
+                !proxy && (
+                  <Button
+                    color={"red"}
+                    onClick={() => this.switchTo("generate")}
+                  >
+                    Generate
+                  </Button>
+                )}
             </RowCell>
           </Row>
         </div>
