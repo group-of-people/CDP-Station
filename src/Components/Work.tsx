@@ -29,6 +29,7 @@ export class Work extends Component<Props, {}> {
               <div>
                 PETH Balance: {balances.pethBalance.toString(4)} {"   "}
                 <Button
+                  style={"primary"}
                   onClick={() => {
                     this.props.store!.convertPETH(
                       0,

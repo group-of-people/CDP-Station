@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Button, Input, Message, Header } from "../../ui";
-import { Block as Loader } from "../../ui/Loader";
 import { inject, observer } from "mobx-react";
 import { observable, autorun, IObservableValue } from "mobx";
 import { parseInputFloat, isValidFloatInputNumber } from "../../utils/sink";
@@ -15,14 +14,10 @@ interface Props {
   onRequestClose: () => void;
 }
 
-interface State {
-  creating: boolean | null;
-}
+interface State {}
 
 export class CDPCreator extends Component<Props, State> {
-  state: State = {
-    creating: null
-  };
+  state: State = {};
   EthToLock = observable.box(
     (
       Math.floor(
@@ -82,70 +77,62 @@ export class CDPCreator extends Component<Props, State> {
 
     return (
       <>
-        {!!this.state.creating ? (
-          this.renderLoading()
-        ) : (
-          <>
-            <div style={{ flex: 1 }}>
-              <Header>New CDP</Header>
-              <Input
-                label={"Deposit:"}
-                unit={"ETH"}
-                value={this.EthToLock.get()}
-                onChange={this.handleEthChange}
-              />
-              <Input
-                label={"Generate:"}
-                unit={"DAI"}
-                value={this.DaiToDraw.get()}
-                onChange={this.handleDaiChange}
-              />
-              {!valid && error && <Message>{error}</Message>}
-              {!!this.DaiToDraw.get() && (
-                <div
-                  style={{
-                    display: "inline",
-                    marginRight: "3%"
-                  }}
-                >
-                  Liquidation Price: ${this.cdp.liquidationPrice.get()}
-                </div>
-              )}
+        <div style={{ flex: 1 }}>
+          <Header>New CDP</Header>
+          <Input
+            label={"Deposit:"}
+            unit={"ETH"}
+            value={this.EthToLock.get()}
+            onChange={this.handleEthChange}
+          />
+          <Input
+            label={"Generate:"}
+            unit={"DAI"}
+            value={this.DaiToDraw.get()}
+            onChange={this.handleDaiChange}
+          />
+          {!valid && error && <Message>{error}</Message>}
+          {!!this.DaiToDraw.get() && (
+            <div
+              style={{
+                display: "inline",
+                marginRight: "3%"
+              }}
+            >
+              Liquidation Price: ${this.cdp.liquidationPrice.get()}
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <Button
-                color={"gray"}
-                style={"muted"}
-                onClick={this.props.onRequestClose}
-              >
-                Cancel
-              </Button>
-              <Button
-                color={"green"}
-                style={"primary"}
-                disabled={!valid}
-                onClick={this.createCDP}
-              >
-                CreateCDP
-              </Button>
-            </div>
-          </>
-        )}
+          )}
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <Button
+            color={"gray"}
+            style={"muted"}
+            onClick={this.props.onRequestClose}
+          >
+            Cancel
+          </Button>
+          <Button
+            color={"green"}
+            style={"primary"}
+            disabled={!valid}
+            onClick={this.createCDP}
+          >
+            CreateCDP
+          </Button>
+        </div>
       </>
     );
   }
 
   createCDP = async () => {
-    this.setState({ creating: true });
     try {
-      await this.props.store!.createCDP(
+      this.props.store!.createCDP(
         parseInputFloat(this.EthToLock.get()),
         parseInputFloat(this.DaiToDraw.get())
       );
     } catch (e) {
       console.log(e);
     }
-    this.setState({ creating: false });
     this.props.onRequestClose();
   };
 
@@ -164,10 +151,6 @@ export class CDPCreator extends Component<Props, State> {
       return;
     }
     this.DaiToDraw.set(value);
-  };
-
-  renderLoading = () => {
-    return <Loader color={"#90A4AE"} />;
   };
 }
 

@@ -40,6 +40,8 @@ interface Extra {
   liquidationRatio: number;
 }
 
+let NEW_CDP_ID = -1;
+
 export class Store {
   // DATA
   cdps = observable<CDP>([]);
@@ -58,7 +60,10 @@ export class Store {
   noWeb3 = observable.box(false);
   pendingTxs = observable.map<
     number,
-    [string, "lock" | "free" | "draw" | "repay" | "approve" | "convert"]
+    [
+      string,
+      "lock" | "free" | "draw" | "repay" | "approve" | "convert" | "create"
+    ]
   >({});
 
   //contract typings
@@ -288,10 +293,30 @@ export class Store {
     const eth = this.web3!.utils.toWei(amountETH.toString(), "ether");
     const dai = amountDAI * Math.pow(10, 18);
     const daiBN = Web3.utils.toBN(dai.toString());
-    await this.contract!.methods.createCDP(daiBN.toString()).send({
-      from: this.account.get(),
-      value: eth
-    });
+
+    const cdp = new CDP(
+      NEW_CDP_ID--,
+      amountETH / this.prices.get()!.wethToPeth,
+      amountDAI,
+      this.prices as IObservableValue<Prices>,
+      this.mkrSettings as IObservableValue<MkrSettings>,
+      "0x0000000000000000000000000000000000000000"
+    );
+
+    this.cdps.push(cdp);
+
+    this.pendingTxs.set(cdp.id, ["", "create"]);
+    await this.contract!.methods.createCDP(daiBN.toString())
+      .send({
+        from: this.account.get(),
+        value: eth
+      })
+      .on("transactionHash", (hash: string) => {
+        this.pendingTxs.set(cdp.id, [hash, "create"]);
+      })
+      .on("receipt", (receipt: TransactionReceipt) => {
+        this.pendingTxs.delete(cdp.id);
+      });
     await this.updateCDPS();
     await this.updateBalances();
   };
@@ -347,7 +372,6 @@ export class Store {
   lockETH = async (amountETH: number, cdp: CDP) => {
     try {
       const eth = this.web3!.utils.toWei(amountETH.toString(), "ether");
-      this.pendingTxs.set(cdp.id, ["", "lock"]);
       await this.contract!.methods.lockETH(cdp.id)
         .send({
           from: this.account.get(),
