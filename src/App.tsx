@@ -60,7 +60,14 @@ class App extends Component<Props> {
     );
   }
   renderLoading() {
-    return <Loader />;
+    return (
+      <div>
+        <Loader />
+        <div style={{ textAlign: "center" }}>
+          {this.props.store!.loadingMessage.get()}
+        </div>
+      </div>
+    );
   }
 
   renderContent() {

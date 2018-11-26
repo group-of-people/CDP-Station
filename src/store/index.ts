@@ -48,8 +48,6 @@ export class Store {
   web3: Web3 | null = null;
   account = observable.box("");
   maker: Maker | null = null;
-  loading = observable.box(true);
-  locked = observable.box(false);
 
   prices: IObservableValue<Prices | null> = observable.box(null);
   mkrSettings: IObservableValue<MkrSettings | null> = observable.box(null);
@@ -58,6 +56,9 @@ export class Store {
 
   // UI State
   noWeb3 = observable.box(false);
+  loading = observable.box(true);
+  locked = observable.box(false);
+  loadingMessage = observable.box("");
   pendingTxs = observable.map<
     number,
     [
@@ -124,7 +125,7 @@ export class Store {
     }
   };
 
-  initializeAccount = async () => {
+  initializeAccount = async (force: boolean = false) => {
     let web3 = this.web3!;
     let accs: string[] = [];
     try {
@@ -136,7 +137,7 @@ export class Store {
         return;
       }
       this.locked.set(false);
-      if (accs[0] === this.account.get()) {
+      if (accs[0] === this.account.get() && !force) {
         setTimeout(this.initializeAccount, 500);
         return;
       }
@@ -146,18 +147,26 @@ export class Store {
     }
 
     this.loading.set(true);
+    this.updateLoading("Initializing with " + accs[0]);
 
     this.maker = Maker.create("browser");
 
     try {
+      this.updateLoading("Authenticating maker");
       await this.maker.authenticate();
+
       const priceService = this.maker.service("price");
       const cdpService = this.maker.service("cdp");
-      const ethPrice = await priceService.getEthPrice();
-      const mkrPrice = await priceService.getMkrPrice();
 
+      this.updateLoading("Fetching eth price");
+      const ethPrice = await priceService.getEthPrice();
+      this.updateLoading("Fetching mkr price");
+      const mkrPrice = await priceService.getMkrPrice();
+      this.updateLoading("Fetching weth to peth ratio");
       const wethToPeth = await priceService.getWethToPethRatio();
+      this.updateLoading("Fetching liquidation ratio");
       const liquidationRatio = await cdpService.getLiquidationRatio();
+      this.updateLoading("Fetching CDP proxies");
       const proxyAdd = await this.registry!.methods.proxies(accs[0]).call();
       if (proxyAdd !== "0x0000000000000000000000000000000000000000") {
         this.proxy = new this.web3!.eth.Contract(DSProxy, proxyAdd) as DSProxy;
@@ -168,8 +177,11 @@ export class Store {
         this.prices.set(new Prices(ethPrice, mkrPrice, wethToPeth));
         this.mkrSettings.set(new MkrSettings(liquidationRatio));
       });
+      this.updateLoading("Updating balances");
       await this.updateBalances();
+      this.updateLoading("Fetching CDPs");
       await this.updateCDPS();
+      this.updateLoading("Fetching approvals");
       await this.getApprovals();
       runInAction(() => {
         this.loading.set(false);
@@ -177,9 +189,16 @@ export class Store {
       });
       setTimeout(this.initializeAccount, 500);
     } catch (e) {
+      this.updateLoading("Failed to initialize. Retrying in 10 seconds.");
+      setTimeout(() => this.initializeAccount(true), 10000);
       console.log(e, "Failed to initialize");
     }
   };
+
+  updateLoading(message: string) {
+    this.loadingMessage.set(message);
+    console.info("[CDP][Init]", message);
+  }
 
   isSafe = async (cdp: CDP) => {
     try {
