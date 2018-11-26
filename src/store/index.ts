@@ -303,15 +303,13 @@ export class Store {
       "0x0000000000000000000000000000000000000000"
     );
 
-    this.cdps.push(cdp);
-
-    this.pendingTxs.set(cdp.id, ["", "create"]);
     await this.contract!.methods.createCDP(daiBN.toString())
       .send({
         from: this.account.get(),
         value: eth
       })
       .on("transactionHash", (hash: string) => {
+        this.cdps.push(cdp);
         this.pendingTxs.set(cdp.id, [hash, "create"]);
       })
       .on("receipt", (receipt: TransactionReceipt) => {
