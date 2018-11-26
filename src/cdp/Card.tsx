@@ -214,13 +214,15 @@ class CDPCard extends React.Component<Props, State> {
           <div style={{ display: "flex", alignItems: "center" }}>
             <Loader color={"#90A4AE"} /> {getPendingMessage(pendingTx![1])}
             &nbsp;
-            <a
-              target="_blank"
-              rel="noopener"
-              href={`https://etherscan.io/tx/${pendingTx![0]}`}
-            >
-              View Tx
-            </a>
+            {!!pendingTx![0] && (
+              <a
+                target="_blank"
+                rel="noopener"
+                href={`https://etherscan.io/tx/${pendingTx![0]}`}
+              >
+                View Tx
+              </a>
+            )}
           </div>
         )}
         <div>
