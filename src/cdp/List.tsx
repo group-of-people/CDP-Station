@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
 import CDPCard from "./Card";
 import NewCard from "./NewCard";
+import AccountCard from "./AccountCard";
 import { Store } from "../store";
 
 interface Props {
@@ -20,6 +21,7 @@ export class CDPList extends Component<Props, State> {
     return (
       <>
         <div style={{ display: display }}>
+          <AccountCard />
           {this.props.store!.cdps.map(cdp => (
             <CDPCard key={cdp.id} cdp={cdp} wide={this.props.mode === "work"} />
           ))}

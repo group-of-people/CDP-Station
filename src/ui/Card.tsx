@@ -110,6 +110,7 @@ const CardSidesContainer = styled.div`
 `;
 
 interface SideProps {
+  noHover?: boolean;
   elevated?: boolean;
   animate?: boolean;
 }
@@ -134,7 +135,10 @@ const Side = styled.div`
           animation: ${hideShadow} 1s forwards;
         `
       : ""} &:hover {
-    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.3), 0 10px 10px rgba(0, 0, 0, 0.22);
+    ${(props: SideProps) =>
+      props.noHover
+        ? ""
+        : "box-shadow: 0 14px 28px rgba(0, 0, 0, 0.3), 0 10px 10px rgba(0, 0, 0, 0.22);"};
   }
 `;
 
@@ -172,7 +176,7 @@ export default function Card(props: Props) {
           transform: props.flipped ? "rotateY(-180deg)" : "rotateY(0deg)"
         }}
       >
-        <Side>{props.children}</Side>
+        <Side noHover={!props.onClick}>{props.children}</Side>
         <Side
           elevated
           animate={!!props.extra && !!props.flipped}

@@ -243,7 +243,7 @@ class CDPCard extends React.Component<Props, State> {
             <RowCell>
               <div style={{ color: "#b5b5b5", marginTop: 5 }}>Available:</div>
               <div style={{ marginBottom: 10 }}>
-                {cdp.ethAvailable.get().toFixed(2)}{" "}
+                {cdp.ethAvailable.get().toFixed(2)}
               </div>
               {!hasPendingTx &&
                 !proxy && (

@@ -6,17 +6,24 @@ import "sanitize.css";
 import "../index.css";
 
 import NewCard from "../cdp/NewCard";
+import AccountCard from "../cdp/AccountCard";
 import Card from "../cdp/Card";
 import { ETH } from "../store";
 import CDP from "../store/cdp";
 
 const mockStore = {
+  account: {
+    get() {
+      return "0x123456789012345678901234567890abcdefabcd";
+    }
+  },
   balances: {
     get() {
       return {
         ethBalance: ETH("12345.1234567890123456789"),
         daiBalance: ETH("123456.1234567890123456789"),
-        mkrBalance: ETH("654321.1234567890123456789")
+        mkrBalance: ETH("654321.1234567890123456789"),
+        pethBalance: ETH("10.1234567890123456789")
       };
     }
   },
@@ -67,6 +74,13 @@ storiesOf("Cards", module)
     <Provider store={mockStore}>
       <div style={{ display: "flex" }}>
         <NewCard /> <NewCard flipped />
+      </div>
+    </Provider>
+  ))
+  .add("Account", () => (
+    <Provider store={mockStore}>
+      <div style={{ display: "flex" }}>
+        <AccountCard />
       </div>
     </Provider>
   ))

@@ -11,3 +11,7 @@ export const Header2 = styled(Header)`
   font-weight: normal;
   margin-bottom: 0px;
 `;
+
+export const Header3 = styled(Header2)`
+  color: #b5b5b5;
+`;

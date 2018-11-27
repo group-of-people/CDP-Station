@@ -61,7 +61,7 @@ export class CDPCreator extends Component<Props, State> {
     if (this.EthToLock.get() === "" || this.DaiToDraw.get() === "") {
       valid = false;
     } else if (this.cdp.collateralization.get() < minCollateralization) {
-      error = `Collateralization < ${minCollateralization}%. You can draw up to ${(
+      error = `You can generate up to ${(
         this.cdp.daiLocked.get() / store.mkrSettings.get()!.liquidationRatio
       ).toFixed(2)} DAI.`;
       valid = false;
