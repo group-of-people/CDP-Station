@@ -15,6 +15,9 @@ export class AccountCard extends React.Component<Props> {
     const shortAddress = `${address.slice(0, 8)}...${address.slice(
       address.length - 6
     )}`;
+    const hasDanglingPeth =
+      balances.pethBalance.toNumber().toFixed(4) !== "0.0000";
+
     return (
       <Card>
         <div style={{ textAlign: "center" }}>
@@ -31,7 +34,7 @@ export class AccountCard extends React.Component<Props> {
         <div style={{ marginBottom: 10 }}>
           {balances.mkrBalance.toNumber().toFixed(4)}
         </div>
-        {!!balances.pethBalance.toNumber() && (
+        {hasDanglingPeth && (
           <>
             <Header3>PETH</Header3>
             <div style={{ marginBottom: 10 }}>
