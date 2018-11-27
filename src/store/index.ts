@@ -21,17 +21,39 @@ import Balances from "./balances";
 import Addresses from "./addresses.json";
 import Approvals from "./approvals";
 import { TransactionReceipt } from "web3/types";
-import { TransactionObject } from "web3/eth/types";
 
 declare global {
   interface Window {
     web3: Web3 | undefined;
-    ethereum: Web3 | undefined;
+    ethereum: any | undefined;
   }
 }
 
 const { DAI, PETH, MKR, ETH } = Maker;
 export { DAI, PETH, MKR, ETH };
+
+function sleep(seconds: number): Promise<void> {
+  return new Promise(resolve => {
+    setTimeout(resolve, seconds * 1000);
+  });
+}
+
+async function retry<T>(runner: () => Promise<T>): Promise<T> {
+  let count = 0;
+  return await runner();
+  // while (true) {
+  //   try {
+  //     const result = await runner();
+  //     return result
+  //   } catch (e) {
+  //     count++;
+  //     await sleep(5);
+  //     if (count >= 3) {
+  //       throw e;
+  //     }
+  //   }
+  // }
+}
 
 // FIXME: remove me
 interface Extra {
@@ -159,13 +181,15 @@ export class Store {
       const cdpService = this.maker.service("cdp");
 
       this.updateLoading("Fetching eth price");
-      const ethPrice = await priceService.getEthPrice();
+      const ethPrice = await retry(() => priceService.getEthPrice());
       this.updateLoading("Fetching mkr price");
-      const mkrPrice = await priceService.getMkrPrice();
+      const mkrPrice = await retry(() => priceService.getMkrPrice());
       this.updateLoading("Fetching weth to peth ratio");
-      const wethToPeth = await priceService.getWethToPethRatio();
+      const wethToPeth = await retry(() => priceService.getWethToPethRatio());
       this.updateLoading("Fetching liquidation ratio");
-      const liquidationRatio = await cdpService.getLiquidationRatio();
+      const liquidationRatio = await retry(() =>
+        cdpService.getLiquidationRatio()
+      );
       this.updateLoading("Fetching CDP proxies");
       const proxyAdd = await this.registry!.methods.proxies(accs[0]).call();
       if (proxyAdd !== "0x0000000000000000000000000000000000000000") {

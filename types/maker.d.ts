@@ -20,13 +20,13 @@ declare module "@makerdao/dai" {
   }
 
   class PriceService {
-    getEthPrice(): Currency;
-    getMkrPrice(): Currency;
-    getWethToPethRatio(): number;
+    async getEthPrice(): Promise<Currency>;
+    async getMkrPrice(): Promise<Currency>;
+    async getWethToPethRatio(): Promise<number>;
   }
 
   class CDPService {
-    getLiquidationRatio(): number;
+    async getLiquidationRatio(): Promise<number>;
   }
 
   class CDPService {
@@ -42,7 +42,7 @@ declare module "@makerdao/dai" {
     static WETH: typeof Currency;
     static USD: typeof Currency;
 
-    static create(string: string): Maker;
+    static create(string: string, options?: any): Maker;
 
     async authenticate(): void;
     async getCdp(cdpId: number): Promise<CDPInstance>;
