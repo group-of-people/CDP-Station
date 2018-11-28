@@ -474,7 +474,6 @@ export class Store {
 
   convertPETH = async (cdp: number | 0, peth: number) => {
     try {
-      const balances = this.balances.get();
       const pethWei = peth * 10 ** 18;
       this.pethContract!.methods.allowance(
         this.account!.get(),
