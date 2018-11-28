@@ -263,7 +263,10 @@ class CDPCard extends React.Component<Props, State> {
             <RowCell>
               <div style={{ color: "#b5b5b5", marginTop: 5 }}>Generated:</div>
               <div style={{ marginBottom: 10 }}>
-                {cdp.daiLocked.get().toFixed(2)}{" "}
+                {cdp.daiDebt
+                  .get()
+                  .toNumber()
+                  .toFixed(2)}{" "}
               </div>
               {!hasPendingTx &&
                 !proxy && (
@@ -300,6 +303,7 @@ class CDPCard extends React.Component<Props, State> {
   };
 
   flipBack = () => {
+    this.previewCdp = this.props.cdp.clone();
     this.setState({
       view: "details"
     });

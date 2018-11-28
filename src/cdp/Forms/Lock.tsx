@@ -20,10 +20,7 @@ interface State {
 
 export class Lock extends Component<Props, State> {
   state: State = {
-    amountETH: this.props
-      .store!.balances.get()!
-      .ethBalance.toNumber()
-      .toString()
+    amountETH: "0"
   };
 
   render() {
