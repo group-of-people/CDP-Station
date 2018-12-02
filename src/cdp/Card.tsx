@@ -140,7 +140,7 @@ class CDPCard extends React.Component<Props, State> {
                   <Chart
                     data={[
                       { name: "DAI Available", value: cdp.daiAvailable.get() },
-                      { name: "DAI Debt", value: cdp.daiDebt.get() }
+                      { name: "DAI Debt", value: cdp.daiDebt.get().toNumber() }
                       // {name: "DAI Collateral", value: cdp.daiLocked - cdp.daiAvailable - cdp.daiDebt.toNumber()}
                     ]}
                   />
@@ -263,7 +263,10 @@ class CDPCard extends React.Component<Props, State> {
             <RowCell>
               <div style={{ color: "#b5b5b5", marginTop: 5 }}>Generated:</div>
               <div style={{ marginBottom: 10 }}>
-                {Number(cdp.daiDebt.get()).toFixed(2)}{" "}
+                {cdp.daiDebt
+                  .get()
+                  .toNumber()
+                  .toFixed(2)}{" "}
               </div>
               {!hasPendingTx &&
                 !proxy && (

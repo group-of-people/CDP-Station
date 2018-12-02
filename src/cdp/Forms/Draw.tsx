@@ -102,8 +102,7 @@ export class Draw extends Component<Props, State> {
     this.setState({ amountDAI: value }, () => {
       this.props.previewCdp.update(
         this.props.previewCdp.ethLocked.get(),
-        (Number(this.props.cdp.daiDebt.get()) + parseInputFloat(value)) *
-          10 ** 18
+        this.props.cdp.daiDebt.get().toNumber() + parseInputFloat(value)
       );
     });
   };

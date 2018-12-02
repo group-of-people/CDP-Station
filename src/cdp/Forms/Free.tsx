@@ -31,21 +31,21 @@ export class Free extends Component<Props, State> {
     const wethToPeth = store.prices.get()!.wethToPeth;
     const amountPETH = amountETH / wethToPeth;
     const DAICollateralAfterFree =
-      (cdp.pethLocked.get() - amountPETH) * wethToPeth * ethPrice;
+      (cdp.pethLocked.get().toNumber() - amountPETH) * wethToPeth * ethPrice;
     const maxDrawnDAIAfterFree =
       DAICollateralAfterFree / store.mkrSettings.get()!.liquidationRatio;
     const minPETHCollateral =
-      (cdp.daiDebt.get() / ethPrice / wethToPeth) *
+      (cdp.daiDebt.get().toNumber() / ethPrice / wethToPeth) *
       store.mkrSettings.get()!.liquidationRatio;
-    const freeablePETH = cdp.pethLocked.get() - minPETHCollateral;
+    const freeablePETH = cdp.pethLocked.get().toNumber() - minPETHCollateral;
 
     let valid = true;
     let inputValid = true;
-    if (amountPETH > cdp.pethLocked.get()) {
+    if (amountPETH > cdp.pethLocked.get().toNumber()) {
       valid = false;
       inputValid = false;
       // error = "CDP has less PETH locked than selected";
-    } else if (maxDrawnDAIAfterFree < cdp.daiDebt.get()) {
+    } else if (maxDrawnDAIAfterFree < cdp.daiDebt.get().toNumber()) {
       valid = false;
       inputValid = false;
       // error = `CDP will become unsafe. You can free at most ${freeablePETH.toFixed(
@@ -113,9 +113,8 @@ export class Free extends Component<Props, State> {
   onChange = (value: string) => {
     this.setState({ amountETH: value }, () => {
       this.props.previewCdp.update(
-        Math.max(0, this.props.cdp.ethLocked.get() - parseInputFloat(value)) *
-          10 ** 18,
-        this.props.previewCdp.daiDebt.get()
+        Math.max(0, this.props.cdp.ethLocked.get() - parseInputFloat(value)),
+        this.props.previewCdp.daiDebt.get().toNumber()
       );
     });
   };

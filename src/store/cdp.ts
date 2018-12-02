@@ -16,8 +16,8 @@ export interface RawCDP {
 
 export default class CDP {
   id: number;
-  pethLocked: IObservableValue<number>;
-  daiDebt: IObservableValue<number>;
+  pethLocked: IObservableValue<Currency>;
+  daiDebt: IObservableValue<Currency>;
 
   prices: IObservableValue<Prices>;
   mkrSettings: IObservableValue<MkrSettings>;
@@ -32,27 +32,27 @@ export default class CDP {
     lad: string
   ) {
     this.id = id;
-    this.pethLocked = observable.box(pethLocked);
-    this.daiDebt = observable.box(daiDebt);
+    this.pethLocked = observable.box(PETH(pethLocked));
+    this.daiDebt = observable.box(DAI(daiDebt));
     this.prices = prices;
     this.mkrSettings = mkrSettings;
     this.lad = lad;
   }
 
   ethLocked = computed(() => {
-    return this.pethLocked.get() * this.prices.get().wethToPeth;
+    return this.pethLocked.get().toNumber() * this.prices.get().wethToPeth;
   });
 
   ethAvailable = computed(() => {
     return (
       this.ethLocked.get() / this.mkrSettings.get().liquidationRatio -
-      this.daiDebt.get() / this.prices.get().ethPrice.toNumber()
+      this.daiDebt.get().toNumber() / this.prices.get().ethPrice.toNumber()
     );
   });
 
   daiLocked = computed(() => {
     return (
-      this.pethLocked.get() *
+      this.pethLocked.get().toNumber() *
       this.prices.get().wethToPeth *
       this.prices.get().ethPrice.toNumber()
     );
@@ -61,34 +61,35 @@ export default class CDP {
   daiAvailable = computed(() => {
     return (
       this.daiLocked.get() / this.mkrSettings.get().liquidationRatio -
-      this.daiDebt.get()
+      this.daiDebt.get().toNumber()
     );
   });
 
   collateralization = computed(() => {
-    return (this.daiLocked.get() / this.daiDebt.get()) * 100;
+    return (this.daiLocked.get() / this.daiDebt.get().toNumber()) * 100;
   });
 
   liquidationPrice = computed(
     () =>
       this.daiLocked.get() && this.daiDebt.get()
         ? (
-            (this.daiDebt.get() * this.mkrSettings.get()!.liquidationRatio) /
+            (this.daiDebt.get().toNumber() *
+              this.mkrSettings.get()!.liquidationRatio) /
             this.ethLocked.get()
           ).toFixed(2)
         : null
   );
 
   update = action((ethLocked: number, daiDebt: number) => {
-    this.pethLocked.set(ethLocked / this.prices.get().wethToPeth);
-    this.daiDebt.set(daiDebt);
+    this.pethLocked.set(PETH(ethLocked / this.prices.get().wethToPeth));
+    this.daiDebt.set(DAI(daiDebt));
   });
 
   clone = () => {
     return new CDP(
       this.id,
-      this.pethLocked.get() * 10 ** 18,
-      this.daiDebt.get() * 10 ** 18,
+      this.pethLocked.get().toNumber(),
+      this.daiDebt.get().toNumber(),
       this.prices,
       this.mkrSettings,
       this.lad
