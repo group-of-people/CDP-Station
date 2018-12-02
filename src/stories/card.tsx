@@ -91,11 +91,11 @@ storiesOf("Cards", module)
           cdp={
             new CDP(
               1543,
-              50000.123456789 * 10 ** 18,
-              8500000.123456789 * 10 ** 18,
+              50000.123456789,
+              8500000.123456789,
               mockStore.prices as any,
               mockStore.mkrSettings as any,
-              "0x0000000000000000000000000000000000000000"
+              "0x123456789012345678901234567890abcdefabcd"
             )
           }
         />
@@ -103,11 +103,11 @@ storiesOf("Cards", module)
           cdp={
             new CDP(
               1543,
-              5 * 10 ** 18,
-              20 * 10 ** 18,
+              5 * 10,
+              20 * 10,
               mockStore.prices as any,
               mockStore.mkrSettings as any,
-              "0x0000000000000000000000000000000000000000"
+              "0x123456789012345678901234567890abcdefabcd"
             )
           }
           view={"deposit"}
@@ -116,11 +116,11 @@ storiesOf("Cards", module)
           cdp={
             new CDP(
               1543,
-              5 * 10 ** 18,
-              20 * 10 ** 18,
+              5 * 10,
+              20 * 10,
               mockStore.prices as any,
               mockStore.mkrSettings as any,
-              "0x0000000000000000000000000000000000000000"
+              "0x123456789012345678901234567890abcdefabcd"
             )
           }
           view={"withdraw"}
@@ -129,11 +129,11 @@ storiesOf("Cards", module)
           cdp={
             new CDP(
               1543,
-              5 * 10 ** 18,
-              200 * 10 ** 18,
+              5 * 10,
+              200 * 10,
               mockStore.prices as any,
               mockStore.mkrSettings as any,
-              "0x0000000000000000000000000000000000000000"
+              "0x123456789012345678901234567890abcdefabcd"
             )
           }
           view={"payback"}
@@ -142,11 +142,11 @@ storiesOf("Cards", module)
           cdp={
             new CDP(
               1543,
-              5 * 10 ** 18,
-              20 * 10 ** 18,
+              5 * 10,
+              20 * 10,
               mockStore.prices as any,
               mockStore.mkrSettings as any,
-              "0x0000000000000000000000000000000000000000"
+              "0x123456789012345678901234567890abcdefabcd"
             )
           }
           view={"generate"}
@@ -161,11 +161,11 @@ storiesOf("Cards", module)
           cdp={
             new CDP(
               1543,
-              5 * 10 ** 18,
-              850 * 10 ** 18,
+              5 * 10,
+              850 * 10,
               mockStore.prices as any,
               mockStore.mkrSettings as any,
-              "0x0000000000000000000000000000000000000000"
+              "0x123456789012345678901234567890abcdefabcd"
             )
           }
           wide={false}
@@ -174,11 +174,11 @@ storiesOf("Cards", module)
           cdp={
             new CDP(
               1543,
-              5 * 10 ** 18,
-              20 * 10 ** 18,
+              5,
+              20,
               mockStore.prices as any,
               mockStore.mkrSettings as any,
-              "0x0000000000000000000000000000000000000000"
+              "0x123456789012345678901234567890abcdefabcd"
             )
           }
           wide={false}
@@ -188,11 +188,11 @@ storiesOf("Cards", module)
           cdp={
             new CDP(
               1543,
-              5 * 10 ** 18,
-              20 * 10 ** 18,
+              5,
+              20,
               mockStore.prices as any,
               mockStore.mkrSettings as any,
-              "0x0000000000000000000000000000000000000000"
+              "0x123456789012345678901234567890abcdefabcd"
             )
           }
           wide={false}
@@ -202,11 +202,11 @@ storiesOf("Cards", module)
           cdp={
             new CDP(
               1543,
-              5 * 10 ** 18,
-              200 * 10 ** 18,
+              5,
+              200,
               mockStore.prices as any,
               mockStore.mkrSettings as any,
-              "0x0000000000000000000000000000000000000000"
+              "0x123456789012345678901234567890abcdefabcd"
             )
           }
           wide={false}
@@ -216,11 +216,11 @@ storiesOf("Cards", module)
           cdp={
             new CDP(
               1543,
-              5 * 10 ** 18,
-              20 * 10 ** 18,
+              5,
+              20,
               mockStore.prices as any,
               mockStore.mkrSettings as any,
-              "0x0000000000000000000000000000000000000000"
+              "0x123456789012345678901234567890abcdefabcd"
             )
           }
           wide={false}

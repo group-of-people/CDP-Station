@@ -22,83 +22,23 @@ const appear = keyframes`
   }
 `;
 
-const hideShadow = keyframes`
-  0% {
-    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.3), 0 10px 10px rgba(0, 0, 0, 0.22)
-  }
-	49% {
-    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.3), 0 10px 10px rgba(0, 0, 0, 0.22)
-  }
-  50% {
-    box-shadow: none;
-  }
-	100% {
-box-shadow: none;
-  }
-`;
-
-const hideShadow2 = keyframes`
-  0% {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)
-  }
-	49% {
-    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.3), 0 10px 10px rgba(0, 0, 0, 0.22)
-  }
-  50% {
-    box-shadow: none;
-  }
-	100% {
-box-shadow: none;
-  }
-`;
-
-const showShadow = keyframes`
-  0% {
-    box-shadow: none
-  }
-  49% {
-    box-shadow: none
-  }
-	50% {
-    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.3), 0 10px 10px rgba(0, 0, 0, 0.22);
-  }
-
-	100% {
-box-shadow: 0 14px 28px rgba(0, 0, 0, 0.3), 0 10px 10px rgba(0, 0, 0, 0.22);
-  }
-`;
-
 const Scene = styled.div`
   margin: 30px;
   display: flex;
   width: ${(props: SceneProps) => (props.extra ? "600px" : "300px")};
   height: 400px;
   perspective: 600px;
-  animation: ${(props: SceneProps) =>
-    props.animate
-      ? css`
-          ${showShadow} 1s forwards;
-        `
-      : css`
-          ${appear} 0.3s ease-out;
-        `};
+  animation: ${appear} 0.3s ease-out;
   transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
 `;
 
 const Extra = styled.div`
   width: 300px;
+  height: 100%;
   flex-shrink: 0;
   background-color: ${CARD_PRIMARY};
-  box-shadow: ${(props: SideProps) =>
-    props.elevated
-      ? "0 14px 28px rgba(0, 0, 0, 0.3), 0 10px 10px rgba(0, 0, 0, 0.22);"
-      : "0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)"};
+  margin-top: ${(props: SideProps) => (props.elevated ? "-5px" : "0")};
   transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-  animation: ${(props: SideProps) =>
-    props.animate &&
-    css`
-      ${hideShadow2} 1s forwards;
-    `};
 `;
 
 const CardSidesContainer = styled.div`
@@ -124,21 +64,10 @@ const Side = styled.div`
   padding: 30px 20px;
   background-color: ${CARD_PRIMARY};
   backface-visibility: hidden;
-  box-shadow: ${(props: SideProps) =>
-    props.elevated
-      ? "0 14px 28px rgba(0, 0, 0, 0.3), 0 10px 10px rgba(0, 0, 0, 0.22)"
-      : "0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)"};
-  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-  ${(props: SideProps) =>
-    props.animate
-      ? css`
-          animation: ${hideShadow} 1s forwards;
-        `
-      : ""} &:hover {
-    ${(props: SideProps) =>
-      props.noHover
-        ? ""
-        : "box-shadow: 0 14px 28px rgba(0, 0, 0, 0.3), 0 10px 10px rgba(0, 0, 0, 0.22);"};
+  margin-top: ${(props: SideProps) => (props.elevated ? "-5px" : "0")};
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  &:hover {
+    ${(props: SideProps) => (props.noHover ? "" : "margin-top: -5px")};
   }
 `;
 
