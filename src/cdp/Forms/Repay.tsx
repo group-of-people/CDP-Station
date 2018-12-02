@@ -26,13 +26,13 @@ export class Repay extends Component<Props, State> {
   render() {
     const amountDAI = parseInputFloat(this.state.amountDAI);
     let valid = false;
-    if (amountDAI > 0 && this.props.cdp.daiDebt.get().toNumber() >= amountDAI) {
+    if (amountDAI > 0 && this.props.cdp.daiDebt.get() >= amountDAI) {
       valid = true;
     }
 
     const max = Math.min(
       this.props.store!.balances.get()!.daiBalance.toNumber(),
-      this.props.cdp.daiDebt.get().toNumber()
+      this.props.cdp.daiDebt.get()
     );
 
     return (
@@ -95,10 +95,8 @@ export class Repay extends Component<Props, State> {
     this.setState({ amountDAI: value }, () => {
       this.props.previewCdp.update(
         this.props.previewCdp.ethLocked.get(),
-        Math.max(
-          0,
-          this.props.cdp.daiDebt.get().toNumber() - parseInputFloat(value)
-        )
+        Math.max(0, this.props.cdp.daiDebt.get() - parseInputFloat(value)) *
+          10 ** 18
       );
     });
   };

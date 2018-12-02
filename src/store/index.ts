@@ -1,6 +1,7 @@
 /// <reference path="../../types/maker.d.ts" />
 
 import { observable, runInAction, IObservableValue } from "mobx";
+import { request } from "graphql-request";
 import Web3 from "web3";
 import Maker, { Currency } from "@makerdao/dai";
 import CDPCreatorBuild from "!json-loader!../abi/CDPCreator.abi";
@@ -129,7 +130,6 @@ export class Store {
     // Checking if Web3 has been injected by the browser (Mist/MetaMask)
     if (typeof web3 !== "undefined") {
       if (window.ethereum) {
-        // @ts-ignore
         this.web3 = new Web3(window.ethereum);
         try {
           // @ts-ignore
@@ -235,28 +235,56 @@ export class Store {
 
   updateCDPS = async () => {
     const acc = this.account.get();
-    const cdpsResponse = await fetch(
-      `https://dai-service.makerdao.com/cups/conditions=lad:${acc.toLowerCase()}/sort=cupi:asc`
+    const query = `{
+      allCups(filter: {lad:{equalTo:"${acc}"}}) {
+        nodes {
+          lad
+          id
+          art
+          ink
+          deleted
+        }
+      }
+    }`;
+
+    const cdpsResponse = await request(
+      "https://sai-mainnet.makerfoundation.com/v1",
+      query
     );
-    let cdps = (await cdpsResponse.json()) as { results: RawCDP[] };
+    // @ts-ignore
+    let cdps = cdpsResponse.allCups.nodes;
 
     if (this.proxy) {
-      const proxyCdpsRes = await fetch(
-        `https://dai-service.makerdao.com/cups/conditions=lad:${this.proxy._address.toLowerCase()}/sort=cupi:asc`
-      );
+      const proxyQuery = `{
+        allCups(filter: {lad:{equalTo:"${this.proxy._address}"}}) {
+          nodes {
+            lad
+            id
+            art
+            ink
+            deleted
+          }
+        }
+      }`;
 
-      const proxyCdps = (await proxyCdpsRes.json()) as { results: RawCDP[] };
-      cdps.results = cdps.results.concat(proxyCdps.results);
+      const proxyCdpsResponse = await request(
+        "https://sai-mainnet.makerfoundation.com/v1",
+        proxyQuery
+      );
+      // @ts-ignore
+      const proxyCdps = proxyCdpsResponse.allCups.nodes;
+      cdps = cdps.concat(proxyCdps);
     }
 
+    console.log(cdps);
     runInAction(() => {
       this.cdps.replace(
-        cdps.results
-          .filter(cdp => !cdp.closed)
+        cdps
+          .filter((cdp: RawCDP) => !cdp.deleted)
           .map(
-            cdp =>
+            (cdp: RawCDP) =>
               new CDP(
-                cdp.cupi,
+                cdp.id,
                 cdp.ink,
                 cdp.art,
                 this.prices as IObservableValue<Prices>,
@@ -506,6 +534,7 @@ export class Store {
               });
           } else {
             this.pendingTxs.set(cdp, ["", "convert"]);
+            console.log(pethWei);
             await this.contract!.methods.convertPETHToETH(pethWei.toString())
               .send({
                 from: this.account.get()
