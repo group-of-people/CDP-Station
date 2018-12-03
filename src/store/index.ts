@@ -171,7 +171,9 @@ export class Store {
     this.loading.set(true);
     this.updateLoading("Initializing with " + accs[0]);
 
-    this.maker = this.maker ? this.maker : Maker.create("browser");
+    this.maker = this.maker
+      ? this.maker
+      : Maker.create("browser", { confirmedBlockcount: 1 });
 
     try {
       this.updateLoading("Authenticating maker");
