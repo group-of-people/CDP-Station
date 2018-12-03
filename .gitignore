@@ -1,2 +1,4 @@
 node_modules/
 contracts/build/
+package-lock.json
+build/
