@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@craco/craco": "^3.2.3",
     "@makerdao/dai": "^0.9.8",
-    "@types/jest": "23.3.9",
-    "@types/react": "16.7.7",
-    "@types/react-dom": "16.0.10",
+    "@types/jest": "^23",
+    "@types/react": "~16.7.0",
+    "@types/react-dom": "^16",
     "@types/recharts": "^1.1.1",
     "@types/styled-components": "^4.1.1",
     "@types/web3": "^1.0.11",
@@ -27,13 +28,13 @@
     "sanitize.css": "^8.0.0",
     "styled-components": "^4.1.1",
     "styled-icons": "^5.1.0",
-    "typescript": "3.1.6",
+    "typescript": "^3",
     "web3": "^1.0.0-beta.36"
   },
   "scripts": {
-    "start": "cross-env PORT=3000 react-scripts start",
+    "start": "cross-env PORT=3000 craco start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "craco test",
     "eject": "react-scripts eject",
     "storybook": "start-storybook -p 9009 -s public",
     "build-storybook": "build-storybook -s public"
