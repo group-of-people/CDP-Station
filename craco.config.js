@@ -1,7 +1,6 @@
 module.exports = {
   webpack: {
     configure: webpackConfig => {
-      console.log(webpackConfig.module.rules);
       const newRules = webpackConfig.module.rules.slice();
       newRules[2].oneOf = [
         {

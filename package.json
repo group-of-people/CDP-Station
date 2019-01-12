@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@craco/craco": "^3.2.3",
-    "@makerdao/dai": "^0.9.8",
+    "@makerdao/dai": "^0.9.10",
     "@types/jest": "^23",
     "@types/react": "~16.7.0",
     "@types/react-dom": "^16",
@@ -29,7 +29,7 @@
     "styled-components": "^4.1.1",
     "styled-icons": "^5.1.0",
     "typescript": "^3",
-    "web3": "^1.0.0-beta.36"
+    "web3": "1.0.0-beta.34"
   },
   "scripts": {
     "start": "cross-env PORT=3000 craco start",
@@ -56,11 +56,10 @@
     "@storybook/addons": "^4.0.9",
     "@storybook/react": "^4.0.9",
     "@types/storybook__react": "^4.0.0",
-    "babel-loader": "^8.0.4",
     "husky": "^1.2.0",
     "json-loader": "^0.5.7",
     "pretty-quick": "^1.8.0",
-    "truffle-hdwallet-provider": "0.0.6",
+    "truffle-hdwallet-provider": "^1",
     "typechain": "^0.3.9"
   },
   "husky": {

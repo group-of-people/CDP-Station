@@ -100,26 +100,26 @@ export class Store {
 
   constructor() {
     this.enableWeb3().then(() => {
-      this.contract = new this.web3!.eth.Contract(
+      this.contract = (new this.web3!.eth.Contract(
         CDPCreatorBuild.abi,
         Addresses.Creator
-      ) as CDPCreatorContract;
-      this.mkrContract = new this.web3!.eth.Contract(
+      ) as any) as CDPCreatorContract;
+      this.mkrContract = (new this.web3!.eth.Contract(
         ERC20.abi,
         Addresses.MKR
-      ) as ERC20Contract;
-      this.daiContract = new this.web3!.eth.Contract(
+      ) as any) as ERC20Contract;
+      this.daiContract = (new this.web3!.eth.Contract(
         ERC20.abi,
         Addresses.DAI
-      ) as ERC20Contract;
-      this.pethContract = new this.web3!.eth.Contract(
+      ) as any) as ERC20Contract;
+      this.pethContract = (new this.web3!.eth.Contract(
         DSToken.abi,
         Addresses.PETH
-      ) as DSTokenContract;
-      this.registry = new this.web3!.eth.Contract(
+      ) as any) as DSTokenContract;
+      this.registry = (new this.web3!.eth.Contract(
         ProxyRegistry,
         Addresses.Registry
-      ) as ProxyRegistryContract;
+      ) as any) as ProxyRegistryContract;
 
       this.initializeAccount();
     });
@@ -365,7 +365,7 @@ export class Store {
   createCDP = async (amountETH: number, amountDAI: number) => {
     const eth = this.web3!.utils.toWei(amountETH.toString(), "ether");
     const dai = amountDAI * Math.pow(10, 18);
-    const daiBN = Web3.utils.toBN(dai.toString());
+    const daiBN = this.web3!.utils.toBN(dai.toString());
 
     const cdp = new CDP(
       NEW_CDP_ID--,
@@ -385,7 +385,7 @@ export class Store {
         this.cdps.push(cdp);
         this.pendingTxs.set(cdp.id, [hash, "create"]);
       })
-      .on("receipt", (receipt: TransactionReceipt) => {
+      .on("receipt", (receipt: TransactionReceipt | string | Error) => {
         this.pendingTxs.delete(cdp.id);
       });
     await this.updateCDPS();
@@ -518,7 +518,7 @@ export class Store {
               .on("transactionHash", (hash: string) => {
                 this.pendingTxs.set(cdp, [hash, "approve"]);
               })
-              .on("receipt", async (receipt: TransactionReceipt) => {
+              .on("receipt", async (_receipt: any) => {
                 this.pendingTxs.delete(cdp);
                 this.pendingTxs.set(cdp, ["", "convert"]);
                 await this.contract!.methods.convertPETHToETH(

@@ -2,7 +2,7 @@
 /* tslint:disable */
 
 import Contract, { CustomOptions, contractOptions } from "web3/eth/contract";
-import { TransactionObject, BlockType } from "web3/eth/types";
+import { TransactionObject, BlockType } from "web3/types";
 import { Callback, EventLog } from "web3/types";
 import { EventEmitter } from "events";
 import { Provider } from "web3/providers";
