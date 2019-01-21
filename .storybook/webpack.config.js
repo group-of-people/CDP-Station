@@ -6,6 +6,10 @@ module.exports = (baseConfig, env, config) => {
       presets: [["react-app", { flow: false, typescript: true }]]
     }
   });
+  config.module.rules.push({
+    test: /\.abi$/,
+    loader: "json-loader"
+  });
   config.resolve.extensions.push(".ts", ".tsx");
   return config;
 };
