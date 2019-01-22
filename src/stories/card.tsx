@@ -2,19 +2,22 @@ import React from "react";
 import { observable } from "mobx";
 import { Provider } from "mobx-react";
 import { storiesOf } from "@storybook/react";
+import { withState } from "@dump247/storybook-state";
 import "sanitize.css";
 import "../index.css";
 
 import NewCard from "../cdp/NewCard";
-import AccountCard from "../cdp/AccountCard";
+import { AccountCardControlled } from "../cdp/AccountCard";
 import Card from "../cdp/Card";
 import { ETH } from "../store";
 import CDP from "../store/cdp";
 
+const A = "0x123456789012345678901234567890abcdefabcd";
+
 const mockStore = {
   account: {
     get() {
-      return "0x123456789012345678901234567890abcdefabcd";
+      return A;
     }
   },
   balances: {
@@ -43,25 +46,25 @@ const mockStore = {
     }
   },
   pendingTxs: observable.map({}),
-  lockETH(amountETH: number, cdp: CDP) {
+  lockETH(_amountETH: number, cdp: CDP) {
     this.pendingTxs.set(cdp.id, ["hash", "lock"]);
     setTimeout(() => {
       this.pendingTxs.set(cdp.id, null);
     }, 5000);
   },
-  freeETH(amountETH: number, cdp: CDP) {
+  freeETH(_amountETH: number, cdp: CDP) {
     this.pendingTxs.set(cdp.id, ["hash", "free"]);
     setTimeout(() => {
       this.pendingTxs.set(cdp.id, null);
     }, 5000);
   },
-  repayDAI(amountETH: number, cdp: CDP) {
+  repayDAI(_amountETH: number, cdp: CDP) {
     this.pendingTxs.set(cdp.id, ["hash", "repay"]);
     setTimeout(() => {
       this.pendingTxs.set(cdp.id, null);
     }, 5000);
   },
-  drawDAI(amountETH: number, cdp: CDP) {
+  drawDAI(_amountETH: number, cdp: CDP) {
     this.pendingTxs.set(cdp.id, ["hash", "draw"]);
     setTimeout(() => {
       this.pendingTxs.set(cdp.id, null);
@@ -77,13 +80,41 @@ storiesOf("Cards", module)
       </div>
     </Provider>
   ))
-  .add("Account", () => (
-    <Provider store={mockStore}>
+  .add(
+    "Account",
+    withState({})(({ store }) => (
       <div style={{ display: "flex" }}>
-        <AccountCard />
+        <AccountCardControlled
+          address={A}
+          daiBalance={"10000000.001"}
+          mkrBalance={"1.0001"}
+          ethBalance={"101.0001"}
+          pethBalance={"0.0000"}
+          onClick={() => {}}
+        />
+        <AccountCardControlled
+          address={A}
+          daiBalance={"10000000.001"}
+          mkrBalance={"1.0001"}
+          ethBalance={"101.0001"}
+          pethBalance={"1000.9786"}
+          loading={(store as any).state.loading}
+          onClick={() => {
+            store.set({ loading: ["0xtx", "convert"] });
+          }}
+        />
+        <AccountCardControlled
+          address={A}
+          daiBalance={"10000000.001"}
+          mkrBalance={"1.0001"}
+          ethBalance={"101.0001"}
+          pethBalance={"1000.9786"}
+          loading={["0xtx", "convert"]}
+          onClick={() => {}}
+        />
       </div>
-    </Provider>
-  ))
+    ))
+  )
   .add("CDP - wide", () => (
     <Provider store={mockStore}>
       <div style={{ display: "flex", flexWrap: "wrap" }}>
@@ -95,7 +126,7 @@ storiesOf("Cards", module)
               8500000.123456789,
               mockStore.prices as any,
               mockStore.mkrSettings as any,
-              "0x123456789012345678901234567890abcdefabcd"
+              A
             )
           }
         />
@@ -107,7 +138,7 @@ storiesOf("Cards", module)
               20 * 10,
               mockStore.prices as any,
               mockStore.mkrSettings as any,
-              "0x123456789012345678901234567890abcdefabcd"
+              A
             )
           }
           view={"deposit"}
@@ -120,7 +151,7 @@ storiesOf("Cards", module)
               20 * 10,
               mockStore.prices as any,
               mockStore.mkrSettings as any,
-              "0x123456789012345678901234567890abcdefabcd"
+              A
             )
           }
           view={"withdraw"}
@@ -133,7 +164,7 @@ storiesOf("Cards", module)
               200 * 10,
               mockStore.prices as any,
               mockStore.mkrSettings as any,
-              "0x123456789012345678901234567890abcdefabcd"
+              A
             )
           }
           view={"payback"}
@@ -146,7 +177,7 @@ storiesOf("Cards", module)
               20 * 10,
               mockStore.prices as any,
               mockStore.mkrSettings as any,
-              "0x123456789012345678901234567890abcdefabcd"
+              A
             )
           }
           view={"generate"}
@@ -165,7 +196,7 @@ storiesOf("Cards", module)
               850 * 10,
               mockStore.prices as any,
               mockStore.mkrSettings as any,
-              "0x123456789012345678901234567890abcdefabcd"
+              A
             )
           }
           wide={false}
@@ -178,7 +209,7 @@ storiesOf("Cards", module)
               20,
               mockStore.prices as any,
               mockStore.mkrSettings as any,
-              "0x123456789012345678901234567890abcdefabcd"
+              A
             )
           }
           wide={false}
@@ -192,7 +223,7 @@ storiesOf("Cards", module)
               20,
               mockStore.prices as any,
               mockStore.mkrSettings as any,
-              "0x123456789012345678901234567890abcdefabcd"
+              A
             )
           }
           wide={false}
@@ -206,7 +237,7 @@ storiesOf("Cards", module)
               200,
               mockStore.prices as any,
               mockStore.mkrSettings as any,
-              "0x123456789012345678901234567890abcdefabcd"
+              A
             )
           }
           wide={false}
@@ -220,7 +251,7 @@ storiesOf("Cards", module)
               20,
               mockStore.prices as any,
               mockStore.mkrSettings as any,
-              "0x123456789012345678901234567890abcdefabcd"
+              A
             )
           }
           wide={false}

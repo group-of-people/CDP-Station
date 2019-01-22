@@ -65,6 +65,11 @@ interface Extra {
 
 let NEW_CDP_ID = -1;
 
+export type PendingTx = [
+  string,
+  "lock" | "free" | "draw" | "repay" | "approve" | "convert" | "create"
+];
+
 export class Store {
   // DATA
   cdps = observable<CDP>([]);
@@ -82,13 +87,7 @@ export class Store {
   loading = observable.box(true);
   locked = observable.box(false);
   loadingMessage = observable.box("");
-  pendingTxs = observable.map<
-    number,
-    [
-      string,
-      "lock" | "free" | "draw" | "repay" | "approve" | "convert" | "create"
-    ]
-  >({});
+  pendingTxs = observable.map<number, PendingTx>({});
 
   //contract typings
   contract: CDPCreatorContract | null = null;

@@ -2,11 +2,7 @@ import React from "react";
 import { observer, inject } from "mobx-react";
 import { Card, Button, Header2, Header3 } from "../ui";
 import { Circular as Loader } from "../ui/Loader";
-import { Store } from "../store";
-
-interface Props {
-  store?: Store;
-}
+import { Store, PendingTx } from "../store";
 
 function getPendingMessage(
   txType: "lock" | "free" | "draw" | "repay" | "approve" | "convert" | "create"
@@ -31,83 +27,120 @@ function getPendingMessage(
   }
 }
 
-export class AccountCard extends React.Component<Props> {
-  state = {};
-  render() {
-    const balances = this.props.store!.balances.get()!;
-    const address = this.props.store!.account.get();
-    const shortAddress = `${address.slice(0, 8)}...${address.slice(
-      address.length - 6
-    )}`;
-    const hasDanglingPeth =
-      balances.pethBalance.toNumber().toFixed(4) !== "0.0000";
-    const pendingTx = this.props.store!.pendingTxs.get(0);
-    const hasPendingTx = !!pendingTx;
+interface LabeledValueProps {
+  label: string;
+  children: React.ReactNode;
+}
 
-    return (
-      <Card>
-        <div style={{ textAlign: "center" }}>
-          <Header2>Account</Header2>
-          <div style={{ marginBottom: 20, color: "#ededed" }} title={address}>
-            {shortAddress}
-          </div>
+function LabeledValue(props: LabeledValueProps) {
+  return (
+    <>
+      <Header3>{props.label}</Header3>
+      <div style={{ marginBottom: 10 }}>{props.children}</div>
+    </>
+  );
+}
+
+interface ControlledProps {
+  address: string;
+
+  daiBalance: string;
+  mkrBalance: string;
+  pethBalance: string;
+  ethBalance: string;
+
+  loading?: PendingTx;
+
+  onClick: () => void;
+}
+
+export function AccountCardControlled(props: ControlledProps) {
+  const {
+    address,
+    daiBalance,
+    mkrBalance,
+    pethBalance,
+    ethBalance,
+    loading,
+    onClick
+  } = props;
+  const pendingTx = loading!;
+  const hasPendingTx = !!pendingTx;
+
+  const shortAddress = `${address.slice(0, 8)}...${address.slice(
+    address.length - 6
+  )}`;
+
+  return (
+    <Card>
+      <div style={{ textAlign: "center" }}>
+        <Header2>Account</Header2>
+        <div style={{ marginBottom: 20, color: "#ededed" }} title={address}>
+          {shortAddress}
         </div>
-        <Header3>DAI</Header3>
-        <div style={{ marginBottom: 10 }}>
-          {balances.daiBalance.toNumber().toFixed(4)}
-        </div>
-        <Header3>MKR</Header3>
-        <div style={{ marginBottom: 10 }}>
-          {balances.mkrBalance.toNumber().toFixed(4)}
-        </div>
-        {hasDanglingPeth && (
-          <>
-            <Header3>PETH</Header3>
-            <div style={{ marginBottom: 10 }}>
-              <div>{balances.pethBalance.toNumber().toFixed(4)}</div>
-              <Button
-                style={"primary"}
-                onClick={() => {
-                  if (hasPendingTx) {
-                    return;
-                  }
-                  this.props.store!.convertPETH(
-                    0,
-                    balances.pethBalance.toNumber()
-                  );
-                }}
-              >
-                {hasPendingTx && (
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <Loader color={"#FFFFFF"} />{" "}
-                    {!!pendingTx![0] && (
-                      <a
-                        target="_blank"
-                        rel="noopener"
-                        href={`https://etherscan.io/tx/${pendingTx![0]}`}
-                      >
-                        {getPendingMessage(pendingTx![1])}
-                      </a>
-                    )}
-                    &nbsp;
-                  </div>
-                )}
-                {!hasPendingTx && <>Convert to ETH</>}
-              </Button>
+      </div>
+      <LabeledValue label={"DAI"}>{daiBalance}</LabeledValue>
+      <LabeledValue label={"MKR"}>{mkrBalance}</LabeledValue>
+      {pethBalance !== "0.0000" && (
+        <LabeledValue label={"PETH"}>
+          <div>{pethBalance}</div>
+          {!hasPendingTx && (
+            <Button
+              style={"primary"}
+              onClick={() => {
+                if (hasPendingTx) {
+                  return;
+                }
+                onClick();
+              }}
+            >
+              Convert to ETH
+            </Button>
+          )}
+          {hasPendingTx && (
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <Loader color={"#FFFFFF"} />{" "}
+              {!!pendingTx![0] && (
+                <a
+                  target="_blank"
+                  rel="noopener"
+                  href={`https://etherscan.io/tx/${pendingTx![0]}`}
+                >
+                  {getPendingMessage(pendingTx![1])}
+                </a>
+              )}
+              &nbsp;
             </div>
-          </>
-        )}
-        <Header3>ETH</Header3>
-        <div style={{ marginBottom: 10 }}>
-          {balances.ethBalance.toNumber().toFixed(4)}
-        </div>
-      </Card>
-    );
-  }
+          )}
+        </LabeledValue>
+      )}
+      <LabeledValue label={"ETH"}>{ethBalance}</LabeledValue>
+    </Card>
+  );
+}
 
-  onClick = () => {
-    this.setState({ showForm: true });
-  };
+interface Props {
+  store?: Store;
+}
+
+export function AccountCard(props: Props) {
+  const store = props.store!;
+  const balances = store.balances.get()!;
+  const pendingTx = store.pendingTxs.get(0);
+
+  return (
+    <AccountCardControlled
+      address={store.account.get()}
+      daiBalance={balances.daiBalance.toNumber().toFixed(4)}
+      mkrBalance={balances.mkrBalance.toNumber().toFixed(4)}
+      pethBalance={balances.pethBalance.toNumber().toFixed(4)}
+      ethBalance={balances.ethBalance.toNumber().toFixed(4)}
+      loading={pendingTx}
+      onClick={() => {
+        store!.convertPETH(0, balances.pethBalance.toNumber());
+      }}
+    />
+  );
 }
 
 export default inject("store")(observer(AccountCard));
